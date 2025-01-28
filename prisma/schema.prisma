@@ -1,0 +1,454 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+    provider      = "prisma-client-js"
+    binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+    provider     = "mysql"
+    url          = env("DATABASE_URL")
+    relationMode = "prisma"
+}
+
+// Necessary for Next auth
+model Account {
+    id                String  @id @default(cuid())
+    userId            String
+    type              String
+    provider          String
+    providerAccountId String
+    refresh_token     String? @db.Text
+    access_token      String? @db.Text
+    expires_at        Int?
+    token_type        String?
+    scope             String?
+    id_token          String? @db.Text
+    session_state     String?
+    user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@unique([provider, providerAccountId])
+    @@index([userId])
+}
+
+model Session {
+    id           String   @id @default(cuid())
+    sessionToken String   @unique
+    userId       String
+    expires      DateTime
+    user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@index([userId])
+}
+
+model User {
+    id            String    @id @default(cuid())
+    name          String
+    email         String?   @unique
+    emailVerified DateTime?
+    image         String?
+
+    username  String @unique
+    userGroup String
+
+    accounts                    Account[]
+    sessions                    Session[]
+    student                     Students?
+    admin                       Admin?
+    Post                        Post[]
+    PostComment                 PostComment[]
+    AdminHelpMessage            AdminHelpMessage[]
+    AdminHelpChat               AdminHelpMessage[]            @relation("AdminHelpParticipant")
+    Faq                         Faq[]
+    EventIndividualParticipants EventIndividualParticipants[]
+    PostIndividualParticipants  PostIndividualParticipants[]
+    SelectedStudents            SelectedStudents[]
+}
+
+model Admin {
+    userId      String   @id @default(cuid())
+    permissions Int      @default(0)
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+    user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@index([userId])
+}
+
+model VerificationToken {
+    identifier String
+    token      String   @unique
+    expires    DateTime
+
+    @@unique([identifier, token])
+}
+
+model Students {
+    userId               String    @id @default(cuid())
+    program              String
+    duration             Int
+    admissionYear        Int
+    currentSemester      String
+    gender               String?
+    dob                  DateTime?
+    tenthMarks           Float?    @default(0)
+    twelvethMarks        Float?    @default(0)
+    addressLine1         String?
+    addressLine2         String?
+    pincode              Int?
+    city                 String?
+    state                String?
+    country              String?
+    isOnboardingComplete Boolean   @default(false)
+    completedCredits     Int
+    totalCredits         Int
+    cgpa                 Float
+    email                String?
+    phone                String?
+    createdAt            DateTime  @default(now())
+    updatedAt            DateTime  @updatedAt
+    user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    resume       StudentResume[]
+    applications Application[]
+    selections   SelectedStudents[]
+
+    @@index([userId])
+}
+
+model StudentResume {
+    id        String   @id @default(cuid())
+    userId    String
+    name      String
+    src       String   @db.Text
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    student     Students      @relation(fields: [userId], references: [userId], onDelete: Cascade)
+    Application Application[]
+
+    @@index([userId])
+}
+
+model Config {
+    key       String   @id
+    value     String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model ParticipatingGroups {
+    id              String @id @default(cuid())
+    year            Int
+    placementTypeId String
+    admissionYear   Int
+    program         String
+
+    placementType PlacementType              @relation(fields: [placementTypeId], references: [id])
+    events        EventParticipatingGroups[]
+
+    @@unique([year, placementTypeId, admissionYear, program])
+    @@index([placementTypeId])
+}
+
+model PlacementType {
+    id                  String                @id @default(cuid())
+    name                String
+    description         String?               @db.Text
+    ParticipatingGroups ParticipatingGroups[]
+    JobOpening          JobOpening[]
+    SelectedStudents    SelectedStudents[]
+
+    Post Post[]
+}
+
+model Company {
+    id          String   @id @default(cuid())
+    name        String
+    logo        String
+    website     String   @unique
+    description String?  @db.Text
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+
+    jobOpenings      JobOpening[]
+    events           Event[]
+    SelectedStudents SelectedStudents[]
+}
+
+model JobOpening {
+    // descriptive data
+    id          String  @id @default(cuid())
+    year        Int
+    companyId   String
+    title       String
+    description String?
+    role        String
+    location    String
+    pay         String
+    payNumeric  Int?
+    basePay     Int?
+    stipend     Int?
+    empBenefits String?
+
+    jobType String
+
+    registrationStart      DateTime
+    registrationEnd        DateTime
+    extraApplicationFields Json?
+    noResumes              Boolean  @default(false)
+
+    hidden        Boolean @default(false)
+    autoApprove   Boolean @default(false)
+    autoVisible   Boolean @default(false)
+    allowSelected Boolean @default(false)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    company                     Company                       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+    placementType               PlacementType                 @relation(fields: [jobType], references: [id])
+    applications                Application[]
+    events                      Event[]
+    JobOpeningParticipantGroups JobOpeningParticipantGroups[]
+    SelectedStudents            SelectedStudents[]
+
+    @@index([companyId])
+    @@index([jobType])
+}
+
+model JobOpeningParticipantGroups {
+    id            String @id @default(cuid())
+    jobOpeningId  String
+    admissionYear Int
+    program       String
+    minCgpa       Float  @default(0)
+    minCredits    Int    @default(0)
+
+    jobOpening JobOpening @relation(fields: [jobOpeningId], references: [id], onDelete: Cascade)
+
+    @@index([jobOpeningId])
+}
+
+model Application {
+    id             String   @id @default(cuid())
+    userId         String
+    jobId          String
+    additionalInfo Json?
+    createdAt      DateTime @default(now())
+    updatedAt      DateTime @updatedAt
+    latestStatusId String?
+    resumeId       String?
+
+    statuses     ApplicationStatus[] @relation("ApplicationStatuses")
+    latestStatus ApplicationStatus?  @relation("LatestStatus", fields: [latestStatusId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+    resume       StudentResume?      @relation(fields: [resumeId], references: [id], onDelete: SetNull)
+
+    student           Students            @relation(fields: [userId], references: [userId], onDelete: Cascade)
+    jobOpening        JobOpening          @relation(fields: [jobId], references: [id], onDelete: Cascade)
+    applicationStatus ApplicationStatus[]
+
+    @@index([userId])
+    @@index([jobId])
+    @@index([latestStatusId])
+    @@index([resumeId])
+}
+
+enum ApplicationStatusEnum {
+    REJECTED
+    REGISTERED
+    APPROVED
+    SHORTLISTED
+    SELECTED
+}
+
+model ApplicationStatus {
+    id            String   @id @default(cuid())
+    applicationId String
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
+
+    status ApplicationStatusEnum @default(REGISTERED)
+
+    application Application @relation("ApplicationStatuses", fields: [applicationId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "application_status_applicationId_fkey")
+
+    applications Application[] @relation("LatestStatus")
+    Application  Application   @relation(fields: [applicationId], references: [id])
+
+    @@index([applicationId, createdAt], name: "latest_status_index")
+    @@map(name: "application_status_applicationId_fkey")
+}
+
+model SelectedStudents {
+    id           String   @id @default(cuid())
+    userId       String
+    authorId     String
+    year         Int
+    jobType      String
+    selectedAt   DateTime @default(now())
+    role         String?
+    payNumeric   Int?
+    basePay      Int?
+    stipend      Int?
+    companyId    String?
+    jobOpeningId String?
+    isOnCampus   Boolean  @default(true)
+
+    student       Students      @relation(fields: [userId], references: [userId], onDelete: Cascade)
+    author        User          @relation(fields: [authorId], references: [id])
+    placementType PlacementType @relation(fields: [jobType], references: [id])
+    company       Company?      @relation(fields: [companyId], references: [id], onDelete: SetNull)
+    jobOpening    JobOpening?   @relation(fields: [jobOpeningId], references: [id], onDelete: SetNull)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([jobType])
+    @@index([authorId])
+    @@index([companyId])
+    @@index([jobOpeningId])
+    @@index([userId])
+}
+
+model Event {
+    id          String  @id @default(cuid())
+    title       String
+    description String? @db.Text
+    location    String
+    year        Int
+    type        String
+    link        String?
+    hidden      Boolean @default(true)
+
+    startTime DateTime
+    endTime   DateTime
+
+    companyId    String?
+    jobOpeningId String?
+
+    company    Company?    @relation(fields: [companyId], references: [id], onDelete: SetNull)
+    jobOpening JobOpening? @relation(fields: [jobOpeningId], references: [id], onDelete: SetNull)
+
+    createdAt              DateTime                      @default(now())
+    updatedAt              DateTime                      @updatedAt
+    participatingGroups    EventParticipatingGroups[]
+    individualParticipants EventIndividualParticipants[]
+
+    @@index([companyId])
+    @@index([jobOpeningId])
+}
+
+model EventParticipatingGroups {
+    id                   String @id @default(cuid())
+    eventId              String
+    participatingGroupId String
+    minCgpa              Float  @default(0)
+
+    event              Event               @relation(fields: [eventId], references: [id], onDelete: Cascade)
+    participatingGroup ParticipatingGroups @relation(fields: [participatingGroupId], references: [id], onDelete: Cascade)
+
+    @@index([eventId])
+    @@index([participatingGroupId])
+}
+
+model EventIndividualParticipants {
+    eventId String
+    userId  String
+
+    event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+    user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@unique([eventId, userId])
+    @@index([eventId])
+    @@index([userId])
+}
+
+model Post {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    title     String
+    published Boolean  @default(false)
+    authorId  String
+    content   String   @db.Text
+    year      Int
+    jobType   String?
+
+    author                 User                         @relation(fields: [authorId], references: [id])
+    comments               PostComment[]
+    participatingGroups    PostParticipantGroups[]
+    individualParticipants PostIndividualParticipants[]
+    placementType          PlacementType?               @relation(fields: [jobType], references: [id])
+
+    @@index([authorId])
+    @@index([jobType])
+}
+
+model PostParticipantGroups {
+    id            String @id @default(cuid())
+    postId        String
+    admissionYear Int
+    program       String
+    minCgpa       Float  @default(0)
+
+    post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+    @@index([postId])
+}
+
+model PostIndividualParticipants {
+    id     String @id @default(cuid())
+    postId String
+    userId String
+
+    post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@unique([postId, userId])
+    @@index([postId])
+    @@index([userId])
+}
+
+model PostComment {
+    id            String   @id @default(cuid())
+    postId        String
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
+    content       String   @db.Text
+    authorId      String
+    isAuthorAdmin Boolean  @default(false)
+
+    author User @relation(fields: [authorId], references: [id])
+    post   Post @relation(fields: [postId], references: [id])
+
+    @@index([authorId])
+    @@index([postId])
+}
+
+model AdminHelpMessage {
+    id            String   @id @default(cuid())
+    participantId String
+    userId        String
+    message       String   @db.Text
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
+
+    user        User @relation(fields: [userId], references: [id], onDelete: Cascade)
+    participant User @relation("AdminHelpParticipant", fields: [participantId], references: [id], onDelete: Cascade)
+
+    @@index([userId])
+    @@index([participantId])
+}
+
+model Faq {
+    id        String   @id @default(cuid())
+    question  String
+    answer    String   @db.Text
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    authorId  String
+    author    User     @relation(fields: [authorId], references: [id])
+
+    @@index([authorId])
+}

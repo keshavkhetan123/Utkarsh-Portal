@@ -1,0 +1,32 @@
+version: "3.8"
+services:
+  app:
+    image: buddylonglegs/utkarsh-webapp:latest
+    restart: always
+    command: sh -c "npm run db:seed && npm run start"
+    ports:
+      - 3000:3000
+      - 5555:5555
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_CLIENTVAR=clientvar
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/google_application_credentials.json
+    volumes:
+      - ./google_application_credentials.json:/app/google_application_credentials.json
+    env_file:
+      - .env
+    networks:
+      default:
+      internal:
+    deploy:
+      resources:
+        limits:
+          cpus: "0.6"
+          memory: 400M
+
+volumes:
+  app-node-cache:
+
+networks:
+  default:
+  internal:
