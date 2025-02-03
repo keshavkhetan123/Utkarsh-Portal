@@ -42,7 +42,23 @@ model Session {
     @@index([userId])
 }
 
-model User {
+enum RoleName {
+  superAdmin
+  PlacementCoreTeam
+  PlacementTeamMember
+  student
+}
+
+model Role {
+  id          String   @id @default(cuid())
+  name        RoleName @unique
+  description String?
+  
+  users       User[]
+}
+
+
+model User {~
     id            String    @id @default(cuid())
     name          String
     email         String?   @unique
@@ -55,7 +71,10 @@ model User {
     accounts                    Account[]
     sessions                    Session[]
     student                     Students?
-    admin                       Admin?
+
+    roleId String
+    role   Role @relation(fields: [roleId], references: [id])
+
     Post                        Post[]
     PostComment                 PostComment[]
     AdminHelpMessage            AdminHelpMessage[]
@@ -64,16 +83,6 @@ model User {
     EventIndividualParticipants EventIndividualParticipants[]
     PostIndividualParticipants  PostIndividualParticipants[]
     SelectedStudents            SelectedStudents[]
-}
-
-model Admin {
-    userId      String   @id @default(cuid())
-    permissions Int      @default(0)
-    createdAt   DateTime @default(now())
-    updatedAt   DateTime @updatedAt
-    user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-    @@index([userId])
 }
 
 model VerificationToken {

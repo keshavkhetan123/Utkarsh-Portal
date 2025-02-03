@@ -17,8 +17,9 @@ declare module "next-auth" {
     name?: string;
     username?: string;
     userGroup?: string;
-    admin?: {
-      permissions: number;
+    // New role property instead of admin: CHANGE
+    role: {
+      name: string;
     };
     isOnboardingComplete: boolean;
     year?: number;
@@ -30,8 +31,9 @@ declare module "next-auth" {
       name?: string;
       username?: string;
       userGroup?: string;
-      admin?: {
-        permissions: number;
+      // New role property: CHANGE
+      role: {
+        name: string;
       };
       isOnboardingComplete: boolean;
       year?: number;
@@ -39,6 +41,7 @@ declare module "next-auth" {
     error?: "RefreshAccessTokenError";
   }
 }
+
 
 declare module "next-auth/jwt" {
   interface JWT {
@@ -105,22 +108,14 @@ export const authOptions: NextAuthOptions = {
             where: {
               id: token.user.id,
             },
-            select: {
+            select: { //CHANGED
               userGroup: true,
-              admin: {
-                select: {
-                  permissions: true,
-                },
-              },
-              student: {
-                select: {
-                  admissionYear: true,
-                  program: true,
-                },
-              },
+              role: { select: { name: true } },
+              student: { select: { admissionYear: true, program: true } },
             },
+            
           });
-          if (!!user.admin) {
+          if (user.role.name == 'superAdmin') {
             const newUser = { ...token.user };
             newUser.year = session.info.year;
             return {
@@ -177,11 +172,11 @@ export const authOptions: NextAuthOptions = {
           username: token.user.username as string,
           name: token.user.name as string,
           id: token.user.id,
-          admin: token.user.admin,
+          role: token.user.role, // new role property
           userGroup: token.user.userGroup,
           year: token.user.year,
           isOnboardingComplete: token.user.isOnboardingComplete,
-        };
+        };        
       }
       session.error = token.error;
       return session;
@@ -211,20 +206,14 @@ export const authOptions: NextAuthOptions = {
 
         if (!authenticatedUserGroup) throw new Error("Invalid Credentials");
 
-        let user = await db.user.findFirst({
-          where: {
-            username: credentials.username,
-          },
+        let user = await db.user.findFirst({  //CHANGED
+          where: { username: credentials.username },
           select: {
             id: true,
             name: true,
             username: true,
             userGroup: true,
-            admin: {
-              select: {
-                permissions: true,
-              },
-            },
+            role: { select: { name: true } },
             student: {
               select: {
                 admissionYear: true,
@@ -234,6 +223,7 @@ export const authOptions: NextAuthOptions = {
             },
           },
         });
+        
 
         if (!user) {
           const userCount = await db.user.count();
@@ -248,24 +238,24 @@ export const authOptions: NextAuthOptions = {
               data: {
                 userGroup: authenticatedUserGroup,
                 username: credentials.username,
-                name: 'sugam',  //userData.name,
+                name: 'sugam',  // or userData.name,
                 email: credentials.username + "@iiita.ac.in",
-                ...(userCount === 0 && {
-                  admin: {
-                    create: {
-                      permissions: 1,
-                    },
+                // New role logic:
+                role: {
+                  connectOrCreate: {
+                    where: { name: userCount === 0 ? "superAdmin" : "student" },
+                    create: { name: userCount === 0 ? "superAdmin" : "student" },
                   },
-                }),
+                },
                 student: {
                   create: {
-                    program: 'IT',  //userData.program,
-                    admissionYear:  2022,  //userData.admissionYear,
-                    duration:  4,   //userData.duration,
-                    currentSemester: '6',   //userData.currentSem,
-                    completedCredits: 108,      //userData.completedCredits,
-                    totalCredits: 150,    //userData.totalCredits,
-                    cgpa:  8.14,     //userData.cgpa,
+                    program: 'IT',
+                    admissionYear: 2022,
+                    duration: 4,
+                    currentSemester: '6',
+                    completedCredits: 108,  
+                    totalCredits: 150,//userData.totalCredits,
+                    cgpa: 8.14,
                     email: credentials.username + "@iiita.ac.in",
                   },
                 },
@@ -275,11 +265,8 @@ export const authOptions: NextAuthOptions = {
                 name: true,
                 username: true,
                 userGroup: true,
-                admin: {
-                  select: {
-                    permissions: true,
-                  },
-                },
+                // Remove admin and include role:
+                role: { select: { name: true } },
                 student: {
                   select: {
                     admissionYear: true,
@@ -289,6 +276,7 @@ export const authOptions: NextAuthOptions = {
                 },
               },
             });
+            
           } else if (authenticatedUserGroup === "faculty") {
             let userData = await getStudentAviralData(
               credentials.username,
@@ -301,22 +289,20 @@ export const authOptions: NextAuthOptions = {
                 username: credentials.username,
                 name: userData.name,
                 email: credentials.username + "@iiita.ac.in",
-                admin: {
-                  create: {
-                    permissions: userCount === 0 ? 1 : 0,
+                role: {
+                  connectOrCreate: {
+                    where: { name: userCount === 0 ? "superAdmin" : "student" },
+                    create: { name: userCount === 0 ? "superAdmin" : "student" },
                   },
                 },
+                
               },
               select: {
                 id: true,
                 name: true,
                 username: true,
                 userGroup: true,
-                admin: {
-                  select: {
-                    permissions: true,
-                  },
-                },
+                role: { select: { name: true } },
                 student: {
                   select: {
                     admissionYear: true,
@@ -351,12 +337,12 @@ export const authOptions: NextAuthOptions = {
           name: user.name,
           username: user.username,
           userGroup: user.userGroup,
-          admin: user.admin,
+          role: user.role,
           isOnboardingComplete: user.student
             ? user.student.isOnboardingComplete
             : true,
           year: latestYear?.year,
-        } as DefaultSession["user"];
+        } as DefaultSession["user"];               
       },
     }),
   ],
