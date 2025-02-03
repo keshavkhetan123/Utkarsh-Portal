@@ -60,7 +60,7 @@ export default function ResponsiveDrawer({
         </Typography>
       </Toolbar>
       <Divider />
-      {!(isAdmin && user.admin?.permissions === 0) &&
+      {!(isAdmin && user.role.name !== "superAdmin") &&
         (isAdmin ? ADMIN_SIDEBAR : USER_SIDEBAR).map((list, index) => {
           return (
             <Fragment key={index}>
@@ -105,28 +105,31 @@ export default function ResponsiveDrawer({
             </Fragment>
           );
         })}
-      {user?.admin &&
-        (!isAdmin ? (
-          <Link href="/admin" onClick={() => setOpen(false)}>
-            <ListItemButton>
-              <ListItemIcon>
-                <VerifiedUserIcon />
-              </ListItemIcon>
-              <ListItemText primary={"Admin Panel"} />
-            </ListItemButton>
-          </Link>
-        ) : (
-          user?.userGroup === "student" && (
-            <Link href="/dashboard" onClick={() => setOpen(false)}>
-              <ListItemButton>
-                <ListItemIcon>
-                  <AccountCircleIcon />
-                </ListItemIcon>
-                <ListItemText primary={"User Panel"} />
-              </ListItemButton>
-            </Link>
-          )
-        ))}
+      {user?.role &&
+  (user.role.name === "superAdmin" ? (
+    !isAdmin && (
+      <Link href="/admin" onClick={() => setOpen(false)}>
+        <ListItemButton>
+          <ListItemIcon>
+            <VerifiedUserIcon />
+          </ListItemIcon>
+          <ListItemText primary={"Admin Panel"} />
+        </ListItemButton>
+      </Link>
+    )
+  ) : (
+    !isAdmin && (
+      <Link href="/dashboard" onClick={() => setOpen(false)}>
+        <ListItemButton>
+          <ListItemIcon>
+            <AccountCircleIcon />
+          </ListItemIcon>
+          <ListItemText primary={"User Panel"} />
+        </ListItemButton>
+      </Link>
+    )
+  ))}
+
     </div>
   );
 
