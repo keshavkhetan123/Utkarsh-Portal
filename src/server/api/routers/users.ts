@@ -16,69 +16,57 @@ export const userRouter = createTRPCRouter({
     return result;
   }),
 
-  searchUser: roleProtectedProcedure('superAdmin').input(z.object({
-    q: z.string(),
-    exclude: z.array(z.string()).optional(),
-    include: z.array(z.string()).optional(),
-    isAdmin: z.boolean().optional(),
-  })).query(async ({ ctx, input }) => {
+  searchUser: roleProtectedProcedure('superAdmin').input(
+    z.object({
+      q: z.string(),
+      exclude: z.array(z.string()).optional(),
+      include: z.array(z.string()).optional(),
+      isAdmin: z.boolean().optional(),
+    })
+  ).query(async ({ ctx, input }) => {
     const data = await ctx.db.user.findMany({
       where: {
         AND: [
+          // Search users where name or username contains input.q
           {
             OR: [
-              {
-                name: {
-                  contains: input.q,
-                },
-              },
-              {
-                username: {
-                  contains: input.q,
-                },
-              },
-            ]
+              { name: { contains: input.q } },
+              { username: { contains: input.q } },
+            ],
           },
+          // Exclude or include specific user IDs if provided
           {
             OR: [
-              {
-                ...input.exclude && {
-                  NOT: {
-                    id: {
-                      in: input.exclude,
-                    }
-                  }
-                }
-              },
-              {
-                ...input.include && {
-                  id: {
-                    in: input.include,
-                  }
-                }
-              }
-            ]
+              input.exclude
+                ? { NOT: { id: { in: input.exclude } } }
+                : {},
+              input.include
+                ? { id: { in: input.include } }
+                : {},
+            ],
           },
+          // Ensure users have one of the required roles
           {
-            ...input.isAdmin !== undefined && {
-              admin: {
-                ...input.isAdmin ? {
-                  isNot: null,
-                } : {
-                  is: null,
-                }
-              }
-            }
-          }
-        ]
+            role: {
+              name: {
+                in: ["PlacementCoreTeam", "PlacementTeamMember", "student"],
+              },
+            },
+          },
+        ],
       },
       select: {
         id: true,
         name: true,
         username: true,
+        role: {
+          select: { name: true }, // Get user role
+        },
       },
-      take: 10,
+      take: 10, 
     });
+  
     return data;
   }),
+  
 });

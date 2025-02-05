@@ -18,7 +18,7 @@ interface AdminListProps {
 }
 
 export default async function AdminList({ query }: AdminListProps) {
-  const admins = await api.admin.getAdmins.query({ query, permissions: 1 });
+  const admins = await api.admin.getAdmins.query({ query });
   if (!admins.length)
     return (
       <Typography variant="body1" className="text-center">
@@ -41,13 +41,16 @@ export default async function AdminList({ query }: AdminListProps) {
               User Type
             </TableCell>
             <TableCell className="text-center whitespace-nowrap">
+              Role
+            </TableCell>
+            <TableCell className="text-center whitespace-nowrap">
               Actions
             </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {admins.map((admin, index) => (
-            <AdminListItem key={admin.user.id} admin={admin} index={index} />
+            <AdminListItem key={admin.id} admin={admin} index={index} />
           ))}
         </TableBody>
       </Table>

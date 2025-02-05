@@ -46,13 +46,16 @@ export default function AdminListItem({ admin, index }: AdminListItemProps) {
         {index + 1}
       </TableCell>
       <TableCell className="uppercase text-center whitespace-nowrap">
-        {admin.user.username}
+        {admin.username}
       </TableCell>
       <TableCell className="text-center whitespace-nowrap">
-        {admin.user.name}
+        {admin.name}
       </TableCell>
       <TableCell className="text-center capitalize whitespace-nowrap">
-        {admin.user.userGroup}
+        {admin.userGroup}
+      </TableCell>
+      <TableCell className="text-center whitespace-nowrap">
+        {admin.role.name.toUpperCase()}
       </TableCell>
       <TableCell className="text-center whitespace-nowrap">
         <Button color="error" variant="outlined" onClick={() => setOpen(true)}>
@@ -65,7 +68,7 @@ export default function AdminListItem({ admin, index }: AdminListItemProps) {
             component: "form",
             onSubmit: (e) => {
               e.preventDefault();
-              removeAdminMutation.mutate(admin.user.id);
+              removeAdminMutation.mutate(admin.id);
             },
           }}
         >
@@ -73,7 +76,7 @@ export default function AdminListItem({ admin, index }: AdminListItemProps) {
           <DialogContent>
             You will be removing admin privileges from{" "}
             <strong>
-              {admin.user.name + " (" + admin.user.username.toUpperCase() + ")"}
+              {admin.name + " (" + admin.username.toUpperCase() + ")"}
             </strong>
             .
           </DialogContent>

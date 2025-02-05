@@ -7,84 +7,85 @@ import {
 } from "~/server/api/trpc";
 
 export const adminRouter = createTRPCRouter({
-  getAdmins: roleProtectedProcedure('superAdmin')
-    .input(
-      z.object({
-        permissions: z.number(),
-        query: z.string().optional(),
-      }),
-    )
-    .query(async ({ ctx, input }) => {
-      return await ctx.db.user.findMany({
-        where: {
-          user: {
-            AND: [
-              {
-                NOT: {
-                  id: ctx.session.user.id,
-                },
-              },
-              {
-                ...(input.query && {
-                  OR: [
-                    {
-                      name: {
-                        contains: input.query,
-                      },
-                    },
-                    {
-                      username: {
-                        contains: input.query,
-                      },
-                    },
-                  ],
-                }),
-              },
-              {
-                admin: {
-                  permissions: input.permissions,
-                },
-              },
-            ],
-          },
-        },
-        select: {
-          permissions: true,
-          updatedAt: true,
-          user: {
-            select: {
-              id: true,
-              name: true,
-              username: true,
-              userGroup: true,
+  getAdmins: roleProtectedProcedure("superAdmin")
+  .input(
+    z.object({
+      query: z.string().optional(),
+    })
+  )
+  .query(async ({ ctx, input }) => {
+    return await ctx.db.user.findMany({
+      where: {
+        AND: [
+          {
+            NOT: {
+              id: ctx.session.user.id,
             },
           },
+          {
+            ...(input.query && {
+              OR: [
+                { name: { contains: input.query } },
+                { username: { contains: input.query } },
+              ],
+            }),
+          },
+          {
+            role: {
+              name: {
+                in: ["superAdmin", "PlacementCoreTeam", "PlacementTeamMember"], // Filtering by multiple roles
+              },
+            },
+          },
+        ],
+      },
+      select: {
+        id: true,
+        name: true,
+        username: true,
+        userGroup: true,
+        role: {
+          select: {
+            name: true,
+          },
         },
-      });
-    }),
+      },
+    });
+  }),
 
-  createAdmin: roleProtectedProcedure('superAdmin')
-    .input(
-      z.object({
-        id: z.string(),
-        permissions: z.number(),
-      }),
-    )
-    .mutation(async ({ ctx, input }) => {
-      if (ctx.session.user.id === input.id) {
-        throw new Error("You can't make yourself admin.");
-      }
-      return await ctx.db.admin.create({
-        data: {
-          permissions: input.permissions,
-          user: {
-            connect: {
-              id: input.id,
-            },
+
+  createAdmin: roleProtectedProcedure("superAdmin")
+  .input(
+    z.object({
+      id: z.string()
+    })
+  )
+  .mutation(async ({ ctx, input }) => {
+    if (ctx.session.user.id === input.id) {
+      throw new Error("You can't assign a role to yourself.");
+    }
+
+    return await ctx.db.user.update({
+      where: { id: input.id },
+      data: {
+        role: {
+          connectOrCreate: {
+            where: { name: "PlacementTeamMember" },
+            create: { name: "PlacementTeamMember" },
           },
         },
-      });
-    }),
+      },
+      select: {
+        id: true,
+        name: true,
+        username: true,
+        role: {
+          select: { name: true },
+        },
+      },
+    });
+  }),
+
 
   removeAdmin: roleProtectedProcedure('superAdmin')
     .input(z.string())
@@ -120,24 +121,24 @@ export const adminRouter = createTRPCRouter({
       });
     }),
 
-  raiseAdminRequest: protectedProcedure.mutation(async ({ ctx }) => {
-    const admin = await ctx.db.admin.findFirst({
-      where: {
-        userId: ctx.session.user.id,
-      },
-    });
-    if (admin) {
-      throw new Error("You are already an admin.");
-    }
-    return await ctx.db.admin.create({
-      data: {
-        user: {
-          connect: {
-            id: ctx.session.user.id,
-          },
-        },
-        permissions: 0,
-      },
-    });
-  }),
+  // raiseAdminRequest: protectedProcedure.mutation(async ({ ctx }) => {
+  //   const admin = await ctx.db.admin.findFirst({
+  //     where: {
+  //       userId: ctx.session.user.id,
+  //     },
+  //   });
+  //   if (admin) {
+  //     throw new Error("You are already an admin.");
+  //   }
+  //   return await ctx.db.admin.create({
+  //     data: {
+  //       user: {
+  //         connect: {
+  //           id: ctx.session.user.id,
+  //         },
+  //       },
+  //       permissions: 0,
+  //     },
+  //   });
+  // }),
 });

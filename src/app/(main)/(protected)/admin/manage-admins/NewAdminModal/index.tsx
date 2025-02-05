@@ -37,8 +37,7 @@ export default function NewAdminModal() {
   const handleSubmit = (e) => {
     e.preventDefault();
     createAdminMutation.mutate({
-      id: value,
-      permissions: 1,
+      id: value
     });
   };
 
