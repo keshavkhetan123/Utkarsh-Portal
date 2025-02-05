@@ -22,7 +22,7 @@ export default function NewAdminModal() {
   const router = useRouter();
   const [open, setOpen] = useState<boolean>(false);
   const [value, setValue] = useState<string>(null);
-  const createAdminMutation = api.admin.createAdmin.useMutation({
+  const createAdminMutation = api.admin.updateUserPermission.useMutation({
     onSuccess: () => {
       handleClose();
       router.refresh();
@@ -37,7 +37,8 @@ export default function NewAdminModal() {
   const handleSubmit = (e) => {
     e.preventDefault();
     createAdminMutation.mutate({
-      id: value
+      id: value,
+      role : "PlacementTeamMember"
     });
   };
 

@@ -23,7 +23,7 @@ export const adminRouter = createTRPCRouter({
             },
           },
           {
-            ...(input.query && {
+            ...(input.query && {  //what happens when input.query is undefine, what is the sql query of this procedure
               OR: [
                 { name: { contains: input.query } },
                 { username: { contains: input.query } },
@@ -53,16 +53,17 @@ export const adminRouter = createTRPCRouter({
     });
   }),
 
-
-  createAdmin: roleProtectedProcedure("superAdmin")
+  updateUserPermission: roleProtectedProcedure("superAdmin")
   .input(
     z.object({
-      id: z.string()
+      id: z.string(),
+      // Only allow one of the allowed roles
+      role: z.enum(["PlacementCoreTeam", "PlacementTeamMember", "student"]),
     })
   )
   .mutation(async ({ ctx, input }) => {
     if (ctx.session.user.id === input.id) {
-      throw new Error("You can't assign a role to yourself.");
+      throw new Error("You can't change your own role.");
     }
 
     return await ctx.db.user.update({
@@ -70,8 +71,8 @@ export const adminRouter = createTRPCRouter({
       data: {
         role: {
           connectOrCreate: {
-            where: { name: "PlacementTeamMember" },
-            create: { name: "PlacementTeamMember" },
+            where: { name: input.role },
+            create: { name: input.role },
           },
         },
       },
@@ -86,40 +87,6 @@ export const adminRouter = createTRPCRouter({
     });
   }),
 
-
-  removeAdmin: roleProtectedProcedure('superAdmin')
-    .input(z.string())
-    .mutation(async ({ ctx, input }) => {
-      if (ctx.session.user.id === input) {
-        throw new Error("You can't remove yourself from admin.");
-      }
-      return await ctx.db.admin.delete({
-        where: {
-          userId: input,
-        },
-      });
-    }),
-
-  updateAdminPermission: roleProtectedProcedure('superAdmin')
-    .input(
-      z.object({
-        id: z.string(),
-        permissions: z.number(),
-      }),
-    )
-    .mutation(async ({ ctx, input }) => {
-      if (ctx.session.user.id == input.id) {
-        throw new Error("You cannot make yourself admin.");
-      }
-      return await ctx.db.admin.update({
-        where: {
-          userId: input.id,
-        },
-        data: {
-          permissions: input.permissions,
-        },
-      });
-    }),
 
   // raiseAdminRequest: protectedProcedure.mutation(async ({ ctx }) => {
   //   const admin = await ctx.db.admin.findFirst({
