@@ -1,7 +1,7 @@
 import dayjs from "dayjs";
 import { z } from "zod";
 
-import { adminProcedure, createTRPCRouter, protectedProcedure } from "../trpc";
+import { roleProtectedProcedure, createTRPCRouter, protectedProcedure } from "../trpc";
 
 import { getFilterQuery, getOrderQuery } from "./utils/jobApplications";
 
@@ -249,7 +249,7 @@ export const jobApplication = createTRPCRouter({
 
       return application;
     }),
-  getJobApplicants: adminProcedure
+  getJobApplicants: roleProtectedProcedure('superAdmin')
     .input(
       z.object({
         jobId: z.string(),
@@ -383,7 +383,7 @@ export const jobApplication = createTRPCRouter({
         hasMore,
       };
     }),
-  getJobApplicantsCSV: adminProcedure
+  getJobApplicantsCSV: roleProtectedProcedure('superAdmin')
     .input(z.string())
     .mutation(async ({ ctx, input }) => {
       const jobPlacementType = await ctx.db.jobOpening.findUnique({
@@ -500,7 +500,7 @@ export const jobApplication = createTRPCRouter({
       return { data: csvString, title: csvTitle };
     }),
 
-  upgradeStatus: adminProcedure
+  upgradeStatus: roleProtectedProcedure('superAdmin')
     .input(
       z.object({
         applicationId: z.array(z.string()),

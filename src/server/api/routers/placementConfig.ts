@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import {
-  adminProcedure,
+  roleProtectedProcedure,
   createTRPCRouter,
   protectedProcedure,
 } from "~/server/api/trpc";
@@ -22,14 +22,14 @@ export const placementConfigRouter = createTRPCRouter({
     });
     return data.map((el) => el.year);
   }),
-  getAdminPlacementYears: adminProcedure.query(async ({ ctx }) => {
+  getAdminPlacementYears: roleProtectedProcedure('superAdmin').query(async ({ ctx }) => {
     const data = await ctx.db.participatingGroups.groupBy({
       by: ["year"],
       orderBy: [{ year: "desc" }],
     });
     return data.map((el) => el.year);
   }),
-  getPlacementTypes: adminProcedure.query(async ({ ctx }) => {
+  getPlacementTypes: roleProtectedProcedure('superAdmin').query(async ({ ctx }) => {
     const data = await ctx.db.placementType.findMany({
       select: {
         id: true,
@@ -38,7 +38,7 @@ export const placementConfigRouter = createTRPCRouter({
     });
     return data;
   }),
-  getYearwisePrograms: adminProcedure.query(async ({ ctx }) => {
+  getYearwisePrograms: roleProtectedProcedure('superAdmin').query(async ({ ctx }) => {
     const data = await ctx.db.students.groupBy({
       by: ["admissionYear", "program"],
     });
@@ -56,7 +56,7 @@ export const placementConfigRouter = createTRPCRouter({
 
     return yearWisePrograms;
   }),
-  getParticipatingGroups: adminProcedure
+  getParticipatingGroups: roleProtectedProcedure('superAdmin')
     .input(z.number())
     .query(async ({ ctx, input }) => {
       const data = await ctx.db.participatingGroups.findMany({
@@ -74,7 +74,7 @@ export const placementConfigRouter = createTRPCRouter({
       });
       return data;
     }),
-  createParticipatingGroups: adminProcedure
+  createParticipatingGroups: roleProtectedProcedure('superAdmin')
     .input(
       z.object({
         year: z.number(),
@@ -110,7 +110,7 @@ export const placementConfigRouter = createTRPCRouter({
       return true;
     }),
 
-  editParticipatingGroups: adminProcedure
+  editParticipatingGroups: roleProtectedProcedure('superAdmin')
     .input(
       z.object({
         year: z.number(),
@@ -150,7 +150,7 @@ export const placementConfigRouter = createTRPCRouter({
       });
       return true;
     }),
-  getParticipatingGroupsForPlacementType: adminProcedure
+  getParticipatingGroupsForPlacementType: roleProtectedProcedure('superAdmin')
     .input(z.string())
     .query(async ({ ctx, input }) => {
       const data = await ctx.db.participatingGroups.groupBy({

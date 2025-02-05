@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import {
-  adminProcedure,
+  roleProtectedProcedure,
   createTRPCRouter,
   protectedProcedure,
 } from "~/server/api/trpc";
@@ -242,7 +242,7 @@ export const eventsRouter = createTRPCRouter({
         total,
       };
     }),
-  getAdminEventsInTimeRange: adminProcedure
+  getAdminEventsInTimeRange: roleProtectedProcedure('superAdmin')
     .input(
       z.object({
         startDate: z.date(),
@@ -295,7 +295,7 @@ export const eventsRouter = createTRPCRouter({
         total,
       };
     }),
-  getPaginatedAdminEvents: adminProcedure
+  getPaginatedAdminEvents: roleProtectedProcedure('superAdmin')
     .input(
       z.object({
         page: z.number().default(1),
@@ -353,7 +353,7 @@ export const eventsRouter = createTRPCRouter({
     return EVENT_TYPES;
   }),
 
-  getAdminEvent: adminProcedure
+  getAdminEvent: roleProtectedProcedure('superAdmin')
     .input(z.string())
     .query(async ({ ctx, input }) => {
       const event = await ctx.db.event.findUnique({
@@ -366,7 +366,7 @@ export const eventsRouter = createTRPCRouter({
       return event;
     }),
 
-  createEvent: adminProcedure
+  createEvent: roleProtectedProcedure('superAdmin')
     .input(
       z.object({
         title: z.string(),
@@ -449,7 +449,7 @@ export const eventsRouter = createTRPCRouter({
 
       return event;
     }),
-  updateEvent: adminProcedure
+  updateEvent: roleProtectedProcedure('superAdmin')
     .input(
       z.object({
         id: z.string(),
@@ -554,7 +554,7 @@ export const eventsRouter = createTRPCRouter({
       return event;
     }),
 
-  deleteEvent: adminProcedure
+  deleteEvent: roleProtectedProcedure('superAdmin')
     .input(z.string())
     .mutation(async ({ ctx, input }) => {
       await ctx.db.event.delete({

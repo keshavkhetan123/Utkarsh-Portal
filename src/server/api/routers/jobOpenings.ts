@@ -1,13 +1,13 @@
 import { z } from "zod";
 
 import {
-  adminProcedure,
+  roleProtectedProcedure,
   createTRPCRouter,
   protectedProcedure,
 } from "~/server/api/trpc";
 
 export const jobOpeningRouter = createTRPCRouter({
-  createJobOpening: adminProcedure
+  createJobOpening: roleProtectedProcedure('superAdmin')
     .input(
       z.object({
         title: z.string(),
@@ -104,7 +104,7 @@ export const jobOpeningRouter = createTRPCRouter({
       return true;
     }),
 
-  updateJobOpening: adminProcedure
+  updateJobOpening: roleProtectedProcedure('superAdmin')
     .input(
       z.object({
         id: z.string(),
@@ -243,7 +243,7 @@ export const jobOpeningRouter = createTRPCRouter({
       return true;
     }),
 
-  deleteJobOpening: adminProcedure
+  deleteJobOpening: roleProtectedProcedure('superAdmin')
     .input(z.string())
     .mutation(async ({ ctx, input }) => {
       await ctx.db.jobOpening.delete({
@@ -516,7 +516,7 @@ export const jobOpeningRouter = createTRPCRouter({
       return jobOpening;
     }),
 
-  adminGetJobOpenings: adminProcedure
+  adminGetJobOpenings: roleProtectedProcedure('superAdmin')
     .input(
       z.object({
         limit: z.number().default(10),
@@ -571,7 +571,7 @@ export const jobOpeningRouter = createTRPCRouter({
       };
     }),
 
-  adminGetJobOpening: adminProcedure
+  adminGetJobOpening: roleProtectedProcedure('superAdmin')
     .input(z.string())
     .query(async ({ ctx, input }) => {
       return await ctx.db.jobOpening.findUnique({
@@ -621,7 +621,7 @@ export const jobOpeningRouter = createTRPCRouter({
       });
     }),
 
-  adminGetRegDetails: adminProcedure
+  adminGetRegDetails: roleProtectedProcedure('superAdmin')
     .input(z.string())
     .query(async ({ ctx, input }) => {
       return await ctx.db.students.groupBy({

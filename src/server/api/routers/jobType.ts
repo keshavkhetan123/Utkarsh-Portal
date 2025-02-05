@@ -1,12 +1,12 @@
 import { z } from "zod";
 
 import {
-    adminProcedure,
+    roleProtectedProcedure,
     createTRPCRouter,
 } from "~/server/api/trpc";
 export const jobTypeRouter = createTRPCRouter({
 
-    getPlacementTypes: adminProcedure.query(async ({ ctx }) => {
+    getPlacementTypes: roleProtectedProcedure('superAdmin').query(async ({ ctx }) => {
         const data = await ctx.db.placementType.findMany({
             select: {
                 id: true,
@@ -16,7 +16,7 @@ export const jobTypeRouter = createTRPCRouter({
         });
         return data;
     }),
-    updatePlacementType: adminProcedure.input(z.object({
+    updatePlacementType: roleProtectedProcedure('superAdmin').input(z.object({
         id: z.string(),
         name: z.string(),
         description: z.string()
@@ -33,7 +33,7 @@ export const jobTypeRouter = createTRPCRouter({
 
         return true;
     }),
-    createPlacementType: adminProcedure.input(z.object({
+    createPlacementType: roleProtectedProcedure('superAdmin').input(z.object({
         id: z.string(),
         name: z.string(),
         description: z.string()

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { adminProcedure, createTRPCRouter } from "~/server/api/trpc";
+import { roleProtectedProcedure, createTRPCRouter } from "~/server/api/trpc";
 
 export const placementSessionRouter = createTRPCRouter({
   // createSession: adminProcedure

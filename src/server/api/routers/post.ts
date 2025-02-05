@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import {
-  adminProcedure,
+  roleProtectedProcedure,
   createTRPCRouter,
   protectedProcedure,
 } from "~/server/api/trpc";
@@ -137,7 +137,7 @@ export const postRouter = createTRPCRouter({
       });
       return data;
     }),
-  addNewPost: adminProcedure
+  addNewPost: roleProtectedProcedure('superAdmin')
     .input(
       z.object({
         title: z.string(),
@@ -185,7 +185,7 @@ export const postRouter = createTRPCRouter({
       });
       return true;
     }),
-  updatePost: adminProcedure
+  updatePost: roleProtectedProcedure('superAdmin')
     .input(
       z.object({
         id: z.string(),
@@ -248,7 +248,7 @@ export const postRouter = createTRPCRouter({
       });
       return true;
     }),
-  deletePost: adminProcedure
+  deletePost: roleProtectedProcedure('superAdmin')
     .input(z.string())
     .mutation(async ({ ctx, input }) => {
       await ctx.db.post.delete({
@@ -259,7 +259,7 @@ export const postRouter = createTRPCRouter({
 
       return true;
     }),
-  getLatestPostAdmin: adminProcedure
+  getLatestPostAdmin: roleProtectedProcedure('superAdmin')
     .input(
       z.object({
         page: z.number().min(1).default(1),
@@ -321,7 +321,7 @@ export const postRouter = createTRPCRouter({
       });
       return data;
     }),
-  getPostAdmin: adminProcedure
+  getPostAdmin: roleProtectedProcedure('superAdmin')
     .input(z.string())
     .query(async ({ ctx, input }) => {
       const userDetails = await ctx.db.user.findUnique({

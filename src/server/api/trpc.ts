@@ -94,17 +94,28 @@ const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
   });
 });
 
-const enforceUserIsAdmin = t.middleware(({ ctx, next }) => {
-  if (!ctx.session || !ctx.session.user || ctx.session.user.role.name != 'superAdmin') {
-    throw new TRPCError({ code: "UNAUTHORIZED" });
-  }
-  return next({
-    ctx: {
-      // infers the `session` as non-nullable
-      session: { ...ctx.session, user: ctx.session.user },
-    },
-  });
-});
+// Parameterized middleware: allowedRoles can be a string or an array of strings.
+export const roleProtectedProcedure = (allowedRoles: string | string[]) =>
+  t.procedure
+    .use(
+      t.middleware(({ ctx, next }) => {
+        const userRole = ctx.session?.user?.role?.name;
+        if (!userRole) {
+          throw new TRPCError({ code: "UNAUTHORIZED", message: "No role defined" });
+        }
+        const rolesArray = Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles];
+        if (!rolesArray.includes(userRole)) {
+          throw new TRPCError({
+            code: "UNAUTHORIZED",
+            message: "Insufficient permissions",
+          });
+        }
+        return next({
+          ctx: { session: { ...ctx.session, user: ctx.session.user } },
+        });
+      })
+    );
+
 
 /**
  * Protected (authenticated) procedure
@@ -116,6 +127,6 @@ const enforceUserIsAdmin = t.middleware(({ ctx, next }) => {
  */
 
 export const protectedProcedure = t.procedure.use(enforceUserIsAuthed);
-export const adminProcedure = t.procedure.use(enforceUserIsAdmin);
+
 
 

@@ -1,9 +1,9 @@
 import { z } from "zod";
 
-import { adminProcedure, createTRPCRouter } from "~/server/api/trpc";
+import { roleProtectedProcedure, createTRPCRouter } from "~/server/api/trpc";
 
 export const analyticsRouter = createTRPCRouter({
-  getJobTypes: adminProcedure.query(async ({ ctx }) => {
+  getJobTypes: roleProtectedProcedure('superAdmin').query(async ({ ctx }) => {
     const data = await ctx.db.placementType.findMany({
       where: {
         ParticipatingGroups: {
@@ -16,7 +16,7 @@ export const analyticsRouter = createTRPCRouter({
     return data;
   }),
 
-  getJobTypeSelectionAnalytics: adminProcedure
+  getJobTypeSelectionAnalytics: roleProtectedProcedure('superAdmin')
     .input(z.string())
     .query(async ({ ctx, input }) => {
       const groups = await ctx.db.participatingGroups.findMany({
@@ -90,7 +90,7 @@ export const analyticsRouter = createTRPCRouter({
       return data;
     }),
 
-  getJobTypePaymentAnalytics: adminProcedure
+  getJobTypePaymentAnalytics: roleProtectedProcedure('superAdmin')
     .input(z.string())
     .query(async ({ ctx, input }) => {
       const data = await ctx.db.$transaction([

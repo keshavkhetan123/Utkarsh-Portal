@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import {
-  adminProcedure,
+  roleProtectedProcedure,
   createTRPCRouter,
   protectedProcedure,
 } from "~/server/api/trpc";
@@ -76,7 +76,7 @@ export const studentRouter = createTRPCRouter({
 
       return "Ok";
     }),
-  searchStudent: adminProcedure
+  searchStudent: roleProtectedProcedure('superAdmin')
     .input(z.string())
     .query(async ({ input, ctx }) => {
       const students = await ctx.db.students.findMany({
@@ -111,7 +111,7 @@ export const studentRouter = createTRPCRouter({
 
       return students;
     }),
-  getStudentDetails: adminProcedure
+  getStudentDetails: roleProtectedProcedure('superAdmin')
     .input(z.string())
     .query(async ({ input, ctx }) => {
       const user = await ctx.db.user.findUnique({

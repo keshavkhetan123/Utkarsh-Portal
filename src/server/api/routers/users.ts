@@ -1,10 +1,10 @@
 import { z } from "zod";
 
-import { adminProcedure, createTRPCRouter } from "~/server/api/trpc";
+import { roleProtectedProcedure, createTRPCRouter } from "~/server/api/trpc";
 
 //not working yet need some dummy data.
 export const userRouter = createTRPCRouter({
-  getUserGroups: adminProcedure.query(async ({ ctx }) => {
+  getUserGroups: roleProtectedProcedure('superAdmin').query(async ({ ctx }) => {
     const data = await ctx.db.students.groupBy({
       by: ["admissionYear", "program"],
     });
@@ -16,7 +16,7 @@ export const userRouter = createTRPCRouter({
     return result;
   }),
 
-  searchUser: adminProcedure.input(z.object({
+  searchUser: roleProtectedProcedure('superAdmin').input(z.object({
     q: z.string(),
     exclude: z.array(z.string()).optional(),
     include: z.array(z.string()).optional(),

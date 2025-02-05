@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import {
-  adminProcedure,
+  roleProtectedProcedure,
   createTRPCRouter,
   protectedProcedure,
   publicProcedure,
@@ -33,7 +33,7 @@ export const adminHelpChatRouter = createTRPCRouter({
       });
       return message;
     }),
-  adminPostMessage: adminProcedure
+  adminPostMessage: roleProtectedProcedure('superAdmin')
     .input(
       z.object({
         message: z.string(),
@@ -99,7 +99,7 @@ export const adminHelpChatRouter = createTRPCRouter({
       });
       return messages;
     }),
-  getLatestAdminHelpChats: adminProcedure
+  getLatestAdminHelpChats: roleProtectedProcedure('superAdmin')
     .input(
       z.object({
         page: z.number().min(1).default(1),
@@ -160,7 +160,7 @@ export const adminHelpChatRouter = createTRPCRouter({
         hasMore: userIds.length > input.pageSize,
       };
     }),
-  getAdminHelpMessages: adminProcedure
+  getAdminHelpMessages: roleProtectedProcedure('superAdmin')
     .input(
       z.object({
         participantId: z.string(),

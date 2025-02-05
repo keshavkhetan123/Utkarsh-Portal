@@ -1,13 +1,13 @@
 import { z } from "zod";
 
 import {
-  adminProcedure,
+  roleProtectedProcedure,
   createTRPCRouter,
   protectedProcedure,
 } from "~/server/api/trpc";
 
 export const adminRouter = createTRPCRouter({
-  getAdmins: adminProcedure
+  getAdmins: roleProtectedProcedure('superAdmin')
     .input(
       z.object({
         permissions: z.number(),
@@ -15,7 +15,7 @@ export const adminRouter = createTRPCRouter({
       }),
     )
     .query(async ({ ctx, input }) => {
-      return await ctx.db.admin.findMany({
+      return await ctx.db.user.findMany({
         where: {
           user: {
             AND: [
@@ -63,7 +63,7 @@ export const adminRouter = createTRPCRouter({
       });
     }),
 
-  createAdmin: adminProcedure
+  createAdmin: roleProtectedProcedure('superAdmin')
     .input(
       z.object({
         id: z.string(),
@@ -86,7 +86,7 @@ export const adminRouter = createTRPCRouter({
       });
     }),
 
-  removeAdmin: adminProcedure
+  removeAdmin: roleProtectedProcedure('superAdmin')
     .input(z.string())
     .mutation(async ({ ctx, input }) => {
       if (ctx.session.user.id === input) {
@@ -99,7 +99,7 @@ export const adminRouter = createTRPCRouter({
       });
     }),
 
-  updateAdminPermission: adminProcedure
+  updateAdminPermission: roleProtectedProcedure('superAdmin')
     .input(
       z.object({
         id: z.string(),

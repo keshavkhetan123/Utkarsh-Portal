@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { adminProcedure, createTRPCRouter, publicProcedure } from "../trpc";
+import { roleProtectedProcedure, createTRPCRouter, publicProcedure } from "../trpc";
 
 export const faqRouter = createTRPCRouter({
     getFaqs: publicProcedure.query(async ({ ctx }) => {
@@ -23,7 +23,7 @@ export const faqRouter = createTRPCRouter({
         });
         return data;
     }),
-    addFaq: adminProcedure.input(z.object({
+    addFaq: roleProtectedProcedure('superAdmin').input(z.object({
         question: z.string(),
         answer: z.string(),
     })).mutation(async ({ ctx, input }) => {
@@ -36,7 +36,7 @@ export const faqRouter = createTRPCRouter({
         });
         return true;
     }),
-    deleteFaq: adminProcedure
+    deleteFaq: roleProtectedProcedure('superAdmin')
         .input(z.string())
         .mutation(async ({ ctx, input }) => {
             await ctx.db.faq.delete({

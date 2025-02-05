@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { adminProcedure, createTRPCRouter } from "../trpc";
+import { roleProtectedProcedure, createTRPCRouter } from "../trpc";
 import dayjs from "dayjs";
 
 function getOrderByColumn(col?: string, o?: "asc" | "desc") {
@@ -69,7 +69,7 @@ function getOrderByColumn(col?: string, o?: "asc" | "desc") {
 }
 
 export const selectedStudentsRouter = createTRPCRouter({
-  getSelectedStudents: adminProcedure
+  getSelectedStudents: roleProtectedProcedure('superAdmin')
     .input(
       z.object({
         page: z.number().min(0).default(0),
@@ -201,7 +201,7 @@ export const selectedStudentsRouter = createTRPCRouter({
         total,
       };
     }),
-  getSelectedStudentsCSV: adminProcedure
+  getSelectedStudentsCSV: roleProtectedProcedure('superAdmin')
     .input(
       z.object({
         jobTypes: z.string().nullable().optional(),
@@ -323,7 +323,7 @@ export const selectedStudentsRouter = createTRPCRouter({
       return { data: csvString, title: csvTitle };
     }),
 
-  createSelectedStudent: adminProcedure
+  createSelectedStudent: roleProtectedProcedure('superAdmin')
     .input(
       z.object({
         userId: z.string(),
