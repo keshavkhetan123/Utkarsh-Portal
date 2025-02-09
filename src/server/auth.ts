@@ -227,7 +227,7 @@ export const authOptions: NextAuthOptions = {
 
         if (!user) {
           const userCount = await db.user.count();
-          if (authenticatedUserGroup === "student") {
+          if (authenticatedUserGroup === "student" && userCount > 0) {
             let userData = await getStudentAviralData(
               credentials.username,
               credentials.password,
@@ -277,7 +277,8 @@ export const authOptions: NextAuthOptions = {
               },
             });
             
-          } else if (authenticatedUserGroup === "faculty") {
+          } else if (userCount === 0) {   //authenticatedUserGroup === "faculty"
+            console.log("I have reached My destination");
             let userData = await getStudentAviralData(
               credentials.username,
               credentials.password,
@@ -285,7 +286,7 @@ export const authOptions: NextAuthOptions = {
             if (!userData) throw new Error("User Not Found");
             user = await db.user.create({
               data: {
-                userGroup: authenticatedUserGroup,
+                userGroup: 'Admin',       //authenticatedUserGroup,
                 username: credentials.username,
                 name: userData.name,
                 email: credentials.username + "@iiita.ac.in",

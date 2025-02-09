@@ -20,7 +20,7 @@ export default function YearSelector() {
 
   const { data: adminYears, isLoading: isAdminYearsLoading } =
     api.placementConfig.getAdminPlacementYears.useQuery(null, {
-      enabled: !!session?.user?.admin && pathname.includes("/admin"),
+      enabled: session?.user?.role.name === "superAdmin" && pathname.includes("/admin"),
     });
 
   const changeYear = useCallback(
@@ -43,7 +43,7 @@ export default function YearSelector() {
     return <></>
   }
 
-  if (!session?.user?.admin || (!pathname.includes("/admin") && !isLoading)) {
+  if (!(session?.user?.role.name === "superAdmin") || (!pathname.includes("/admin") && !isLoading)) {
     if (data && !data.includes(session?.user?.year)) {
       changeYear(data[0]);
     }
@@ -52,7 +52,7 @@ export default function YearSelector() {
   if (
     !session?.user?.year ||
     isLoading ||
-    (!!session?.user?.admin &&
+    ((session?.user?.role.name === "superAdmin") &&
       pathname.includes("/admin") &&
       isAdminYearsLoading)
   )
@@ -62,7 +62,7 @@ export default function YearSelector() {
       <FormControl
         size="small"
         disabled={
-          !!session?.user?.admin && pathname.includes("/admin")
+          (session?.user?.role.name === "superAdmin" && pathname.includes("/admin"))
             ? adminYears.length === 1
             : data.length === 1
         }
@@ -74,7 +74,7 @@ export default function YearSelector() {
           label="Age"
           onChange={(e) => changeYear(parseInt(e.target.value.toString()))}
         >
-          {!!session?.user?.admin && pathname.includes("/admin")
+          {(session?.user?.role.name === "superAdmin" && pathname.includes("/admin"))
             ? adminYears.map((el) => (
               <MenuItem key={el} value={el}>
                 {el}

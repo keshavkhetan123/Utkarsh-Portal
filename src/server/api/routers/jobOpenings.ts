@@ -61,7 +61,7 @@ export const jobOpeningRouter = createTRPCRouter({
 
       await ctx.db.jobOpening.create({
         data: {
-          year: ctx.session.user.year,
+          // year: ctx.session.user.year,
           title: input.title,
           description: input.description,
           location: input.location,
