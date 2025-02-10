@@ -298,7 +298,6 @@ export const jobOpeningRouter = createTRPCRouter({
           },
         }),
         jobOpening: {
-          year: ctx.session.user.year,
           OR: [
             {
               hidden: false,
@@ -430,7 +429,6 @@ export const jobOpeningRouter = createTRPCRouter({
         where: {
           id: input,
           hidden: false,
-          year: ctx.session.user.year,
         },
         select: {
           id: true,
@@ -525,15 +523,8 @@ export const jobOpeningRouter = createTRPCRouter({
     )
     .query(async ({ ctx, input }) => {
       const [count, jobOpenings] = await ctx.db.$transaction([
-        ctx.db.jobOpening.count({
-          where: {
-            year: ctx.session.user.year,
-          },
-        }),
+        ctx.db.jobOpening.count(),
         ctx.db.jobOpening.findMany({
-          where: {
-            year: ctx.session.user.year,
-          },
           select: {
             id: true,
             title: true,
