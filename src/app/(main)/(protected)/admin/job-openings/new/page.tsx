@@ -35,6 +35,8 @@ import { DEFAULT_JOB_OPENING } from "./constants";
 export default function NewJobOpening() {
   const [companyQuery, setCompanyQuery] = useState("");
   const [jobOpening, setJobOpening] = useState(DEFAULT_JOB_OPENING);
+  const [manualCompany, setManualCompany] = useState(false);
+
   const descEditorRef = useRef<any>();
   const router = useRouter();
 
@@ -142,68 +144,115 @@ export default function NewJobOpening() {
             {jobOpening.title.length}/180
           </FormHelperText>
         </FormControl>
-        <Autocomplete
-          value={jobOpening.company}
-          onChange={(_, newValue) =>
-            setJobOpening({ ...jobOpening, company: newValue })
+          {/* Toggle for manual entry */}
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={manualCompany}
+              onChange={(e) => {
+                setManualCompany(e.target.checked);
+                // Optionally reset the company field if switching modes
+                setJobOpening({ ...jobOpening, company: {name: "", domain: "", logo: ""} });
+              }}
+            />
           }
-          options={companyOptions || []}
-          getOptionKey={(option) => option.domain}
-          getOptionLabel={(option) => option.name}
-          renderOption={(props, option) => (
-            // @ts-ignore
-            <div
-              {...props}
-              className="flex flex-row items-center gap-2 px-3 py-2 cursor-pointer"
-            >
-              <Avatar
-                sx={{
-                  borderRadius: 1,
-                }}
-                variant="square"
-                src={option.logo}
-              />
-              <Typography variant="body2">{option.name}</Typography>
-              <Typography variant="caption" color="textSecondary">
-                ({option.domain})
-              </Typography>
-            </div>
-          )}
-          renderInput={(params) => (
-            <div className="flex flex-row gap-2 items-center">
-              {jobOpening.company?.logo && (
+          label="Enter company manually"
+        />
+
+        {manualCompany ? (
+          // Manual company input fields
+          <div className="flex flex-col gap-2">
+            <TextField
+              label="Company Name"
+              name="companyName"
+              value={jobOpening.company?.name || ""}
+              onChange={(e) =>
+                setJobOpening({
+                  ...jobOpening,
+                  company: { ...jobOpening.company, name: e.target.value },
+                })
+              }
+              required
+            />
+            <TextField
+              label="Company Logo URL"
+              name="companyLogo"
+              value={jobOpening.company?.logo || ""}
+              onChange={(e) =>
+                setJobOpening({
+                  ...jobOpening,
+                  company: { ...jobOpening.company, logo: e.target.value },
+                })
+              }
+              required
+            />
+          </div>
+        ) : (
+          // Autocomplete for company search
+          <Autocomplete
+            value={jobOpening.company}
+            onChange={(_, newValue) =>
+              setJobOpening({ ...jobOpening, company: newValue })
+            }
+            options={companyOptions || []}
+            getOptionKey={(option) => option.domain}
+            getOptionLabel={(option) => option.name}
+            renderOption={(props, option) => (
+              // @ts-ignore
+              <div
+                {...props}
+                className="flex flex-row items-center gap-2 px-3 py-2 cursor-pointer"
+              >
                 <Avatar
                   sx={{
                     borderRadius: 1,
-                    height: 54,
-                    width: 54,
                   }}
                   variant="square"
-                  src={jobOpening.company.logo}
+                  src={option.logo}
                 />
-              )}
-              <TextField
-                {...params}
-                label="Company"
-                name="company"
-                onChange={(e) => setCompanyQuery(e.target.value)}
-                InputProps={{
-                  ...params.InputProps,
-                  required: true,
-                  endAdornment: (
-                    <React.Fragment>
-                      {isCompaniesLoading ? (
-                        <CircularProgress color="inherit" size={20} />
-                      ) : null}
-                      {params.InputProps.endAdornment}
-                    </React.Fragment>
-                  ),
-                }}
-                required
-              />
-            </div>
-          )}
-        />
+                <Typography variant="body2">{option.name}</Typography>
+                <Typography variant="caption" color="textSecondary">
+                  ({option.domain})
+                </Typography>
+              </div>
+            )}
+            renderInput={(params) => (
+              <div className="flex flex-row gap-2 items-center">
+                {jobOpening.company?.logo && (
+                  <Avatar
+                    sx={{
+                      borderRadius: 1,
+                      height: 54,
+                      width: 54,
+                    }}
+                    variant="square"
+                    src={jobOpening.company.logo}
+                  />
+                )}
+                <TextField
+                  {...params}
+                  label="Company"
+                  name="company"
+                  onChange={(e) => setCompanyQuery(e.target.value)}
+                  InputProps={{
+                    ...params.InputProps,
+                    required: true,
+                    endAdornment: (
+                      <React.Fragment>
+                        {isCompaniesLoading ? (
+                          <CircularProgress color="inherit" size={20} />
+                        ) : null}
+                        {params.InputProps.endAdornment}
+                      </React.Fragment>
+                    ),
+                  }}
+                  required
+                />
+              </div>
+            )}
+          />
+        )}
+
         <FormControl>
           <InputLabel>Job Type *</InputLabel>
           <Select
