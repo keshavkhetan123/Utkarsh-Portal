@@ -236,6 +236,7 @@ export const authOptions: NextAuthOptions = {
 
             user = await db.user.create({
               data: {
+                year : 2026,
                 userGroup: authenticatedUserGroup,
                 username: credentials.username,
                 name: 'sugam',  // or userData.name,
@@ -243,8 +244,8 @@ export const authOptions: NextAuthOptions = {
                 // New role logic:
                 role: {
                   connectOrCreate: {
-                    where: { name: userCount === 0 ? "superAdmin" : "student" },
-                    create: { name: userCount === 0 ? "superAdmin" : "student" },
+                    where: { name: "student" },
+                    create: { name: "student" },
                   },
                 },
                 student: {
@@ -292,8 +293,8 @@ export const authOptions: NextAuthOptions = {
                 email: credentials.username + "@iiita.ac.in",
                 role: {
                   connectOrCreate: {
-                    where: { name: userCount === 0 ? "superAdmin" : "student" },
-                    create: { name: userCount === 0 ? "superAdmin" : "student" },
+                    where: { name: "superAdmin"},
+                    create: { name: "superAdmin" },
                   },
                 },
                 

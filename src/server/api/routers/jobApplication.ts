@@ -249,6 +249,7 @@ export const jobApplication = createTRPCRouter({
 
       return application;
     }),
+    
   getJobApplicants: roleProtectedProcedure('superAdmin')
     .input(
       z.object({
