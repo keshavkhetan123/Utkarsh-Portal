@@ -21,11 +21,29 @@ const s3Client = new S3Client({
 
 export async function uploadFile(buffer: Buffer, key: string) {
   try {
+    const corsConfiguration = {
+      Bucket: env.S3_BUCKET_NAME,
+      CORSConfiguration: {
+        CORSRules: [
+          {
+            AllowedOrigins: ["*"],
+            AllowedMethods: ["GET", "POST", "PUT", "DELETE", "HEAD"],
+            AllowedHeaders: ["*"],
+            MaxAgeSeconds: 3000,
+          },
+        ],
+      },
+    };
+
+    await s3Client.send(new PutBucketCorsCommand(corsConfiguration));
+    
     return await s3Client.send(
       new PutObjectCommand({
         Bucket: env.S3_BUCKET_NAME,
         Key: key,
         Body: buffer,
+        ContentDisposition: "inline",
+        ContentType: "application/pdf",
       }),
     );
   } catch (error) {
@@ -59,6 +77,8 @@ export async function uploadFile(buffer: Buffer, key: string) {
           Bucket: env.S3_BUCKET_NAME,
           Key: key,
           Body: buffer,
+          ContentDisposition: "inline",
+          ContentType: "application/pdf",
         }),
       );
     }

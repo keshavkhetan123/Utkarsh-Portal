@@ -56,29 +56,20 @@ export default function ResumeCard(props: {
 
   return (
     <Card>
-      <CardMedia className="w-full">
-        <PDFViewer file={props.src} />
-      </CardMedia>
+      <Link href={props.src} target="_blank">
+        <CardMedia className="w-full">
+          <PDFViewer file={props.src} />
+        </CardMedia>
+      </Link>
 
       <CardContent className="flex flex-row justify-between">
-        <div className="flex flex-col w-[60%]">
-          <Typography component="div" className="w-fit" variant="h6">
-            {props.name}
-          </Typography>
-          <Link
-            href={props.src}
-            target="_blank"
-            className="flex flex-row items-center gap-1 hover:underline w-full"
-          >
-            <Typography
-              variant="caption"
-              className="whitespace-nowrap overflow-hidden text-ellipsis w-fit"
-            >
-              {props.src}
+        <Link href={props.src} target="_blank" className="w-[85%]">
+          <div className="flex flex-col w-full">
+            <Typography component="div" className="w-full" variant="h6">
+              {props.name}
             </Typography>
-            <OpenInNewIcon fontSize="inherit" />
-          </Link>
-        </div>
+          </div>
+        </Link>
         <div className="-mr-2 -mt-1">
           <IconButton onClick={handleClick}>
             <MoreVertIcon />
