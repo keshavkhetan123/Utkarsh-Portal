@@ -4,6 +4,7 @@ import {
   roleProtectedProcedure,
   createTRPCRouter,
   protectedProcedure,
+  publicProcedure,
 } from "~/server/api/trpc";
 
 export const placementConfigRouter = createTRPCRouter({
@@ -150,14 +151,14 @@ export const placementConfigRouter = createTRPCRouter({
       });
       return true;
     }),
-  getParticipatingGroupsForPlacementType: roleProtectedProcedure('superAdmin')
+  getParticipatingGroupsForPlacementType: publicProcedure
     .input(z.string())
     .query(async ({ ctx, input }) => {
       const data = await ctx.db.participatingGroups.groupBy({
         by: ["admissionYear", "program"],
         where: {
           placementTypeId: input,
-          year: ctx.session.user.year,
+          year: 2026,
         },
       });
       const yearWisePrograms: {

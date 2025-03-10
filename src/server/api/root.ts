@@ -15,6 +15,7 @@ import { studentResumeRouter } from "./routers/resume";
 import { selectedStudentsRouter } from "./routers/selectedStudents";
 import { studentRouter } from "./routers/student";
 import { userRouter } from "./routers/users";
+import {hrTokenRouter} from "./routers/hrToken";
 
 /**
  * This is the primary router for your server.
@@ -37,6 +38,7 @@ export const appRouter = createTRPCRouter({
   analytics: analyticsRouter,
   events: eventsRouter,
   selections: selectedStudentsRouter,
+  hrToken : hrTokenRouter, 
 });
 
 // export type definition of API

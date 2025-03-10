@@ -44,3 +44,5 @@ yarn-error.log*
 prod_backup
 
 google_application_credentials.json
+
+docker-compose.yml

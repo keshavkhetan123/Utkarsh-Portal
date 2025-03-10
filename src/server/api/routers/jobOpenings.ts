@@ -4,10 +4,11 @@ import {
   roleProtectedProcedure,
   createTRPCRouter,
   protectedProcedure,
+  publicProcedure,
 } from "~/server/api/trpc";
 
 export const jobOpeningRouter = createTRPCRouter({
-  createJobOpening: roleProtectedProcedure('superAdmin')
+  createJobOpening: publicProcedure
     .input(
       z.object({
         title: z.string(),

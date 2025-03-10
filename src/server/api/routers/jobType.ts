@@ -3,10 +3,11 @@ import { z } from "zod";
 import {
     roleProtectedProcedure,
     createTRPCRouter,
+    publicProcedure
 } from "~/server/api/trpc";
 export const jobTypeRouter = createTRPCRouter({
 
-    getPlacementTypes: roleProtectedProcedure('superAdmin').query(async ({ ctx }) => {
+    getPlacementTypes: publicProcedure.query(async ({ ctx }) => {
         const data = await ctx.db.placementType.findMany({
             select: {
                 id: true,

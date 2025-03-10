@@ -49,6 +49,15 @@ enum RoleName {
   student
 }
 
+model HRToken {
+  id       String   @id @default(cuid())
+  token    String   @unique
+  isValid  Boolean  @default(true)
+  // Optionally, add a createdAt for expiration logic later:
+  createdAt DateTime @default(now())
+}
+
+
 model Role {
   id          String   @id @default(cuid())
   name        RoleName @unique
