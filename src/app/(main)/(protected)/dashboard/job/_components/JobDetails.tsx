@@ -22,6 +22,7 @@ interface JobDetailsProps {
     name: string;
   };
   canRegister: boolean;
+  whyNotRegister:string;
   alreadyRegistered: boolean;
   registrationStart: Date;
   registrationEnd: Date;

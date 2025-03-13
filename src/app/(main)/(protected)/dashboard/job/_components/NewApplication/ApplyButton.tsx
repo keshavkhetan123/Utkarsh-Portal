@@ -4,6 +4,7 @@ import dayjs from "~/app/_utils/extendedDayjs";
 
 interface ApplyButtonProps {
   canRegister: boolean;
+  whyNotRegister: string;
   alreadyRegistered: boolean;
   registrationStart: Date;
   registrationEnd: Date;
@@ -14,7 +15,7 @@ export default function ApplyButton(props: ApplyButtonProps) {
   const label = props.alreadyRegistered
     ? "Registered"
     : !props.canRegister
-      ? "Not Eligible"
+      ? props.whyNotRegister
       : props.registrationStart > new Date()
         ? "Registration starts @"
         : props.registrationEnd < new Date()

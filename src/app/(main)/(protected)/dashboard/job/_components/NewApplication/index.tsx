@@ -8,6 +8,7 @@ import ApplyButton from "./ApplyButton";
 interface NewApplicationProps {
   id: string;
   canRegister: boolean;
+  whyNotRegister: string;
   alreadyRegistered: boolean;
   registrationStart: Date;
   registrationEnd: Date;
@@ -15,6 +16,7 @@ interface NewApplicationProps {
 
 export default function NewApplication(props: NewApplicationProps) {
   const [open, setOpen] = useState(false);
+  
   return (
     <>
       <ApplyButton

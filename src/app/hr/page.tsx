@@ -151,6 +151,8 @@ export default function NewJobOpening() {
             (group) => ({
               admissionYear: parseInt(group.admissionYear),
               program: group.program,
+              minCgpa: group.minCgpa,
+              minCredits: group.minCredits
             })
           );
           createJobOpeningMutation.mutate(reqData);
@@ -328,7 +330,8 @@ export default function NewJobOpening() {
             required
           />
           <FormHelperText>
-            Specify the pay of the company as a string, e.g. "Rs. 12 LPA"
+          Specify the pay of the company as a string, same will be displayed
+          to the user, e.g. "Rs. 12 LPA"
           </FormHelperText>
         </FormControl>
         <FormControl variant="standard">
@@ -347,7 +350,9 @@ export default function NewJobOpening() {
             required
           />
           <FormHelperText>
-            Specify the pay (numeric). It will be used for analytics only.
+             Specify the pay of the company on per month basis for internship and
+             per year basis for full time, this number will <strong>NOT</strong>{" "}
+             be displayed to user. It will only be used for analytics.
           </FormHelperText>
         </FormControl>
         <DateTimePicker

@@ -380,19 +380,31 @@ export const jobOpeningRouter = createTRPCRouter({
         }),
       ]);
 
-      const data = jobOpenings.map((jobOpening) => ({
-        ...jobOpening.jobOpening,
-        canRegister:
-          (jobOpening.jobOpening.allowSelected ||
-            userDetails.student.selections.filter(
-              (sel) => sel.jobType === jobOpening.jobOpening.placementType.id,
-            ).length === 0) &&
-          jobOpening.admissionYear === userDetails.student.admissionYear &&
-          jobOpening.program === userDetails.student.program &&
-          jobOpening.minCgpa <= userDetails.student.cgpa &&
-          jobOpening.minCredits <= userDetails.student.completedCredits,
-        alreadyRegistered: jobOpening.jobOpening.applications.length > 0,
-      }));
+      const data = jobOpenings.map((jobOpening) => {
+        let whyNotRegister = "";
+      
+        if (!jobOpening.jobOpening.allowSelected &&
+            userDetails.student.selections.some(
+              (sel) => sel.jobType === jobOpening.jobOpening.placementType.id
+            )) {
+          whyNotRegister = "Already selected for this job type.";
+        } else if (jobOpening.admissionYear !== userDetails.student.admissionYear) {
+          whyNotRegister = "Admission year does not match.";
+        } else if (jobOpening.program !== userDetails.student.program) {
+          whyNotRegister = "Program does not match.";
+        } else if (jobOpening.minCgpa > userDetails.student.cgpa) {
+          whyNotRegister = `Required CGPA: ${jobOpening.minCgpa}, Your CGPA: ${userDetails.student.cgpa}`;
+        } else if (jobOpening.minCredits > userDetails.student.completedCredits) {
+          whyNotRegister = `Required Credits: ${jobOpening.minCredits}, Your Credits: ${userDetails.student.completedCredits}`;
+        }
+      
+        return {
+          ...jobOpening.jobOpening,
+          canRegister: whyNotRegister === "", // True if no reason exists
+          whyNotRegister, // Store the reason
+          alreadyRegistered: jobOpening.jobOpening.applications.length > 0,
+        };
+      });
 
       return {
         data: data.slice(0, input.limit),
@@ -486,12 +498,14 @@ export const jobOpeningRouter = createTRPCRouter({
       type JobOpening = typeof jobOpening;
       type Data = {
         canRegister: boolean;
+        whyNotRegister:string;
         alreadyRegistered: boolean;
       };
 
       const data: JobOpening & Data = {
         ...jobOpening,
         canRegister: false,
+        whyNotRegister:"",
         alreadyRegistered: false,
       };
 
