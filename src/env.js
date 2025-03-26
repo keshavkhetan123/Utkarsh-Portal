@@ -12,7 +12,7 @@ export const env = createEnv({
       .string()
       .url()
       .refine(
-        (str) => !str.includes("YOUR_MYSQL_URL_HERE"),
+        (str) => !str.includes("ysql://utkarsh:utkarsh@localhost:3306/utkarsh"),
         "You forgot to change the default URL",
       ),
     REDIS_URL: z.string().url(),
@@ -32,7 +32,7 @@ export const env = createEnv({
     AVIRAL_SESSION: z.string().optional(),
     USE_AVIRAL: z.string(),
     S3_ENDPOINT: z.string(),
-    S3_BUCKET_REGION: z.string().default("apac"),
+    S3_BUCKET_REGION: z.string().default("ap-south-1"),
     S3_BUCKET_NAME: z.string(),
     S3_ACCESS_KEY: z.string(),
     S3_SECRET_KEY: z.string(),
