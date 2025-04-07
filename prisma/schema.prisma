@@ -1,6 +1,7 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
+
 generator client {
     provider      = "prisma-client-js"
     binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
@@ -470,4 +471,26 @@ model Faq {
     author    User     @relation(fields: [authorId], references: [id])
 
     @@index([authorId])
+}
+
+enum NOCStatus {
+  Pending
+  Approved
+  Rejected
+}
+
+
+model PlacementNOC {
+  id              Int      @id @default(autoincrement())
+  name            String   // Student's name
+  rollNo          String   // Student's roll number
+  offerLetterDate DateTime
+  todaysDate      DateTime
+  companyName     String
+  salary          Float    // You can also use Decimal for higher precision
+  location        String
+  status          NOCStatus  @default(Pending)  // <--- Status enum
+  userId          String @default("") 
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }

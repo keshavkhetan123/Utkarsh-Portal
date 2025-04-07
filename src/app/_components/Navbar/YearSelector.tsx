@@ -64,7 +64,7 @@ export default function YearSelector() {
         disabled={
           (session?.user?.role.name === "superAdmin" && pathname.includes("/admin"))
             ? adminYears.length === 1
-            : data.length === 1
+            : data?.length === 1
         }
       >
         <InputLabel>Year</InputLabel>
@@ -80,7 +80,7 @@ export default function YearSelector() {
                 {el}
               </MenuItem>
             ))
-            : data.map((el) => (
+            : data?.map((el) => (
               <MenuItem key={el} value={el}>
                 {el}
               </MenuItem>

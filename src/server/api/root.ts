@@ -16,6 +16,7 @@ import { selectedStudentsRouter } from "./routers/selectedStudents";
 import { studentRouter } from "./routers/student";
 import { userRouter } from "./routers/users";
 import {hrTokenRouter} from "./routers/hrToken";
+import { nocRouter } from "./routers/noc-req";
 
 /**
  * This is the primary router for your server.
@@ -39,6 +40,7 @@ export const appRouter = createTRPCRouter({
   events: eventsRouter,
   selections: selectedStudentsRouter,
   hrToken : hrTokenRouter, 
+  noc: nocRouter
 });
 
 // export type definition of API

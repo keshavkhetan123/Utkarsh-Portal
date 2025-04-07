@@ -6,6 +6,8 @@ import MailIcon from "@mui/icons-material/Mail";
 import QuizIcon from "@mui/icons-material/Quiz";
 import WorkIcon from "@mui/icons-material/Work";
 import EventIcon from "@mui/icons-material/Event";
+import DescriptionIcon from "@mui/icons-material/Description"; // <-- New icon
+
 export const USER_SIDEBAR = [
   {
     base: "/dashboard",
@@ -56,6 +58,11 @@ export const USER_SIDEBAR = [
         label: "FAQ",
         path: "/faq",
         icon: QuizIcon,
+      },
+      {
+        label: "NOC Request",
+        path: "/noc",
+        icon: DescriptionIcon,
       },
     ],
   },

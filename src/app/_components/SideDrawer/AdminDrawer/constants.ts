@@ -61,6 +61,11 @@ export const ADMIN_SIDEBAR = [
         icon: PeopleIcon,
       },
       {
+        label: "NOC APPROVAL",
+        path: "/noc-approval",
+        icon: FeedbackIcon,
+      },
+      {
         label: "Placement Years",
         path: "/placement-years",
         icon: CalendarMonthIcon,
