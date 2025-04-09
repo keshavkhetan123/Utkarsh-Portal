@@ -5,6 +5,7 @@ interface NewOnboarding {
   dob: dayjs.Dayjs;
   tenthMarks: number;
   twelvethMarks: number;
+  passOutYear: number;
   addressLine1: string;
   addressLine2: string;
   pincode: number;
