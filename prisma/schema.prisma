@@ -114,6 +114,7 @@ model Students {
     dob                  DateTime?
     tenthMarks           Float?    @default(0)
     twelvethMarks        Float?    @default(0)
+    passOutYear          Int?
     addressLine1         String?
     addressLine2         String?
     pincode              Int?

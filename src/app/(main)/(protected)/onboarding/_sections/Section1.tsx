@@ -10,6 +10,8 @@ import {
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
 
+import dayjs from "dayjs";
+
 import { type SectionProps } from "../types";
 
 export default function Section1(props: SectionProps) {
@@ -46,6 +48,19 @@ export default function Section1(props: SectionProps) {
           }
           format="DD/MM/YYYY"
         />
+        <DatePicker
+          views={['year']}
+          label="Passout Year *"
+          value={props.onboarding.passOutYear ? dayjs(`${props.onboarding.passOutYear}-01-01`) : null}
+          onChange={(year) =>
+            props.setOnboarding({
+              ...props.onboarding,
+              passOutYear: year ? year.year() : null,
+            })
+          }
+          openTo="year"
+          format="YYYY"
+        />
       </div>
       <Box sx={{ mb: 1 }}>
         <div>
@@ -57,7 +72,8 @@ export default function Section1(props: SectionProps) {
               disabled={
                 props.isLoading ||
                 !props.onboarding.gender ||
-                !props.onboarding.dob
+                !props.onboarding.dob ||
+                !props.onboarding.passOutYear
               }
             >
               Continue

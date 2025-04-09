@@ -13,10 +13,19 @@ export default function YearSelector() {
 
   const utils = api.useUtils();
 
-  const { data, isLoading } =
-    api.placementConfig.getStudentPlacementYears.useQuery();
+  // const { data, isLoading } =
+  //   api.placementConfig.getStudentPlacementYears.useQuery();
 
   const { data: session, update } = useSession();
+
+  const data = (session?.user?.role.name !== "superAdmin")
+    ? session?.user?.year
+      ? [session.user.year]
+      : []
+    : undefined;
+  
+  const isLoading = false;
+  
 
   const { data: adminYears, isLoading: isAdminYearsLoading } =
     api.placementConfig.getAdminPlacementYears.useQuery(null, {
@@ -43,11 +52,11 @@ export default function YearSelector() {
     return <></>
   }
 
-  if (!(session?.user?.role.name === "superAdmin") || (!pathname.includes("/admin") && !isLoading)) {
-    if (data && !data.includes(session?.user?.year)) {
-      changeYear(data[0]);
-    }
-  }
+  // if (!(session?.user?.role.name === "superAdmin") || (!pathname.includes("/admin") && !isLoading)) {
+  //   if (data && !data.includes(session?.user?.year)) {
+  //     changeYear(data[0]);
+  //   }
+  // }
 
   if (
     !session?.user?.year ||
@@ -57,31 +66,32 @@ export default function YearSelector() {
       isAdminYearsLoading)
   )
     return <></>;
+
   return (
     <>
       <FormControl
         size="small"
         disabled={
-          (session?.user?.role.name === "superAdmin" && pathname.includes("/admin"))
-            ? adminYears.length === 1
-            : data?.length === 1
+          !(session?.user?.role.name === "superAdmin" && pathname.includes("/admin"))
+            ? true
+            : false
         }
       >
         <InputLabel>Year</InputLabel>
         <Select
           color="primary"
-          value={session.user.year}
+          value={Number(session.user.year)}
           label="Age"
           onChange={(e) => changeYear(parseInt(e.target.value.toString()))}
         >
           {(session?.user?.role.name === "superAdmin" && pathname.includes("/admin"))
             ? adminYears.map((el) => (
-              <MenuItem key={el} value={el}>
+              <MenuItem key={el} value={Number(el)}>
                 {el}
               </MenuItem>
             ))
             : data?.map((el) => (
-              <MenuItem key={el} value={el}>
+              <MenuItem key={el} value={Number(el)}>
                 {el}
               </MenuItem>
             ))}
