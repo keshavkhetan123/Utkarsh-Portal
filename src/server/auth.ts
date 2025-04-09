@@ -212,6 +212,7 @@ export const authOptions: NextAuthOptions = {
             id: true,
             name: true,
             username: true,
+            year: true,
             userGroup: true,
             role: { select: { name: true } },
             student: {
@@ -219,6 +220,7 @@ export const authOptions: NextAuthOptions = {
                 admissionYear: true,
                 program: true,
                 isOnboardingComplete: true,
+                passOutYear : true
               },
             },
           },
@@ -272,6 +274,7 @@ export const authOptions: NextAuthOptions = {
                     admissionYear: true,
                     program: true,
                     isOnboardingComplete: true,
+                    passOutYear : true
                   },
                 },
               },
@@ -301,6 +304,7 @@ export const authOptions: NextAuthOptions = {
               select: {
                 id: true,
                 name: true,
+                year: true,
                 username: true,
                 userGroup: true,
                 role: { select: { name: true } },
@@ -318,20 +322,24 @@ export const authOptions: NextAuthOptions = {
           }
         }
 
-        const latestYear = await db.participatingGroups.findFirst({
-          select: {
-            year: true,
-          },
-          where: {
-            ...(user.student && {
-              admissionYear: user.student?.admissionYear,
-              program: user.student?.program,
-            }),
-          },
-          orderBy: {
-            year: "desc",
-          },
-        });
+        // const latestYear = await db.participatingGroups.findFirst({
+        //   select: {
+        //     year: true,
+        //   },
+        //   where: {
+        //     ...(user.student && {
+        //       admissionYear: user.student?.admissionYear,
+        //       program: user.student?.program,
+        //     }),
+        //   },
+        //   orderBy: {
+        //     year: "desc",
+        //   },
+        // });
+
+        const latestYear = user.student?.passOutYear || user.year;
+
+        console.log(latestYear);
 
         return {
           id: user.id,
@@ -342,7 +350,7 @@ export const authOptions: NextAuthOptions = {
           isOnboardingComplete: user.student
             ? user.student.isOnboardingComplete
             : true,
-          year: latestYear?.year,
+          year: latestYear,
         } as DefaultSession["user"];               
       },
     }),
