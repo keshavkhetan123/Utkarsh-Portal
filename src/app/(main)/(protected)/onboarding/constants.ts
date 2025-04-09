@@ -5,6 +5,7 @@ export const DEFAULT_ONBOARDING: NewOnboarding = {
   dob: null,
   tenthMarks: null,
   twelvethMarks: null,
+  passOutYear: null,
   addressLine1: "",
   addressLine2: "",
   pincode: null,

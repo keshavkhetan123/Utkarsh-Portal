@@ -236,7 +236,6 @@ export const authOptions: NextAuthOptions = {
 
             user = await db.user.create({
               data: {
-                year : 2026,
                 userGroup: authenticatedUserGroup,
                 username: credentials.username,
                 name: 'sugam',  // or userData.name,
