@@ -12,7 +12,6 @@ import { api } from "~/trpc/react";
 import ApplicationsSection from "./_components/Applications";
 import DataDisplay from "./_components/DataDisplay";
 import ResumeSection from "./_components/resume";
-import NOCSection from "./_components/noc";
 import SelectionsDataDisplay from "./_components/Selections";
 
 export default function TrackStudentPage() {
@@ -41,7 +40,7 @@ export default function TrackStudentPage() {
       </Container>
     );
   }
-console.log(data);
+
   return (
     <Container className="py-2 max-w-[inherit] flex flex-col gap-6">
       <Paper className="p-3 flex flex-col gap-2" elevation={4}>
@@ -75,7 +74,6 @@ console.log(data);
       <ResumeSection resumes={data.resume} />
       <SelectionsDataDisplay data={data.selections} />
       <ApplicationsSection data={data.applications} />
-      <NOCSection nocs={data.noc} />
     </Container>
   );
 }
