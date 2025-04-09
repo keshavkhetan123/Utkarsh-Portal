@@ -250,13 +250,13 @@ export const authOptions: NextAuthOptions = {
                 },
                 student: {
                   create: {
-                    program: 'IT',
+                    program: 'ECE',
                     admissionYear: 2022,
                     duration: 4,
                     currentSemester: '6',
                     completedCredits: 108,  
                     totalCredits: 150,//userData.totalCredits,
-                    cgpa: 8.14,
+                    cgpa: 7.6,
                     email: credentials.username + "@iiita.ac.in",
                   },
                 },

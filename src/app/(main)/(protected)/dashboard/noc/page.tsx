@@ -3,6 +3,9 @@
 import { useEffect, useState } from "react";
 import {
   Container,
+  Checkbox,  
+  FormControlLabel,
+  Link as MuiLink,
   Typography,
   TextField,
   Button,
@@ -26,6 +29,8 @@ export default function NocRequestPage() {
     reason: "",
     details: "",
   });
+  const [acceptedTnC, setAcceptedTnC] = useState(false);
+  const [file, setFile] = useState<File | null>(null);
 
   const {
     data: myNoc,
@@ -42,6 +47,8 @@ export default function NocRequestPage() {
     },
   });
 
+  const uploadNocFile =api.studentResume.uploadNoc.useMutation();
+
   useEffect(() => {
     const today = new Date().toISOString().split("T")[0];
     setFormData((prev) => ({ ...prev, todaysDate: today }));
@@ -51,8 +58,29 @@ export default function NocRequestPage() {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = () => {
-    createNoc.mutate(formData);
+  const handleSubmit = async () => {
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const fileDataUrl = e.target?.result as string;
+        const fileName = "noc_" + Date.now();
+
+        try {
+          const res = await uploadNocFile.mutateAsync({
+            key: fileName,
+            fileDataUrl,
+          });
+          console.log("Uploaded NOC PDF URL:", res.url);
+        } catch (err) {
+          console.error("NOC upload failed", err);
+        }
+
+        createNoc.mutate(formData);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      createNoc.mutate(formData);
+    }
   };
 
   if (loadingNoc) {
@@ -100,7 +128,6 @@ export default function NocRequestPage() {
       <Divider />
 
       <Grid container spacing={2}>
-        {/* same TextFields as before */}
         <Grid item xs={12} sm={6}>
           <TextField
             label="Name"
@@ -182,14 +209,53 @@ export default function NocRequestPage() {
             fullWidth
           />
         </Grid>
+
+        <Grid item xs={12}>
+          <Button variant="outlined" component="label">
+            Upload NOC PDF
+            <input
+              type="file"
+              hidden
+              accept="application/pdf"
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f && f.type === "application/pdf") setFile(f);
+              }}
+            />
+          </Button>
+          <Typography variant="body2" className="mt-2">
+            {file ? `Selected: ${file.name}` : "No file selected"}
+          </Typography>
+        </Grid>
+        <Grid item xs={12}>
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={acceptedTnC}
+              onChange={(e) => setAcceptedTnC(e.target.checked)}
+            />
+          }
+          label={
+            <Typography variant="body2">
+              I have read and agree to the{" "}
+              <MuiLink href="https://utkarsh-resume.buddylonglegs.tech/Terms%20and%20Conditions.pdf" target="_blank" rel="noopener noreferrer">
+                Terms and Conditions
+              </MuiLink>
+            </Typography>
+          }
+        />
+      </Grid>
+
       </Grid>
 
       <Button
         variant="contained"
         onClick={handleSubmit}
-        disabled={createNoc.isLoading}
+        disabled={createNoc.isLoading || uploadNocFile.isLoading || !acceptedTnC} // Disable if not checked}
       >
-        {createNoc.isLoading ? "Submitting..." : "Submit NOC Request"}
+        {createNoc.isLoading || uploadNocFile.isLoading
+          ? "Submitting..."
+          : "Submit NOC Request"}
       </Button>
     </Container>
   );

@@ -54,6 +54,39 @@ export const studentResumeRouter = createTRPCRouter({
       });
     }),
 
+    uploadNoc: protectedProcedure
+  .input(
+    z.object({
+      key: z.string(),
+      fileDataUrl: z.string(),
+    }),
+  )
+  .mutation(async ({ ctx, input }) => {
+    const key = `${ctx.session.user.username}/${input.key}.pdf`;
+
+    const blob = await fetch(input.fileDataUrl).then((res) => res.blob());
+    const arrayBuffer = await blob.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    try {
+      await uploadFile(buffer, key); // This uploads to S3
+    } catch (err) {
+      console.error("NOC upload failed:", err);
+      throw new Error("Failed to upload NOC file");
+    }
+
+    const fileUrl = `${env.S3_PUBLIC_URL}/${key.replace("/", "%2F")}`;
+    await ctx.db.students.update({
+      where: {
+        userId: ctx.session.user.id,
+      },
+      data: {
+        noc: fileUrl,
+      },
+    });
+    return { url: fileUrl };
+  }),
+
   deleteStudentResume: protectedProcedure
     .input(z.string())
     .mutation(async ({ ctx, input }) => {

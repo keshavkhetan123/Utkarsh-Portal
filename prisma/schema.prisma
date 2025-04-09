@@ -129,7 +129,7 @@ model Students {
     createdAt            DateTime  @default(now())
     updatedAt            DateTime  @updatedAt
     user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-
+    noc                  String?
     resume       StudentResume[]
     applications Application[]
     selections   SelectedStudents[]
