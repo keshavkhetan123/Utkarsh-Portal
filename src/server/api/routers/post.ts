@@ -262,62 +262,77 @@ export const postRouter = createTRPCRouter({
   getLatestPostAdmin: roleProtectedProcedure('superAdmin')
     .input(
       z.object({
-        page: z.number().min(1).default(1),
-        pageSize: z.number().max(100).default(10),
-        jobType: z.string().nullable().default(null),
+        // page: z.number().min(1).default(1),
+        // pageSize: z.number().max(100).default(10),
+        jobType: z.string().nullable().default("All"),
+        admissionYear: z.number().nullable().default(2026),
       }),
     )
     .query(async ({ ctx, input }) => {
+      console.log("hii");
       const userDetails = await ctx.db.user.findUnique({
         where: {
           id: ctx.session.user.id,
         },
-        select: {
-          student: {
-            select: {
-              admissionYear: true,
-              program: true
-            },
-          },
-        },
+        // select: {
+        //   student: {
+        //     select: {
+        //       // admissionYear: true,
+        //       // program: true
+        //     },
+        //   },
+        // },
       });
+      // console.log("userDetails");
+      // if (!userDetails || !userDetails.student) {
+      //   console.error('Student details not found for user:', ctx.session.user.id);
+      //   return [];
+      // }
+      // console.log('User ID:', ctx.session.user.id);
+      // console.log('User Details:', userDetails);
+      // console.log('Input:', input);
+      // if (!userDetails.jobType || !userDetails.student) {
+      //   console.error('Student details not found for user:', ctx.session.user.id);
+      //   return [];
+      // }
+
       const data = await ctx.db.post.findMany({
         select: {
           id: true,
           title: true,
           createdAt: true,
-          jobType: true,
+          // jobType: true,
         },
         where: {
           published: true,
-          year: ctx.session.user.year,
-          ...(input.jobType ? {
+          year: input.admissionYear,
+          // ...(input.jobType ? {
             jobType: input.jobType
-          } : {}),
-          OR: [
-            {
-              participatingGroups: {
-                some: {
-                  admissionYear: userDetails.student.admissionYear,
-                  program: userDetails.student.program,
-                },
-              },
-            },
-            {
-              individualParticipants: {
-                some: {
-                  userId: ctx.session.user.id,
-                },
-              },
-            },
-          ],
+          // } : {}),
+          // OR: [
+          //   {
+          //     participatingGroups: {
+          //       some: {
+          //         admissionYear: input.admissionYear,
+          //         program: input.program,
+          //       },
+          //     },
+          //   },
+          //   {
+          //     individualParticipants: {
+          //       some: {
+          //         userId: ctx.session.user.id,
+          //       },
+          //     },
+          //   },
+          // ],
         },
         orderBy: {
           createdAt: "desc",
         },
 
-        take: input.pageSize,
-        skip: (input.page - 1) * input.pageSize,
+        // take: input.pageSize,
+        // skip: (input.page - 1) * input.pageSize,
       });
       return data;
     }),

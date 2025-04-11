@@ -9,6 +9,7 @@ export const onboardingRouter = createTRPCRouter({
         dob: z.date(),
         tenthMarks: z.number(),
         twelvethMarks: z.number(),
+        passOutYear: z.number(),
         addressLine1: z.string(),
         addressLine2: z.string(),
         pincode: z.number(),

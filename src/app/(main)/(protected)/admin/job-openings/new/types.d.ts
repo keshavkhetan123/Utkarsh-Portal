@@ -23,7 +23,8 @@ interface NewJobOpening {
     admissionYear?: number;
     program?: string;
     minCgpa?: number;
-    minCredits?: number;
+    // minCredits?: number;
+    backlog?: boolean;
   }[];
 }
 

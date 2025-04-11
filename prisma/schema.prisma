@@ -114,6 +114,7 @@ model Students {
     dob                  DateTime?
     tenthMarks           Float?    @default(0)
     twelvethMarks        Float?    @default(0)
+    passOutYear          Int?
     addressLine1         String?
     addressLine2         String?
     pincode              Int?
@@ -123,13 +124,14 @@ model Students {
     isOnboardingComplete Boolean   @default(false)
     completedCredits     Int
     totalCredits         Int
+    backlog              Boolean   @default(false)
     cgpa                 Float
     email                String?
     phone                String?
     createdAt            DateTime  @default(now())
     updatedAt            DateTime  @updatedAt
     user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-
+    noc                  String?
     resume       StudentResume[]
     applications Application[]
     selections   SelectedStudents[]
@@ -244,7 +246,8 @@ model JobOpeningParticipantGroups {
     admissionYear Int
     program       String
     minCgpa       Float  @default(0)
-    minCredits    Int    @default(0)
+   // minCredits    Int    @default(0)
+    backlog        Boolean @default(true)
 
     jobOpening JobOpening @relation(fields: [jobOpeningId], references: [id], onDelete: Cascade)
 

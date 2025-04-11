@@ -37,7 +37,8 @@ export const jobOpeningRouter = createTRPCRouter({
             admissionYear: z.number(),
             program: z.string(),
             minCgpa: z.number().max(10).optional().default(0),
-            minCredits: z.number().optional().default(0),
+            // minCredits: z.number().optional().default(0),
+            backlog:z.boolean().default(false),
           }),
         ),
       }),
@@ -95,7 +96,8 @@ export const jobOpeningRouter = createTRPCRouter({
                 admissionYear: group.admissionYear,
                 program: group.program,
                 minCgpa: group.minCgpa,
-                minCredits: group.minCredits,
+                // minCredits: group.minCredits,
+                backlog:group.backlog,
               })),
             },
           },
@@ -136,7 +138,9 @@ export const jobOpeningRouter = createTRPCRouter({
             admissionYear: z.number(),
             program: z.string(),
             minCgpa: z.number().max(10).optional().default(0),
-            minCredits: z.number().optional().default(0),
+            // minCredits: z.number().optional().default(0),
+            backlog:z.boolean().default(false),
+
           }),
         ),
       }),
@@ -186,7 +190,8 @@ export const jobOpeningRouter = createTRPCRouter({
                 admissionYear: group.admissionYear,
                 program: group.program,
                 minCgpa: group.minCgpa,
-                minCredits: group.minCredits,
+                // minCredits: group.minCredits,
+                backlog:group.backlog,
               },
             }),
           );
@@ -232,7 +237,8 @@ export const jobOpeningRouter = createTRPCRouter({
                     admissionYear: group.admissionYear,
                     program: group.program,
                     minCgpa: group.minCgpa,
-                    minCredits: group.minCredits,
+                    // minCredits: group.minCredits,
+                    backlog:group.backlog,
                   })),
               },
             },
@@ -294,9 +300,12 @@ export const jobOpeningRouter = createTRPCRouter({
           minCgpa: {
             lte: userDetails.student.cgpa,
           },
-          minCredits: {
-            lte: userDetails.student.completedCredits,
-          },
+          // minCredits: {
+          //   lte: userDetails.student.completedCredits,
+          // },
+          backlog:{
+            lte:userDetails.student.backlog,
+          }
         }),
         jobOpening: {
           year: ctx.session.user.year,
@@ -329,7 +338,8 @@ export const jobOpeningRouter = createTRPCRouter({
             admissionYear: true,
             program: true,
             minCgpa: true,
-            minCredits: true,
+            // minCredits: true,
+            backlog:false,
             jobOpening: {
               select: {
                 id: true,
@@ -394,8 +404,12 @@ export const jobOpeningRouter = createTRPCRouter({
           whyNotRegister = "Program does not match.";
         } else if (jobOpening.minCgpa > userDetails.student.cgpa) {
           whyNotRegister = `Required CGPA: ${jobOpening.minCgpa}, Your CGPA: ${userDetails.student.cgpa}`;
-        } else if (jobOpening.minCredits > userDetails.student.completedCredits) {
-          whyNotRegister = `Required Credits: ${jobOpening.minCredits}, Your Credits: ${userDetails.student.completedCredits}`;
+        } 
+        // else if (jobOpening.minCredits > userDetails.student.completedCredits) {
+        //   whyNotRegister = `Required Credits: ${jobOpening.minCredits}, Your Credits: ${userDetails.student.completedCredits}`;
+        // }
+        else if(jobOpening.backlog == false && userDetails.backlog == true){
+          whyNotRegister = `Company does not allow students with backlog`;
         }
       
         return {
@@ -488,7 +502,8 @@ export const jobOpeningRouter = createTRPCRouter({
               admissionYear: true,
               program: true,
               minCgpa: true,
-              minCredits: true,
+              // minCredits: true,
+              backlog:true,
             },
           },
           createdAt: true,
@@ -522,7 +537,8 @@ export const jobOpeningRouter = createTRPCRouter({
               group.admissionYear === userDetails.student.admissionYear &&
               group.program === userDetails.student.program &&
               group.minCgpa <= userDetails.student.cgpa &&
-              group.minCredits <= userDetails.student.completedCredits,
+              ((group.backlog == 0) ? !userDetails.student.backlog : true)
+              // group.minCredits <= userDetails.student.completedCredits,
           );
 
         data.alreadyRegistered = jobOpening.applications.length > 0;
@@ -622,7 +638,8 @@ export const jobOpeningRouter = createTRPCRouter({
               admissionYear: true,
               program: true,
               minCgpa: true,
-              minCredits: true,
+              // minCredits: true,
+              backlog:true,
             },
           },
         },

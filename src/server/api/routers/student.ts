@@ -76,6 +76,7 @@ export const studentRouter = createTRPCRouter({
 
       return "Ok";
     }),
+    
   searchStudent: roleProtectedProcedure('superAdmin')
     .input(z.string())
     .query(async ({ input, ctx }) => {
@@ -144,6 +145,7 @@ export const studentRouter = createTRPCRouter({
           program: true,
           email: true,
           phone: true,
+          noc:true,
           user: {
             select: {
               name: true,
