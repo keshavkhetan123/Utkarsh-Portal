@@ -28,7 +28,7 @@ import { useQuery } from "@tanstack/react-query";
 import TextEditor from "~/app/common/components/TextEditor";
 import { api } from "~/trpc/react";
 
-import AdditionalFieldSelector from "./_components/AdditionalFieldsSelector";
+// import AdditionalFieldSelector from "./_components/AdditionalFieldsSelector";
 import JobOpeningGroupSelector from "./_components/ParticipatingGroupsSelector";
 
 import { DEFAULT_JOB_OPENING } from "./constants";
@@ -386,12 +386,12 @@ export default function NewJobOpening() {
           value={jobOpening.description}
           ref={descEditorRef}
         />
-        <AdditionalFieldSelector
+        {/* <AdditionalFieldSelector
           value={jobOpening.extraApplicationFields}
           onChange={(value) =>
             setJobOpening({ ...jobOpening, extraApplicationFields: value })
           }
-        />
+        /> */}
         <div className="flex flex-row gap-4 justify-end flex-wrap">
           <FormControlLabel
             label="Create Hidden"
