@@ -13,6 +13,7 @@ import {
 } from "@mui/material";
 
 export default function GroupCard(props: JobOpeningGroupCardProps) {
+  console.log("here is the group", props.group);
   return (
     <Paper elevation={4} className="group flex flex-col p-4 gap-3">
       <Typography variant="subtitle2" className="relative">

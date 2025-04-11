@@ -63,6 +63,8 @@ export default function UpdateJobOpening() {
         participatingGroups: originalJobOpening.JobOpeningParticipantGroups,
       });
     }
+
+    console.log("Here are participating groups : ", jobOpening.participatingGroups);
   }, [originalJobOpening]);
 
   const { data: jobTypes, isLoading: isJobTypesLoading } =
@@ -151,6 +153,8 @@ export default function UpdateJobOpening() {
             (group) => ({
               admissionYear: parseInt(group.admissionYear),
               program: group.program,
+              minCgpa : group.minCgpa,
+              backlog: group.backlog
             }),
           );
           updateJobOpeningMutation.mutate(reqData);

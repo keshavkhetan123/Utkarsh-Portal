@@ -139,8 +139,7 @@ export const jobOpeningRouter = createTRPCRouter({
             program: z.string(),
             minCgpa: z.number().max(10).optional().default(0),
             // minCredits: z.number().optional().default(0),
-            backlog:z.boolean().default(false),
-
+            backlog:z.boolean().default(true),
           }),
         ),
       }),
