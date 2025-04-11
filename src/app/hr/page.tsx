@@ -152,7 +152,8 @@ export default function NewJobOpening() {
               admissionYear: parseInt(group.admissionYear),
               program: group.program,
               minCgpa: group.minCgpa,
-              minCredits: group.minCredits
+              // minCredits: group.minCredits
+              backlog: group.backlog
             })
           );
           createJobOpeningMutation.mutate(reqData);

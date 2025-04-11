@@ -124,6 +124,7 @@ model Students {
     isOnboardingComplete Boolean   @default(false)
     completedCredits     Int
     totalCredits         Int
+    backlog              Boolean   @default(false)
     cgpa                 Float
     email                String?
     phone                String?
@@ -245,7 +246,8 @@ model JobOpeningParticipantGroups {
     admissionYear Int
     program       String
     minCgpa       Float  @default(0)
-    minCredits    Int    @default(0)
+   // minCredits    Int    @default(0)
+    backlog        Boolean @default(true)
 
     jobOpening JobOpening @relation(fields: [jobOpeningId], references: [id], onDelete: Cascade)
 

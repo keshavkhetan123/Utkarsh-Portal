@@ -41,9 +41,10 @@ export const jobApplication = createTRPCRouter({
               minCgpa: {
                 lte: userDetails.student.cgpa,
               },
-              minCredits: {
-                lte: userDetails.student.completedCredits,
-              },
+              // minCredits: {
+              //   lte: userDetails.student.completedCredits,
+              // },
+              backlog : userDetails.student.backlog,
             },
           },
           registrationEnd: {
@@ -150,9 +151,10 @@ export const jobApplication = createTRPCRouter({
               minCgpa: {
                 lte: userDetails.student.cgpa,
               },
-              minCredits: {
-                lte: userDetails.student.completedCredits,
-              },
+              // minCredits: {
+              //   lte: userDetails.student.completedCredits,
+              // },
+              backlog : userDetails.student.backlog
             },
           },
           registrationEnd: {

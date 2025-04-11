@@ -8,6 +8,8 @@ import {
   Select,
   TextField,
   Typography,
+  Checkbox,
+  FormControlLabel 
 } from "@mui/material";
 
 export default function GroupCard(props: JobOpeningGroupCardProps) {
@@ -80,7 +82,7 @@ export default function GroupCard(props: JobOpeningGroupCardProps) {
           })
         }
       />
-      <TextField
+      {/* <TextField
         label="Min. Credits"
         value={props.group.minCredits}
         type="number"
@@ -94,7 +96,25 @@ export default function GroupCard(props: JobOpeningGroupCardProps) {
             minCredits: Number(e.target.value),
           })
         }
-      />
+      /> */}
+      <FormControlLabel
+      control={
+        <Checkbox
+          checked={props.group.backlog}
+          onChange={(e) =>
+            props.onChange({
+              ...props.group,
+              backlog: e.target.checked,
+            })
+          }
+          disabled={props.disabled}
+        />
+      }
+      label="Allow students with backlog?"
+      disabled={props.disabled}
+    />
+    {/* <span>Backlog</span> */}
+
     </Paper>
   );
 }

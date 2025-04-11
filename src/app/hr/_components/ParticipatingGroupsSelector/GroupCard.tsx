@@ -7,6 +7,7 @@ import {
   Paper,
   Select,
   TextField,
+  Checkbox,
   Typography,
 } from "@mui/material";
 
@@ -80,7 +81,7 @@ export default function GroupCard(props: JobOpeningGroupCardProps) {
           })
         }
       />
-      <TextField
+      {/* <TextField
         label="Min. Credits"
         value={props.group.minCredits}
         type="number"
@@ -94,7 +95,18 @@ export default function GroupCard(props: JobOpeningGroupCardProps) {
             minCredits: Number(e.target.value),
           })
         }
-      />
+      /> */}
+      <Checkbox
+  checked={props.group.backlog}
+  onChange={(e) =>
+    props.onChange({
+      ...props.group,
+      backlog: e.target.checked,
+    })
+  }
+/>
+<span>Backlog</span>
+
     </Paper>
   );
 }
