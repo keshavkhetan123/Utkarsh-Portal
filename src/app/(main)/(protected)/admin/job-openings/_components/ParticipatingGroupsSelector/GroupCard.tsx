@@ -30,14 +30,14 @@ export default function GroupCard(props: JobOpeningGroupCardProps) {
         )}
       </Typography>
       <FormControl size="small" required disabled={props.disabled}>
-        <InputLabel>Admission Year</InputLabel>
+        <InputLabel>PassOut Year</InputLabel>
         <Select
-          value={props.group.admissionYear || ""}
-          label="Admission Year"
+          value={props.group.passOutYear || ""}
+          label="PassOut Year"
           onChange={(event) => {
             props.onChange({
               ...props.group,
-              admissionYear: parseInt(event.target.value.toString()),
+              passOutYear: parseInt(event.target.value.toString()),
             });
           }}
         >
@@ -51,7 +51,7 @@ export default function GroupCard(props: JobOpeningGroupCardProps) {
       <FormControl
         size="small"
         required
-        disabled={props.disabled || !props.group.admissionYear}
+        disabled={props.disabled || !props.group.passOutYear}
       >
         <InputLabel>Program</InputLabel>
         <Select
@@ -64,7 +64,7 @@ export default function GroupCard(props: JobOpeningGroupCardProps) {
             });
           }}
         >
-          {props.allGroups[props.group.admissionYear]?.map((program) => (
+          {props.allGroups[props.group.passOutYear]?.map((program) => (
             <MenuItem value={program} key={program}>
               {program}
             </MenuItem>

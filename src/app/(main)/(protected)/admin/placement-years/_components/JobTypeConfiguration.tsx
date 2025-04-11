@@ -72,7 +72,7 @@ export default function JobTypeConfiguration(props: JobTypeConfigurationProps) {
                     .filter((key) => {
                       return (
                         props.placementConfig.batches?.filter((el, elIdx) => {
-                          elIdx !== index && el.admissionYear === Number(key);
+                          elIdx !== index && el.passOutYear === Number(key);
                         }).length !== props.yearWisePrograms[Number(key)].length
                       );
                     })
@@ -83,7 +83,7 @@ export default function JobTypeConfiguration(props: JobTypeConfigurationProps) {
                           (el, elIdx) =>
                             elIdx !== index &&
                             el.program === batch &&
-                            el.admissionYear === Number(key),
+                            el.passOutYear === Number(key),
                         );
                       }),
                     ]),
@@ -122,7 +122,7 @@ export default function JobTypeConfiguration(props: JobTypeConfigurationProps) {
                   className="border-dashed"
                   disabled={
                     props.placementConfig.batches?.length > 0 &&
-                    (!props.placementConfig.batches.at(-1).admissionYear ||
+                    (!props.placementConfig.batches.at(-1).passOutYear ||
                       !props.placementConfig.batches.at(-1).program)
                   }
                   onClick={(_) => {
@@ -132,7 +132,7 @@ export default function JobTypeConfiguration(props: JobTypeConfigurationProps) {
                         ...(props.placementConfig.batches || []),
                         {
                           program: "",
-                          admissionYear: 0,
+                          passOutYear: 0,
                         },
                       ],
                     });

@@ -164,13 +164,13 @@ model ParticipatingGroups {
     id              String @id @default(cuid())
     year            Int
     placementTypeId String
-    admissionYear   Int
+    passOutYear     Int
     program         String
 
     placementType PlacementType              @relation(fields: [placementTypeId], references: [id])
     events        EventParticipatingGroups[]
 
-    @@unique([year, placementTypeId, admissionYear, program])
+    @@unique([year, placementTypeId, program])
     @@index([placementTypeId])
 }
 
