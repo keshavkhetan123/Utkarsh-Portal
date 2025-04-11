@@ -66,7 +66,7 @@ export default function IndividualPlacementYear() {
         .find((conf) => conf.id === el.placementType.id)
         ?.batches.push({
           program: el.program,
-          admissionYear: el.admissionYear,
+          passOutYear: el.passOutYear,
         });
     });
 
@@ -162,7 +162,7 @@ export default function IndividualPlacementYear() {
                       !config.id ||
                       !config.batches?.length ||
                       config.batches.some(
-                        (group) => !group.program || !group.admissionYear,
+                        (group) => !group.program || !group.passOutYear,
                       ),
                   )
                 }

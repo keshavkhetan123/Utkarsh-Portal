@@ -16,7 +16,7 @@ export default function JobOpeningGroupSelector(
 
   const handleAddGroup = () => {
     const newGroup = {
-      admissionYear: null,
+      passOutYear: null,
       program: "",
       minCgpa: null,
       backlog: false,
@@ -49,7 +49,7 @@ export default function JobOpeningGroupSelector(
                     .filter((key) => {
                       return (
                         (props.value || []).filter((el, elIdx) =>
-                          elIdx !== index && el.admissionYear === Number(key),
+                          elIdx !== index && el.passOutYear === Number(key),
                         ).length !== yearWisePrograms[Number(key)].length
                       );
                     })
@@ -60,7 +60,7 @@ export default function JobOpeningGroupSelector(
                           (el, elIdx) =>
                             elIdx !== index &&
                             el.program === batch &&
-                            el.admissionYear === Number(key),
+                            el.passOutYear === Number(key),
                         );
                       }),
                     ])

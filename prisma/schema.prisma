@@ -164,13 +164,13 @@ model ParticipatingGroups {
     id              String @id @default(cuid())
     year            Int
     placementTypeId String
-    admissionYear   Int
+    passOutYear     Int
     program         String
 
     placementType PlacementType              @relation(fields: [placementTypeId], references: [id])
     events        EventParticipatingGroups[]
 
-    @@unique([year, placementTypeId, admissionYear, program])
+    @@unique([year, placementTypeId, program])
     @@index([placementTypeId])
 }
 
@@ -243,10 +243,9 @@ model JobOpening {
 model JobOpeningParticipantGroups {
     id            String @id @default(cuid())
     jobOpeningId  String
-    admissionYear Int
+    passOutYear   Int
     program       String
     minCgpa       Float  @default(0)
-   // minCredits    Int    @default(0)
     backlog        Boolean @default(true)
 
     jobOpening JobOpening @relation(fields: [jobOpeningId], references: [id], onDelete: Cascade)
