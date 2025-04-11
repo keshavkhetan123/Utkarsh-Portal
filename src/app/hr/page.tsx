@@ -103,7 +103,7 @@ export default function NewJobOpening() {
 
     if (
       jobOpening.participatingGroups.some(
-        (group) => !group.admissionYear || !group.program
+        (group) => !group.passOutYear || !group.program
       )
     )
       return true;
@@ -149,7 +149,7 @@ export default function NewJobOpening() {
           reqData.description = descEditorRef.current.getContent();
           reqData.participatingGroups = reqData.participatingGroups.map(
             (group) => ({
-              admissionYear: parseInt(group.admissionYear),
+              passOutYear: parseInt(group.passOutYear),
               program: group.program,
               minCgpa: group.minCgpa,
               // minCredits: group.minCredits

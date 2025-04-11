@@ -29,7 +29,7 @@ export const jobOpeningRouter = createTRPCRouter({
         extraApplicationFields: z.any(),
         noResumes: z.boolean().optional().default(false),
         hidden: z.boolean().optional().default(false),
-        autoApprove: z.boolean().optional().default(false),
+        autoApprove: z.boolean().optional().default(true),
         autoVisible: z.boolean().optional().default(false),
         allowSelected: z.boolean().optional().default(false),
         participatingGroups: z.array(
@@ -63,7 +63,7 @@ export const jobOpeningRouter = createTRPCRouter({
 
       await ctx.db.jobOpening.create({
         data: {
-          year : 2026,
+          year : input.participatingGroups[0].passOutYear,
           title: input.title,
           description: input.description,
           location: input.location,

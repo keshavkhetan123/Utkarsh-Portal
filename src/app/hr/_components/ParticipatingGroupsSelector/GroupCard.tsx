@@ -9,6 +9,7 @@ import {
   TextField,
   Checkbox,
   Typography,
+  FormControlLabel
 } from "@mui/material";
 
 export default function GroupCard(props: JobOpeningGroupCardProps) {
@@ -96,16 +97,22 @@ export default function GroupCard(props: JobOpeningGroupCardProps) {
           })
         }
       /> */}
-      <Checkbox
-  checked={props.group.backlog}
-  onChange={(e) =>
-    props.onChange({
-      ...props.group,
-      backlog: e.target.checked,
-    })
-  }
-/>
-<span>Backlog</span>
+      <FormControlLabel
+      control={
+        <Checkbox
+          checked={true}
+          onChange={(e) =>
+            props.onChange({
+              ...props.group,
+              backlog: e.target.checked,
+            })
+          }
+          disabled={props.disabled}
+        />
+      }
+      label="Allow students with backlog?"
+      disabled={props.disabled}
+    />
 
     </Paper>
   );
