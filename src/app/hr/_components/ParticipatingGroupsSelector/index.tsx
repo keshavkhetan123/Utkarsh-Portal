@@ -19,7 +19,7 @@ export default function JobOpeningGroupSelector(
       passOutYear: null,
       program: "",
       minCgpa: null,
-      backlog: false,
+      backlog: true,
     };
     props.onChange([...(props.value || []), newGroup]);
   };

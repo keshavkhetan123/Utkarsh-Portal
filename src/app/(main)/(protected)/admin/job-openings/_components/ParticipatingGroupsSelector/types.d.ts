@@ -10,6 +10,7 @@ interface JobOpeningGroupsSelectorProps {
   jobTypeId: string;
   value: ParticipatingGroupConfig[];
   onChange: (value: ParticipatingGroupConfig[]) => void;
+  disabled?: boolean
 }
 
 type JobOpeningGroupCardProps = {
