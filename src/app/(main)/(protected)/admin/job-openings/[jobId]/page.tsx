@@ -27,7 +27,7 @@ export default async function Page({
         />
         <div className="flex flex-row gap-4 justify-end">
           <DeleteJobOpening jobId={params.jobId} />
-          <Link href={"./" + params.jobId + "/edit"}>
+          <Link href={"./" + params.jobId + "/view"}>
             <IconButton size="small" color="success">
               Edit
             </IconButton>

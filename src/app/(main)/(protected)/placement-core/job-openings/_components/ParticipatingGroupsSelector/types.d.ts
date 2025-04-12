@@ -2,7 +2,7 @@ interface ParticipatingGroupConfig {
   admissionYear?: number;
   program?: string;
   minCgpa?: number;
-  minCredits?: number;
+  backlog?: boolean;
 }
 
 interface JobOpeningGroupsSelectorProps {

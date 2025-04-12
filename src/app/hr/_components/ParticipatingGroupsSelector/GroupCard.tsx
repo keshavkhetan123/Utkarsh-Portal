@@ -100,7 +100,7 @@ export default function GroupCard(props: JobOpeningGroupCardProps) {
       <FormControlLabel
       control={
         <Checkbox
-          checked={true}
+          checked={props.group.backlog}
           onChange={(e) =>
             props.onChange({
               ...props.group,
