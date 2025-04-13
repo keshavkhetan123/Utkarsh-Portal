@@ -147,7 +147,6 @@ export const postRouter = createTRPCRouter({
             passOutYear: z.number(),
             program: z.string(),
             minCgpa: z.number().max(10).optional().default(0),
-
           }),
         ),
         jobType: z.string().nullable().default(null),
@@ -157,7 +156,6 @@ export const postRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       await ctx.db.post.create({
         data: {
-
           title: input.title,
           content: input.content,
           year: ctx.session.user.year,

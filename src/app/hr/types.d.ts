@@ -20,7 +20,7 @@ interface NewJobOpening {
   autoVisible: boolean;
   allowSelected: boolean;
   participatingGroups: {
-    admissionYear?: number;
+    passOutYear?: number;
     program?: string;
     minCgpa?: number;
     backlog?: boolean;

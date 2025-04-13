@@ -14,7 +14,7 @@ export const studentRouter = createTRPCRouter({
         userId: ctx.session.user.id,
       },
       select: {
-        admissionYear: true,
+        passOutYear: true,
         cgpa: true,
         currentSemester: true,
         totalCredits: true,
@@ -45,7 +45,7 @@ export const studentRouter = createTRPCRouter({
         },
         data: {
           program: userData.program,
-          admissionYear: userData.admissionYear,
+          passOutYear: userData.passOutYear,
           duration: userData.duration,
           currentSemester: userData.currentSem,
           completedCredits: userData.completedCredits,
@@ -127,7 +127,7 @@ export const studentRouter = createTRPCRouter({
           userId: user.id,
         },
         select: {
-          admissionYear: true,
+          passOutYear: true,
           cgpa: true,
           currentSemester: true,
           totalCredits: true,

@@ -69,11 +69,11 @@ export default function JobAnalyticsRow(props: JobAnalyticsRowProps) {
               series={[
                 {
                   data: data.map((item) => ({
-                    id: item.group.admissionYear + "_" + item.group.program,
+                    id: item.group.passOutYear + "_" + item.group.program,
                     value: item.selected,
                     label: `${item.group.program} ${
-                      item.group.admissionYear
-                        ? `(${item.group.admissionYear})`
+                      item.group.passOutYear
+                        ? `(${item.group.passOutYear})`
                         : ""
                     }`,
                   })),
@@ -99,7 +99,7 @@ export default function JobAnalyticsRow(props: JobAnalyticsRowProps) {
             </PieChart>
             <div className="flex flex-row md:flex-col gap-2 flex-wrap justify-center">
               {data.map((item, index) => (
-                <div key={item.group.admissionYear + "_" + item.group.program}>
+                <div key={item.group.passOutYear + "_" + item.group.program}>
                   <div className="flex flex-row gap-2 items-center">
                     <div
                       className="w-4 h-4 rounded-full"
@@ -113,8 +113,8 @@ export default function JobAnalyticsRow(props: JobAnalyticsRowProps) {
                       }}
                     />
                     <div>{`${item.group.program} ${
-                      item.group.admissionYear
-                        ? `(${item.group.admissionYear})`
+                      item.group.passOutYear
+                        ? `(${item.group.passOutYear})`
                         : ""
                     }`}</div>
                   </div>

@@ -165,7 +165,7 @@ export default function ParticipatingGroupSelector(
               </ListItemIcon>
               <ListItemText
                 id={labelId}
-                primary={`${value.placementType.id} - ${value.admissionYear} - ${value.program}`}
+                primary={`${value.placementType.id} - ${value.passOutYear} - ${value.program}`}
               />
             </ListItemButton>
           );

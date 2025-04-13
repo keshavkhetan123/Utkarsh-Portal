@@ -1,5 +1,5 @@
 interface ParticipatingGroupConfig {
-  admissionYear?: number;
+  passOutYear?: number;
   program?: string;
   minCgpa?: number;
 }
