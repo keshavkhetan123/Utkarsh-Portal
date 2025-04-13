@@ -3,7 +3,7 @@ import { z } from "zod";
 import { roleProtectedProcedure, createTRPCRouter } from "~/server/api/trpc";
 
 export const analyticsRouter = createTRPCRouter({
-  getJobTypes: roleProtectedProcedure('superAdmin').query(async ({ ctx }) => {
+  getJobTypes: roleProtectedProcedure(['superAdmin', 'PlacementCoreTeam', 'PlacementTeamMember']).query(async ({ ctx }) => {
     const data = await ctx.db.placementType.findMany({
       where: {
         ParticipatingGroups: {
@@ -16,7 +16,7 @@ export const analyticsRouter = createTRPCRouter({
     return data;
   }),
 
-  getJobTypeSelectionAnalytics: roleProtectedProcedure('superAdmin')
+  getJobTypeSelectionAnalytics: roleProtectedProcedure(['superAdmin', 'PlacementCoreTeam', 'PlacementTeamMember'])
     .input(z.string())
     .query(async ({ ctx, input }) => {
       const groups = await ctx.db.participatingGroups.findMany({

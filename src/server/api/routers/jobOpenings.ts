@@ -543,7 +543,7 @@ export const jobOpeningRouter = createTRPCRouter({
       return jobOpening;
     }),
 
-  adminGetJobOpenings: roleProtectedProcedure('superAdmin')
+  adminGetJobOpenings: roleProtectedProcedure(['superAdmin', 'PlacementCoreTeam', 'PlacementTeamMember'])
     .input(
       z.object({
         limit: z.number().default(10),
@@ -591,7 +591,7 @@ export const jobOpeningRouter = createTRPCRouter({
       };
     }),
 
-  adminGetJobOpening: roleProtectedProcedure('superAdmin')
+  adminGetJobOpening: roleProtectedProcedure(['superAdmin', 'PlacementCoreTeam', 'PlacementTeamMember'])
     .input(z.string())
     .query(async ({ ctx, input }) => {
       return await ctx.db.jobOpening.findUnique({
@@ -642,7 +642,7 @@ export const jobOpeningRouter = createTRPCRouter({
       });
     }),
 
-  adminGetRegDetails: roleProtectedProcedure('superAdmin')
+  adminGetRegDetails: roleProtectedProcedure(['superAdmin', 'PlacementCoreTeam', 'PlacementTeamMember'])
     .input(z.string())
     .query(async ({ ctx, input }) => {
       return await ctx.db.students.groupBy({
