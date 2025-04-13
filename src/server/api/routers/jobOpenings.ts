@@ -554,6 +554,9 @@ export const jobOpeningRouter = createTRPCRouter({
       const [count, jobOpenings] = await ctx.db.$transaction([
         ctx.db.jobOpening.count(),
         ctx.db.jobOpening.findMany({
+          where: {
+            year: ctx.session.user.year,
+          },
           select: {
             id: true,
             title: true,

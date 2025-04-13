@@ -36,7 +36,7 @@ function Page() {
   const postsQuery = api.post.getLatestPostAdmin.useQuery(
     {
       jobType: jobType ?? null,
-      admissionYear: year,
+      passOutYear: year,
     },
     {
       enabled: false,
