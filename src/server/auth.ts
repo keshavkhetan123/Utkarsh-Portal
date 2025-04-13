@@ -111,7 +111,7 @@ export const authOptions: NextAuthOptions = {
             select: { //CHANGED
               userGroup: true,
               role: { select: { name: true } },
-              student: { select: { admissionYear: true, program: true } },
+              student: { select: { passOutYear: true, program: true } },
             },
             
           });
@@ -218,10 +218,9 @@ export const authOptions: NextAuthOptions = {
             role: { select: { name: true } },
             student: {
               select: {
-                admissionYear: true,
+                passOutYear: true,
                 program: true,
                 isOnboardingComplete: true,
-                passOutYear : true
               },
             },
           },
@@ -253,7 +252,6 @@ export const authOptions: NextAuthOptions = {
                 student: {
                   create: {
                     program: 'ECE',
-                    admissionYear: 2022,
                     duration: 4,
                     currentSemester: '6',
                     completedCredits: 108,  
@@ -272,10 +270,9 @@ export const authOptions: NextAuthOptions = {
                 role: { select: { name: true } },
                 student: {
                   select: {
-                    admissionYear: true,
+                    passOutYear: true,
                     program: true,
                     isOnboardingComplete: true,
-                    passOutYear : true
                   },
                 },
               },
@@ -300,7 +297,7 @@ export const authOptions: NextAuthOptions = {
                     create: { name: "superAdmin" },
                   },
                 },
-                
+                year: 2026,
               },
               select: {
                 id: true,
@@ -311,7 +308,7 @@ export const authOptions: NextAuthOptions = {
                 role: { select: { name: true } },
                 student: {
                   select: {
-                    admissionYear: true,
+                    passOutYear: true,
                     program: true,
                     isOnboardingComplete: true,
                   },
@@ -329,7 +326,7 @@ export const authOptions: NextAuthOptions = {
         //   },
         //   where: {
         //     ...(user.student && {
-        //       admissionYear: user.student?.admissionYear,
+        //       passOutYear: user.student?.passOutYear,
         //       program: user.student?.program,
         //     }),
         //   },

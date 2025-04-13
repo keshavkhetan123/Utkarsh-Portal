@@ -30,7 +30,7 @@ export const analyticsRouter = createTRPCRouter({
         ...groups.map((grp) => {
           return ctx.db.students.count({
             where: {
-              admissionYear: grp.admissionYear,
+              passOutYear: grp.passOutYear,
               program: grp.program,
             },
             select: {
@@ -41,7 +41,7 @@ export const analyticsRouter = createTRPCRouter({
         ...groups.map((grp) => {
           return ctx.db.students.count({
             where: {
-              admissionYear: grp.admissionYear,
+              passOutYear: grp.passOutYear,
               program: grp.program,
               selections: {
                 some: {
@@ -79,7 +79,7 @@ export const analyticsRouter = createTRPCRouter({
         group: {
           id: "total",
           year: ctx.session.user.year,
-          admissionYear: null,
+          passOutYear: null,
           program: "Unselected",
           placementTypeId: input,
         },

@@ -21,7 +21,7 @@ export default function PostGroupSelector(
         const year = parseInt(yearStr)
         yearWisePrograms[year].forEach((program) => {
           participatingGroups.push({
-            admissionYear: year,
+            passOutYear: year,
             program,
           });
         })
@@ -51,7 +51,7 @@ export default function PostGroupSelector(
                   .filter((key) => {
                     return (
                       props.value?.filter((el, elIdx) => {
-                        elIdx !== index && el.admissionYear === Number(key);
+                        elIdx !== index && el.passOutYear === Number(key);
                       }).length !== yearWisePrograms[Number(key)].length
                     );
                   })
@@ -62,7 +62,7 @@ export default function PostGroupSelector(
                         (el, elIdx) =>
                           elIdx !== index &&
                           el.program === batch &&
-                          el.admissionYear === Number(key),
+                          el.passOutYear === Number(key),
                       );
                     }),
                   ]),

@@ -15,7 +15,7 @@ type StudentAviralData = Promise<{
   totalCredits: number;
   program: string;
   duration: number;
-  admissionYear: number;
+  passOutYear: number;
 } | null>;
 
 type FacultyAviralData = Promise<{
@@ -71,7 +71,7 @@ export const getStudentAviralData = async (
       completedCredits: res.data["completed_total"] || 0,
       totalCredits: res.data["total_credits"] || 0,
       program: res.data["program"] || "Default Program",
-      admissionYear: res.data["admission_year"] || 2022,
+      passOutYear: res.data["admission_year"] || 2022,
       duration: res.data["duration"] || 4,
     };
 
@@ -89,7 +89,7 @@ export const getStudentAviralData = async (
       completedCredits: 0,
       totalCredits: 0,
       program: "Default Program",
-      admissionYear: 2022,
+      passOutYear: 2022,
       duration: 4,
     };
   }

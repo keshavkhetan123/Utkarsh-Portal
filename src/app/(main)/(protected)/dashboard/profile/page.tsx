@@ -165,7 +165,7 @@ export default function UserProfile() {
               <TextField
                 disabled
                 label="Admission Year"
-                defaultValue={profile.admissionYear}
+                defaultValue={profile.passOutYear}
                 className="md:basis-[30%] sm:basis-[45%] basis-full"
               />
               <TextField

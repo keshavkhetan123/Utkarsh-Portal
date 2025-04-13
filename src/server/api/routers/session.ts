@@ -40,7 +40,7 @@ export const placementSessionRouter = createTRPCRouter({
   //         .findMany({
   //           where: {
   //             program: group.program,
-  //             admissionYear: group.year,
+  //             passOutYear: group.year,
   //             completedCredits: { gte: group.minCredits },
   //             cgpa: { gte: group.minCGPA },
   //           },

@@ -7,7 +7,7 @@ export type ParticipatingGroup = {
   id: string;
   year: number;
   placementTypeId: string;
-  admissionYear: number;
+  passOutYear: number;
   program: string;
 };
 
