@@ -231,8 +231,10 @@ export default function ResponsiveDrawer({
   // Determine the sidebar to show based on the user role
   const getSidebar = () => {
     if (isAdmin) return ADMIN_SIDEBAR;
-    if (user.role.name === "PlacementCoreTeam") return PLACEMENT_CORE_SIDEBAR;
-    if (user.role.name === "PlacementTeamMember") return PL_TEAM;
+    if (user.role.name === "PlacementCoreTeam" && pathname.includes('placement-core')){
+        return PLACEMENT_CORE_SIDEBAR;
+    }
+    if (user.role.name === "PlacementTeamMember" && pathname.includes('placement-team')) return PL_TEAM;
     return USER_SIDEBAR;
   };
 
@@ -241,7 +243,7 @@ export default function ResponsiveDrawer({
     if (isAdmin) return "Admin";
     if (user.role.name === "PlacementCoreTeam") return "Placement Core";
     if (user.role.name === "PlacementTeamMember") return "Placement Team";
-    return "Dashboard";
+    return "Student";
   };
 
   const drawer = (
@@ -340,7 +342,8 @@ export default function ResponsiveDrawer({
     )}
 
     {user.role.name === "PlacementCoreTeam" && (
-      <Link href="/placement-core-dashboard" onClick={() => setOpen(false)}>
+      <>
+      <Link href="/placement-core" onClick={() => setOpen(false)}>
         <ListItemButton>
           <ListItemIcon>
             <VerifiedUserIcon />
@@ -348,10 +351,21 @@ export default function ResponsiveDrawer({
           <ListItemText primary={"Placement Core Panel"} />
         </ListItemButton>
       </Link>
+
+      <Link href="/dashboard" onClick={() => setOpen(false)}>
+        <ListItemButton>
+          <ListItemIcon>
+            <VerifiedUserIcon />
+          </ListItemIcon>
+          <ListItemText primary={"Student Panel"} />
+        </ListItemButton>
+      </Link>
+    </>
     )}
 
     {user.role.name === "PlacementTeamMember" && (
-      <Link href="/placement-team-dashboard" onClick={() => setOpen(false)}>
+      <>
+      <Link href="/placement-team" onClick={() => setOpen(false)}>
         <ListItemButton>
           <ListItemIcon>
           <VerifiedUserIcon />
@@ -359,6 +373,16 @@ export default function ResponsiveDrawer({
           <ListItemText primary={"Placement Team Panel"} />
         </ListItemButton>
       </Link>
+
+      <Link href="/dashboard" onClick={() => setOpen(false)}>
+      <ListItemButton>
+        <ListItemIcon>
+          <VerifiedUserIcon />
+        </ListItemIcon>
+        <ListItemText primary={"Student Panel"} />
+      </ListItemButton>
+      </Link>
+      </>
     )}
 
     {user.role.name === "student" && (

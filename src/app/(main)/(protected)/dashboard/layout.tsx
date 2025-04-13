@@ -9,10 +9,11 @@ export default async function ProtectedPagesLayout({
   children: React.ReactNode;
 }) {
   let session = await getServerAuthSession();
+  
   if (session?.user?.role?.name === "superAdmin") {
     return redirect("/admin");
   }
-  if (session?.user?.isOnboardingComplete === false) {
+  else if (session?.user?.isOnboardingComplete === false) {
     return redirect("/onboarding");
   }
   return <Suspense fallback={<FullPageLoader />}>{children}</Suspense>;
