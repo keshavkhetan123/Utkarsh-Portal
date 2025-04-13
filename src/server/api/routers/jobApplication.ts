@@ -16,7 +16,7 @@ export const jobApplication = createTRPCRouter({
         select: {
           student: {
             select: {
-              admissionYear: true,
+              passOutYear: true,
               program: true,
               cgpa: true,
               completedCredits: true,
@@ -36,7 +36,7 @@ export const jobApplication = createTRPCRouter({
           year: ctx.session.user.year,
           JobOpeningParticipantGroups: {
             some: {
-              admissionYear: userDetails.student.admissionYear,
+              passOutYear: userDetails.student.passOutYear,
               program: userDetails.student.program,
               minCgpa: {
                 lte: userDetails.student.cgpa,
@@ -118,7 +118,7 @@ export const jobApplication = createTRPCRouter({
                   id: input.resumeId,
                 },
               },
-              admissionYear: true,
+              passOutYear: true,
               program: true,
               cgpa: true,
               completedCredits: true,
@@ -146,7 +146,7 @@ export const jobApplication = createTRPCRouter({
           year: ctx.session.user.year,
           JobOpeningParticipantGroups: {
             some: {
-              admissionYear: userDetails.student.admissionYear,
+              passOutYear: userDetails.student.passOutYear,
               program: userDetails.student.program,
               minCgpa: {
                 lte: userDetails.student.cgpa,
@@ -475,7 +475,7 @@ export const jobApplication = createTRPCRouter({
           application.student.gender,
           application.student.tenthMarks,
           application.student.twelvethMarks,
-          application.student.admissionYear,
+          application.student.passOutYear,
           application.createdAt,
         ];
         if (
