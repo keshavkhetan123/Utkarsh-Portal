@@ -22,7 +22,7 @@ export const postRouter = createTRPCRouter({
         select: {
           student: {
             select: {
-              admissionYear: true,
+              passOutYear: true,
               program: true,
 
             },
@@ -44,7 +44,7 @@ export const postRouter = createTRPCRouter({
             {
               participatingGroups: {
                 some: {
-                  admissionYear: userDetails.student.admissionYear,
+                  passOutYear: userDetails.student.passOutYear,
                   program: userDetails.student.program,
                 },
               },
@@ -77,7 +77,7 @@ export const postRouter = createTRPCRouter({
         select: {
           student: {
             select: {
-              admissionYear: true,
+              passOutYear: true,
               program: true,
             },
           },
@@ -91,7 +91,7 @@ export const postRouter = createTRPCRouter({
             {
               participatingGroups: {
                 some: {
-                  admissionYear: userDetails.student.admissionYear,
+                  passOutYear: userDetails.student.passOutYear,
                   program: userDetails.student.program,
                 },
               },
@@ -117,7 +117,7 @@ export const postRouter = createTRPCRouter({
           },
           participatingGroups: {
             select: {
-              admissionYear: true,
+              passOutYear: true,
               minCgpa: true,
               program: true,
             }
@@ -144,7 +144,7 @@ export const postRouter = createTRPCRouter({
         content: z.string(),
         participatingGroups: z.array(
           z.object({
-            admissionYear: z.number(),
+            passOutYear: z.number(),
             program: z.string(),
             minCgpa: z.number().max(10).optional().default(0),
 
@@ -167,7 +167,7 @@ export const postRouter = createTRPCRouter({
           participatingGroups: {
             createMany: {
               data: input.participatingGroups.map((group) => ({
-                admissionYear: group.admissionYear,
+                passOutYear: group.passOutYear,
                 program: group.program,
                 minCgpa: group.minCgpa,
               })),
@@ -193,7 +193,7 @@ export const postRouter = createTRPCRouter({
         content: z.string(),
         participatingGroups: z.array(
           z.object({
-            admissionYear: z.number(),
+            passOutYear: z.number(),
             program: z.string(),
             minCgpa: z.number().max(10).optional().default(0),
           }),
@@ -231,7 +231,7 @@ export const postRouter = createTRPCRouter({
           participatingGroups: {
             createMany: {
               data: input.participatingGroups.map((group) => ({
-                admissionYear: group.admissionYear,
+                passOutYear: group.passOutYear,
                 program: group.program,
                 minCgpa: group.minCgpa,
               })),
@@ -265,7 +265,7 @@ export const postRouter = createTRPCRouter({
         // page: z.number().min(1).default(1),
         // pageSize: z.number().max(100).default(10),
         jobType: z.string().nullable().default("All"),
-        admissionYear: z.number().nullable().default(2026),
+        passOutYear: z.number().nullable().default(2026),
       }),
     )
     .query(async ({ ctx, input }) => {
@@ -277,7 +277,7 @@ export const postRouter = createTRPCRouter({
         // select: {
         //   student: {
         //     select: {
-        //       // admissionYear: true,
+        //       // passOutYear: true,
         //       // program: true
         //     },
         //   },
@@ -305,7 +305,7 @@ export const postRouter = createTRPCRouter({
         },
         where: {
           published: true,
-          year: input.admissionYear,
+          year: input.passOutYear,
           // ...(input.jobType ? {
             jobType: input.jobType
           // } : {}),
@@ -313,7 +313,7 @@ export const postRouter = createTRPCRouter({
           //   {
           //     participatingGroups: {
           //       some: {
-          //         admissionYear: input.admissionYear,
+          //         passOutYear: input.passOutYear,
           //         program: input.program,
           //       },
           //     },
@@ -346,7 +346,7 @@ export const postRouter = createTRPCRouter({
         select: {
           student: {
             select: {
-              admissionYear: true,
+              passOutYear: true,
               program: true,
             },
           },
@@ -360,7 +360,7 @@ export const postRouter = createTRPCRouter({
             {
               participatingGroups: {
                 some: {
-                  admissionYear: userDetails.student.admissionYear,
+                  passOutYear: userDetails.student.passOutYear,
                   program: userDetails.student.program,
                 },
               },
@@ -387,7 +387,7 @@ export const postRouter = createTRPCRouter({
           },
           participatingGroups: {
             select: {
-              admissionYear: true,
+              passOutYear: true,
               minCgpa: true,
               program: true,
             }
