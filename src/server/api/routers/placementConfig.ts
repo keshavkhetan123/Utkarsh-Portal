@@ -23,7 +23,7 @@ export const placementConfigRouter = createTRPCRouter({
     });
     return data.map((el) => el.year);
   }),
-  getAdminPlacementYears: roleProtectedProcedure('superAdmin').query(async ({ ctx }) => {
+  getAdminPlacementYears: roleProtectedProcedure(['superAdmin','PlacementCoreTeam','PlacementTeamMember']).query(async ({ ctx }) => {
     const data = await ctx.db.participatingGroups.groupBy({
       by: ["year"],
       orderBy: [{ year: "desc" }],

@@ -115,30 +115,31 @@ export const authOptions: NextAuthOptions = {
             },
             
           });
-          if (user.role.name == 'superAdmin') {
+          if (user.role.name !== 'student') {
             const newUser = { ...token.user };
             newUser.year = session.info.year;
             return {
               ...token,
               user: newUser,
             };
-          } else if (user.userGroup === "student") {
-            const yearExists = await db.participatingGroups.findFirst({
-              where: {
-                year: session.info.year,
-                admissionYear: user.student?.admissionYear || null,
-                program: user.student?.program || null,
-              },
-            });
-            if (yearExists) {
-              const newUser = { ...token.user };
-              newUser.year = session.info.year;
-              return {
-                ...token,
-                user: newUser,
-              };
-            }
-          }
+          } 
+          // else if (user.userGroup === "student") {
+          //   const yearExists = await db.participatingGroups.findFirst({
+          //     where: {
+          //       year: session.info.year,
+          //       passOutYear: user.student?.passOutYear || null,
+          //       program: user.student?.program || null,
+          //     },
+          //   });
+          //   if (yearExists) {
+          //     const newUser = { ...token.user };
+          //     newUser.year = session.info.year;
+          //     return {
+          //       ...token,
+          //       user: newUser,
+          //     };
+          //   }
+          // }
         } else if (session.info.onboardingComplete) {
           const user = await db.user.findFirst({
             where: {

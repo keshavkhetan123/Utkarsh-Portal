@@ -181,8 +181,9 @@
 
 import { Fragment } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { api } from "~/trpc/react";
 
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import VerifiedUserIcon from "@mui/icons-material/VerifiedUser";
@@ -219,12 +220,19 @@ export default function ResponsiveDrawer({
   setOpen,
   isAdmin,
 }: ResponsiveDrawerProps) {
-  const { data: session } = useSession();
+  const { data: session, update } = useSession();
   const pathname = usePathname();
+  const router = useRouter();
 
   const handleDrawerToggle = () => {
     setOpen(!open);
   };
+
+  // Only fetch passOutYear for student users
+  const { data: passOutYear, isLoading: isYearLoading } =
+    api.student.getStudentPassOutYear.useQuery(undefined, {
+      enabled: session?.user?.role.name === "PlacementCoreTeam" || session?.user?.role.name==="PlacementTeamMember",
+  });
 
   if (!session) return null;
   const { user } = session;
@@ -244,6 +252,15 @@ export default function ResponsiveDrawer({
     if (user.role.name === "PlacementCoreTeam") return "Placement Core";
     if (user.role.name === "PlacementTeamMember") return "Placement Team";
     return "Student";
+  };
+
+   // When the user clicks "Student Panel", set their session.year to passOutYear, then go to /dashboard
+  const goToStudentPanel = async () => {
+    if (passOutYear) {
+     await update({ info: { year: passOutYear } });
+    }
+    router.push("/dashboard");
+    setOpen(false);
   };
 
   const drawer = (
@@ -302,33 +319,7 @@ export default function ResponsiveDrawer({
         </Fragment>
       ))}
 
-      {/* SuperAdmin Links */}
-      {/* {user?.role &&
-        (user.role.name === "superAdmin" ? (
-          !isAdmin && (
-            <Link href="/admin" onClick={() => setOpen(false)}>
-              <ListItemButton>
-                <ListItemIcon>
-                  <VerifiedUserIcon />
-                </ListItemIcon>
-                <ListItemText primary={"Admin Panel"} />
-              </ListItemButton>
-            </Link>
-          )
-        ) : (
-          !isAdmin && (
-            <Link href="/dashboard" onClick={() => setOpen(false)}>
-              <ListItemButton>
-                <ListItemIcon>
-                  <AccountCircleIcon />
-                </ListItemIcon>
-                <ListItemText primary={"User Panel"} />
-              </ListItemButton>
-            </Link>
-          )
-        ))} */}
-        {/* { SuperAdmin Links} */}
-{user?.role && (
+  {user?.role && (
   <>
     {user.role.name === "superAdmin" && !isAdmin && (
       <Link href="/admin" onClick={() => setOpen(false)}>
@@ -352,36 +343,28 @@ export default function ResponsiveDrawer({
         </ListItemButton>
       </Link>
 
-      <Link href="/dashboard" onClick={() => setOpen(false)}>
-        <ListItemButton>
-          <ListItemIcon>
-            <VerifiedUserIcon />
-          </ListItemIcon>
-          <ListItemText primary={"Student Panel"} />
-        </ListItemButton>
-      </Link>
+      <ListItemButton onClick={goToStudentPanel} disabled={isYearLoading}>
+        <ListItemIcon><VerifiedUserIcon /></ListItemIcon>
+        <ListItemText primary={"Student Panel"} />
+      </ListItemButton>
     </>
     )}
 
     {user.role.name === "PlacementTeamMember" && (
       <>
-      <Link href="/placement-team" onClick={() => setOpen(false)}>
-        <ListItemButton>
-          <ListItemIcon>
-          <VerifiedUserIcon />
-          </ListItemIcon>
-          <ListItemText primary={"Placement Team Panel"} />
-        </ListItemButton>
-      </Link>
+        <Link href="/placement-team" onClick={() => setOpen(false)}>
+          <ListItemButton>
+            <ListItemIcon>
+            <VerifiedUserIcon />
+            </ListItemIcon>
+            <ListItemText primary={"Placement Team Panel"} />
+          </ListItemButton>
+        </Link>
 
-      <Link href="/dashboard" onClick={() => setOpen(false)}>
-      <ListItemButton>
-        <ListItemIcon>
-          <VerifiedUserIcon />
-        </ListItemIcon>
-        <ListItemText primary={"Student Panel"} />
-      </ListItemButton>
-      </Link>
+        <ListItemButton onClick={goToStudentPanel} disabled={isYearLoading}>
+          <ListItemIcon><VerifiedUserIcon /></ListItemIcon>
+          <ListItemText primary={"Student Panel"} />
+        </ListItemButton>
       </>
     )}
 
