@@ -546,7 +546,7 @@ export const jobOpeningRouter = createTRPCRouter({
   adminGetJobOpenings: roleProtectedProcedure(['superAdmin', 'PlacementCoreTeam', 'PlacementTeamMember'])
     .input(
       z.object({
-        limit: z.number().default(10),
+        limit: z.number().default(2),
         page: z.number().default(1),
       }),
     )
