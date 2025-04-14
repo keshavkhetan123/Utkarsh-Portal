@@ -1,4 +1,5 @@
 import CloseIcon from "@mui/icons-material/Close";
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import {
   FormControl,
   IconButton,
@@ -24,7 +25,7 @@ export default function GroupCard(props: JobOpeningGroupCardProps) {
             color="error"
             size="small"
           >
-            <CloseIcon />
+          <CheckCircleIcon style={{ color: 'green' }} />
           </IconButton>
         )}
       </Typography>
