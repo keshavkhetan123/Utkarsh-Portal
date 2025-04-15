@@ -33,7 +33,7 @@ export default function AdminHomePage() {
         </Link>
       </div>
       <Divider />
-      {jobTypes.map((jobType, index) => (
+      {jobTypes?.map((jobType, index) => (
         <JobAnalyticsRow jobType={jobType} key={index} />
       ))}
     </Container>
