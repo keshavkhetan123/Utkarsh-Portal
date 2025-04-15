@@ -65,7 +65,7 @@ export const BASE_COLUMNS: DataColumn[] = [
     disableSort: true,
   },
   {
-    id: "admissionYear",
+    id: "passOutYear",
     numeric: false,
     disablePadding: false,
     label: "Admission Year",

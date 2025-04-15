@@ -47,7 +47,7 @@ const EventsDTO = {
               name: true,
             },
           },
-          admissionYear: true,
+          passOutYear: true,
           program: true,
         },
       },
@@ -85,7 +85,7 @@ export const eventsRouter = createTRPCRouter({
         select: {
           student: {
             select: {
-              admissionYear: true,
+              passOutYear: true,
               program: true,
             },
           },
@@ -100,7 +100,7 @@ export const eventsRouter = createTRPCRouter({
               participatingGroups: {
                 some: {
                   participatingGroup: {
-                    admissionYear: userDetails.student.admissionYear,
+                    passOutYear: userDetails.student.passOutYear,
                     program: userDetails.student.program,
                   },
                 },
@@ -129,7 +129,7 @@ export const eventsRouter = createTRPCRouter({
               participatingGroups: {
                 some: {
                   participatingGroup: {
-                    admissionYear: userDetails.student.admissionYear,
+                    passOutYear: userDetails.student.passOutYear,
                     program: userDetails.student.program,
                   },
                 },
@@ -173,7 +173,7 @@ export const eventsRouter = createTRPCRouter({
         select: {
           student: {
             select: {
-              admissionYear: true,
+              passOutYear: true,
               program: true,
             },
           },
@@ -188,7 +188,7 @@ export const eventsRouter = createTRPCRouter({
               participatingGroups: {
                 some: {
                   participatingGroup: {
-                    admissionYear: userDetails.student.admissionYear,
+                    passOutYear: userDetails.student.passOutYear,
                     program: userDetails.student.program,
                   },
                 },
@@ -214,7 +214,7 @@ export const eventsRouter = createTRPCRouter({
               participatingGroups: {
                 some: {
                   participatingGroup: {
-                    admissionYear: userDetails.student.admissionYear,
+                    passOutYear: userDetails.student.passOutYear,
                     program: userDetails.student.program,
                   },
                 },

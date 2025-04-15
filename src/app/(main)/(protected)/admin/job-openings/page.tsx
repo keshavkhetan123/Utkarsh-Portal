@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import {
@@ -13,12 +14,28 @@ import {
 } from "@mui/material";
 
 import { api } from "~/trpc/react";
-
 import JobRow from "./_components/jobRow/JobRow";
 
+const LIMIT = 4; // Display 4 openings per page
+
 export default function JobOpeningsPage() {
-  const { data: openings, isLoading } =
-    api.jobOpenings.adminGetJobOpenings.useQuery({});
+  const [page, setPage] = useState(1);
+
+  const { data, isLoading, isFetching } =
+    api.jobOpenings.adminGetJobOpenings.useQuery({
+      limit: LIMIT,
+      page,
+    });
+
+  const handlePrev = () => {
+    if (page > 1) setPage((prev) => prev - 1);
+  };
+
+  const handleNext = () => {
+    if (data?.hasMore) setPage((prev) => prev + 1);
+  };
+
+  const openings = data?.data ?? [];
 
   return (
     <Container className="flex flex-col gap-4 py-4">
@@ -40,21 +57,44 @@ export default function JobOpeningsPage() {
       </div>
       <Divider />
 
-      {isLoading && (
+      {isLoading ? (
         <Container className="h-96 w-full flex justify-center items-center">
           <CircularProgress />
         </Container>
-      )}
-      {
-        <Box className="flex flex-col gap-2">
-          {openings &&
-            openings.data.map((jobs) => (
+      ) : (
+        <>
+          <Box className="flex flex-col gap-2">
+            {openings.map((jobs) => (
               <Link key={jobs.id} href={"./job-openings/" + jobs.id}>
                 <JobRow {...jobs} />
               </Link>
             ))}
-        </Box>
-      }
+          </Box>
+
+          {/* Pagination Controls moved to the bottom */}
+          <div className="flex justify-center items-center pb-10">
+            <Button
+              variant="outlined"
+              onClick={handlePrev}
+              disabled={page === 1 || isFetching}
+              className="mx-2" // Add margin for spacing
+            >
+              Previous
+            </Button>
+            <Typography variant="body2" className="text-center px-4">
+              Page {page}
+            </Typography>
+            <Button
+              variant="outlined"
+              onClick={handleNext}
+              disabled={!data?.hasMore || isFetching}
+              className="mx-2" // Add margin for spacing
+            >
+              Next
+            </Button>
+          </div>
+        </>
+      )}
     </Container>
   );
 }

@@ -1,4 +1,5 @@
 import CloseIcon from "@mui/icons-material/Close";
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import {
   FormControl,
   IconButton,
@@ -9,6 +10,7 @@ import {
   TextField,
   Checkbox,
   Typography,
+  FormControlLabel
 } from "@mui/material";
 
 export default function GroupCard(props: JobOpeningGroupCardProps) {
@@ -23,19 +25,19 @@ export default function GroupCard(props: JobOpeningGroupCardProps) {
             color="error"
             size="small"
           >
-            <CloseIcon />
+          <CheckCircleIcon style={{ color: 'green' }} />
           </IconButton>
         )}
       </Typography>
       <FormControl size="small" required disabled={props.disabled}>
-        <InputLabel>Admission Year</InputLabel>
+        <InputLabel>PassOut Year</InputLabel>
         <Select
-          value={props.group.admissionYear || ""}
-          label="Admission Year"
+          value={props.group.passOutYear || ""}
+          label="PassOut Year"
           onChange={(event) => {
             props.onChange({
               ...props.group,
-              admissionYear: parseInt(event.target.value.toString()),
+              passOutYear: parseInt(event.target.value.toString()),
             });
           }}
         >
@@ -49,7 +51,7 @@ export default function GroupCard(props: JobOpeningGroupCardProps) {
       <FormControl
         size="small"
         required
-        disabled={props.disabled || !props.group.admissionYear}
+        disabled={props.disabled || !props.group.passOutYear}
       >
         <InputLabel>Program</InputLabel>
         <Select
@@ -62,7 +64,7 @@ export default function GroupCard(props: JobOpeningGroupCardProps) {
             });
           }}
         >
-          {props.allGroups[props.group.admissionYear]?.map((program) => (
+          {props.allGroups[props.group.passOutYear]?.map((program) => (
             <MenuItem value={program} key={program}>
               {program}
             </MenuItem>
@@ -96,16 +98,22 @@ export default function GroupCard(props: JobOpeningGroupCardProps) {
           })
         }
       /> */}
-      <Checkbox
-  checked={props.group.backlog}
-  onChange={(e) =>
-    props.onChange({
-      ...props.group,
-      backlog: e.target.checked,
-    })
-  }
-/>
-<span>Backlog</span>
+      <FormControlLabel
+      control={
+        <Checkbox
+          checked={props.group.backlog}
+          onChange={(e) =>
+            props.onChange({
+              ...props.group,
+              backlog: e.target.checked,
+            })
+          }
+          disabled={props.disabled}
+        />
+      }
+      label="Allow students with backlog?"
+      disabled={props.disabled}
+    />
 
     </Paper>
   );

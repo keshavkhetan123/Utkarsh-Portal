@@ -53,7 +53,7 @@ console.log(data);
         </div>
         <div className="flex flex-row gap-x-4 gap-y-2 flex-wrap mt-2">
           <DataDisplay label="Program" value={data.program} />
-          <DataDisplay label="Admission Year" value={data.admissionYear} />
+          <DataDisplay label="Admission Year" value={data.passOutYear} />
           <DataDisplay label="Email" value={data.email} />
           <DataDisplay label="Phone" value={data.phone} />
           <DataDisplay label="CGPA" value={data.cgpa} />

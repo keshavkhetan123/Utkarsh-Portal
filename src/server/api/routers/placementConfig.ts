@@ -15,15 +15,15 @@ export const placementConfigRouter = createTRPCRouter({
       },
     });
     const data = await ctx.db.participatingGroups.groupBy({
-      by: ["year", "admissionYear", "program"],
+      by: ["year", "passOutYear", "program"],
       having: {
         program: user.program,
-        admissionYear: user.admissionYear,
+        passOutYear: user.passOutYear,
       },
     });
     return data.map((el) => el.year);
   }),
-  getAdminPlacementYears: roleProtectedProcedure('superAdmin').query(async ({ ctx }) => {
+  getAdminPlacementYears: roleProtectedProcedure(['superAdmin','PlacementCoreTeam','PlacementTeamMember']).query(async ({ ctx }) => {
     const data = await ctx.db.participatingGroups.groupBy({
       by: ["year"],
       orderBy: [{ year: "desc" }],
@@ -41,7 +41,7 @@ export const placementConfigRouter = createTRPCRouter({
   }),
   getYearwisePrograms: roleProtectedProcedure('superAdmin').query(async ({ ctx }) => {
     const data = await ctx.db.students.groupBy({
-      by: ["admissionYear", "program"],
+      by: ["passOutYear", "program"],
     });
 
     const yearWisePrograms: {
@@ -49,10 +49,10 @@ export const placementConfigRouter = createTRPCRouter({
     } = {};
 
     data.forEach((el) => {
-      if (!yearWisePrograms[el.admissionYear]) {
-        yearWisePrograms[el.admissionYear] = [];
+      if (!yearWisePrograms[el.passOutYear]) {
+        yearWisePrograms[el.passOutYear] = [];
       }
-      yearWisePrograms[el.admissionYear].push(el.program);
+      yearWisePrograms[el.passOutYear].push(el.program);
     });
 
     return yearWisePrograms;
@@ -86,7 +86,7 @@ export const placementConfigRouter = createTRPCRouter({
             batches: z.array(
               z.object({
                 program: z.string(),
-                admissionYear: z.number(),
+                passOutYear: z.number(),
               }),
             ),
           }),
@@ -101,7 +101,7 @@ export const placementConfigRouter = createTRPCRouter({
             year: input.year,
             placementTypeId: config.id,
             program: batch.program,
-            admissionYear: batch.admissionYear,
+            passOutYear: batch.passOutYear,
           });
         }
       }
@@ -122,7 +122,7 @@ export const placementConfigRouter = createTRPCRouter({
             batches: z.array(
               z.object({
                 program: z.string(),
-                admissionYear: z.number(),
+                passOutYear: z.number(),
               }),
             ),
           }),
@@ -142,7 +142,7 @@ export const placementConfigRouter = createTRPCRouter({
             year: input.year,
             placementTypeId: config.id,
             program: batch.program,
-            admissionYear: batch.admissionYear,
+            passOutYear: batch.passOutYear,
           });
         }
       }
@@ -155,7 +155,7 @@ export const placementConfigRouter = createTRPCRouter({
     .input(z.string())
     .query(async ({ ctx, input }) => {
       const data = await ctx.db.participatingGroups.groupBy({
-        by: ["admissionYear", "program"],
+        by: ["passOutYear", "program"],
         where: {
           placementTypeId: input,
           year: 2026,
@@ -166,10 +166,10 @@ export const placementConfigRouter = createTRPCRouter({
       } = {};
 
       data.forEach((el) => {
-        if (!yearWisePrograms[el.admissionYear]) {
-          yearWisePrograms[el.admissionYear] = [];
+        if (!yearWisePrograms[el.passOutYear]) {
+          yearWisePrograms[el.passOutYear] = [];
         }
-        yearWisePrograms[el.admissionYear].push(el.program);
+        yearWisePrograms[el.passOutYear].push(el.program);
       });
       return yearWisePrograms;
     }),

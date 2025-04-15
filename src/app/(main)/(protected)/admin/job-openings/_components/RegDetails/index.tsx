@@ -51,9 +51,9 @@ export default function RegDetails(props: RegDetailsProps) {
             series={[
               {
                 data: data.map((item) => ({
-                  id: item.admissionYear + "_" + item.program,
+                  id: item.passOutYear + "_" + item.program,
                   value: item._count._all,
-                  label: `${item.program} (${item.admissionYear})`,
+                  label: `${item.program} (${item.passOutYear})`,
                 })),
                 innerRadius: 60,
               },
@@ -73,7 +73,7 @@ export default function RegDetails(props: RegDetailsProps) {
           </PieChart>
           <div className="flex flex-row md:flex-col gap-2 flex-wrap justify-center">
             {data.map((item, index) => (
-              <div key={item.admissionYear + "_" + item.program}>
+              <div key={item.passOutYear + "_" + item.program}>
                 <div className="flex flex-row gap-2 items-center">
                   <div
                     className="w-4 h-4 rounded-full"
@@ -86,7 +86,7 @@ export default function RegDetails(props: RegDetailsProps) {
                       ],
                     }}
                   />
-                  <div>{`${item.program} (${item.admissionYear})`}</div>
+                  <div>{`${item.program} (${item.passOutYear})`}</div>
                 </div>
               </div>
             ))}

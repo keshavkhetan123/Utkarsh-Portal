@@ -131,7 +131,7 @@ export default function NewPlacementYear() {
                     !config.id ||
                     !config.batches?.length ||
                     config.batches.some(
-                      (group) => !group.program || !group.admissionYear,
+                      (group) => !group.program || !group.passOutYear,
                     ),
                 )
               }

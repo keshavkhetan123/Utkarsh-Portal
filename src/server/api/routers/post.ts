@@ -22,7 +22,7 @@ export const postRouter = createTRPCRouter({
         select: {
           student: {
             select: {
-              admissionYear: true,
+              passOutYear: true,
               program: true,
 
             },
@@ -34,17 +34,15 @@ export const postRouter = createTRPCRouter({
           id: true,
           title: true,
           createdAt: true,
-
         },
         where: {
           published: true,
           year: ctx.session.user.year,
-
           OR: [
             {
               participatingGroups: {
                 some: {
-                  admissionYear: userDetails.student.admissionYear,
+                  passOutYear: userDetails.student.passOutYear,
                   program: userDetails.student.program,
                 },
               },
@@ -61,12 +59,16 @@ export const postRouter = createTRPCRouter({
         orderBy: {
           createdAt: "desc",
         },
-
-        take: input.pageSize,
+        take: input.pageSize + 1, // Fetch one extra to check hasMore
         skip: (input.page - 1) * input.pageSize,
       });
-      return data;
+      
+      return {
+        data: data.slice(0, input.pageSize),
+        hasMore: data.length > input.pageSize,
+      };      
     }),
+    
   getPost: protectedProcedure
     .input(z.string())
     .query(async ({ ctx, input }) => {
@@ -77,7 +79,7 @@ export const postRouter = createTRPCRouter({
         select: {
           student: {
             select: {
-              admissionYear: true,
+              passOutYear: true,
               program: true,
             },
           },
@@ -91,7 +93,7 @@ export const postRouter = createTRPCRouter({
             {
               participatingGroups: {
                 some: {
-                  admissionYear: userDetails.student.admissionYear,
+                  passOutYear: userDetails.student.passOutYear,
                   program: userDetails.student.program,
                 },
               },
@@ -117,7 +119,7 @@ export const postRouter = createTRPCRouter({
           },
           participatingGroups: {
             select: {
-              admissionYear: true,
+              passOutYear: true,
               minCgpa: true,
               program: true,
             }
@@ -144,10 +146,9 @@ export const postRouter = createTRPCRouter({
         content: z.string(),
         participatingGroups: z.array(
           z.object({
-            admissionYear: z.number(),
+            passOutYear: z.number(),
             program: z.string(),
             minCgpa: z.number().max(10).optional().default(0),
-
           }),
         ),
         jobType: z.string().nullable().default(null),
@@ -157,7 +158,6 @@ export const postRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       await ctx.db.post.create({
         data: {
-
           title: input.title,
           content: input.content,
           year: ctx.session.user.year,
@@ -167,7 +167,7 @@ export const postRouter = createTRPCRouter({
           participatingGroups: {
             createMany: {
               data: input.participatingGroups.map((group) => ({
-                admissionYear: group.admissionYear,
+                passOutYear: group.passOutYear,
                 program: group.program,
                 minCgpa: group.minCgpa,
               })),
@@ -193,7 +193,7 @@ export const postRouter = createTRPCRouter({
         content: z.string(),
         participatingGroups: z.array(
           z.object({
-            admissionYear: z.number(),
+            passOutYear: z.number(),
             program: z.string(),
             minCgpa: z.number().max(10).optional().default(0),
           }),
@@ -231,7 +231,7 @@ export const postRouter = createTRPCRouter({
           participatingGroups: {
             createMany: {
               data: input.participatingGroups.map((group) => ({
-                admissionYear: group.admissionYear,
+                passOutYear: group.passOutYear,
                 program: group.program,
                 minCgpa: group.minCgpa,
               })),
@@ -259,83 +259,43 @@ export const postRouter = createTRPCRouter({
 
       return true;
     }),
-  getLatestPostAdmin: roleProtectedProcedure('superAdmin')
+
+  getLatestPostAdmin: roleProtectedProcedure("superAdmin")
     .input(
       z.object({
-        // page: z.number().min(1).default(1),
-        // pageSize: z.number().max(100).default(10),
+        page: z.number().min(1).default(1),
+        pageSize: z.number().max(100).default(10),
         jobType: z.string().nullable().default("All"),
-        admissionYear: z.number().nullable().default(2026),
-      }),
+        passOutYear: z.number().nullable().default(2026),
+      })
     )
     .query(async ({ ctx, input }) => {
-      console.log("hii");
-      const userDetails = await ctx.db.user.findUnique({
-        where: {
-          id: ctx.session.user.id,
-        },
-        // select: {
-        //   student: {
-        //     select: {
-        //       // admissionYear: true,
-        //       // program: true
-        //     },
-        //   },
-        // },
-      });
-      // console.log("userDetails");
-      // if (!userDetails || !userDetails.student) {
-      //   console.error('Student details not found for user:', ctx.session.user.id);
-      //   return [];
-      // }
-      // console.log('User ID:', ctx.session.user.id);
-      // console.log('User Details:', userDetails);
-      // console.log('Input:', input);
-      // if (!userDetails.jobType || !userDetails.student) {
-      //   console.error('Student details not found for user:', ctx.session.user.id);
-      //   return [];
-      // }
-
-      const data = await ctx.db.post.findMany({
+      const { page, pageSize, jobType, passOutYear } = input;
+  
+      const posts = await ctx.db.post.findMany({
         select: {
           id: true,
           title: true,
           createdAt: true,
-          // jobType: true,
         },
         where: {
           published: true,
-          year: input.admissionYear,
-          // ...(input.jobType ? {
-            jobType: input.jobType
-          // } : {}),
-          // OR: [
-          //   {
-          //     participatingGroups: {
-          //       some: {
-          //         admissionYear: input.admissionYear,
-          //         program: input.program,
-          //       },
-          //     },
-          //   },
-          //   {
-          //     individualParticipants: {
-          //       some: {
-          //         userId: ctx.session.user.id,
-          //       },
-          //     },
-          //   },
-          // ],
+          year: passOutYear,
+          jobType: jobType,
         },
         orderBy: {
           createdAt: "desc",
         },
-
-        // take: input.pageSize,
-        // skip: (input.page - 1) * input.pageSize,
+        take: pageSize + 1, // Fetch one extra to determine hasMore
+        skip: (page - 1) * pageSize,
       });
-      return data;
+  
+      return {
+        data: posts.slice(0, pageSize),
+        hasMore: posts.length > pageSize,
+      };
     }),
+  
   getPostAdmin: roleProtectedProcedure('superAdmin')
     .input(z.string())
     .query(async ({ ctx, input }) => {
@@ -346,7 +306,7 @@ export const postRouter = createTRPCRouter({
         select: {
           student: {
             select: {
-              admissionYear: true,
+              passOutYear: true,
               program: true,
             },
           },
@@ -360,7 +320,7 @@ export const postRouter = createTRPCRouter({
             {
               participatingGroups: {
                 some: {
-                  admissionYear: userDetails.student.admissionYear,
+                  passOutYear: userDetails.student.passOutYear,
                   program: userDetails.student.program,
                 },
               },
@@ -387,7 +347,7 @@ export const postRouter = createTRPCRouter({
           },
           participatingGroups: {
             select: {
-              admissionYear: true,
+              passOutYear: true,
               minCgpa: true,
               program: true,
             }

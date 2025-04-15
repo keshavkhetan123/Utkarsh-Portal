@@ -39,6 +39,9 @@ export default function NewJobOpening() {
   const [companyQuery, setCompanyQuery] = useState("");
   const [jobOpening, setJobOpening] = useState(DEFAULT_JOB_OPENING);
   const [manualCompany, setManualCompany] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+
   const descEditorRef = useRef<any>();
   const router = useRouter();
 
@@ -71,10 +74,10 @@ export default function NewJobOpening() {
   });
 
   const createJobOpeningMutation = api.jobOpenings.createJobOpening.useMutation({
-    onSuccess: () => {
-      router.replace("/admin/job-openings");
-      router.refresh();
-    },
+    // onSuccess: () => {
+    //   router.replace("/admin/job-openings");
+    //   router.refresh();
+    // },
   });
 
   const isCreationDisabled = useMemo(() => {
@@ -103,7 +106,7 @@ export default function NewJobOpening() {
 
     if (
       jobOpening.participatingGroups.some(
-        (group) => !group.admissionYear || !group.program
+        (group) => !group.passOutYear || !group.program
       )
     )
       return true;
@@ -137,8 +140,13 @@ export default function NewJobOpening() {
       <Divider />
       <form
         className="flex flex-col gap-3"
-        onSubmit={(e) => {
+        onSubmit={async (e) => {
           e.preventDefault();
+      
+          if (isSubmitting || hasSubmitted) return;
+      
+          setIsSubmitting(true);
+      
           const reqData: any = jobOpening;
           reqData.registrationStart = new Date(
             reqData.registrationStart.toISOString()
@@ -149,15 +157,23 @@ export default function NewJobOpening() {
           reqData.description = descEditorRef.current.getContent();
           reqData.participatingGroups = reqData.participatingGroups.map(
             (group) => ({
-              admissionYear: parseInt(group.admissionYear),
+              passOutYear: parseInt(group.passOutYear),
               program: group.program,
               minCgpa: group.minCgpa,
-              // minCredits: group.minCredits
-              backlog: group.backlog
+              backlog: group.backlog,
             })
           );
-          createJobOpeningMutation.mutate(reqData);
-        }}
+      
+          try {
+            await createJobOpeningMutation.mutateAsync(reqData);
+            setHasSubmitted(true); // ✅ block further attempts
+            await router.replace("/admin/job-openings");
+            router.refresh();
+          } catch (error) {
+            console.error("Error creating job opening", error);
+            setIsSubmitting(false); // ✅ allow retry
+          }
+        }}       
       >
         <FormControl variant="standard">
           <TextField
@@ -392,7 +408,7 @@ export default function NewJobOpening() {
           onChange={(value) =>
             setJobOpening({ ...jobOpening, extraApplicationFields: value })
           }
-        /> */}
+        />
         <div className="flex flex-row gap-4 justify-end flex-wrap">
           <FormControlLabel
             label="Create Hidden"
@@ -458,8 +474,8 @@ export default function NewJobOpening() {
           <LoadingButton
             type="submit"
             variant="contained"
-            disabled={isCreationDisabled}
-            loading={createJobOpeningMutation.isLoading}
+            disabled={isCreationDisabled || isSubmitting || hasSubmitted}
+            loading={createJobOpeningMutation.isLoading || isSubmitting}
           >
             Create
           </LoadingButton>

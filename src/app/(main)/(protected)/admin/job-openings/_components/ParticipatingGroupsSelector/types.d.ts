@@ -1,5 +1,5 @@
 interface ParticipatingGroupConfig {
-  admissionYear?: number;
+  passOutYear?: number;
   program?: string;
   minCgpa?: number;
   // minCredits?: number;
@@ -10,6 +10,7 @@ interface JobOpeningGroupsSelectorProps {
   jobTypeId: string;
   value: ParticipatingGroupConfig[];
   onChange: (value: ParticipatingGroupConfig[]) => void;
+  disabled?: boolean
 }
 
 type JobOpeningGroupCardProps = {

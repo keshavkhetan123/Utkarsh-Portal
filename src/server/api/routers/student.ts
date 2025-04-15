@@ -14,7 +14,7 @@ export const studentRouter = createTRPCRouter({
         userId: ctx.session.user.id,
       },
       select: {
-        admissionYear: true,
+        passOutYear: true,
         cgpa: true,
         currentSemester: true,
         totalCredits: true,
@@ -45,7 +45,7 @@ export const studentRouter = createTRPCRouter({
         },
         data: {
           program: userData.program,
-          admissionYear: userData.admissionYear,
+          passOutYear: userData.passOutYear,
           duration: userData.duration,
           currentSemester: userData.currentSem,
           completedCredits: userData.completedCredits,
@@ -127,7 +127,7 @@ export const studentRouter = createTRPCRouter({
           userId: user.id,
         },
         select: {
-          admissionYear: true,
+          passOutYear: true,
           cgpa: true,
           currentSemester: true,
           totalCredits: true,
@@ -235,4 +235,15 @@ export const studentRouter = createTRPCRouter({
 
       return student;
     }),
+
+    getStudentPassOutYear: protectedProcedure.query(async ({ ctx }) => {
+      const student = await ctx.db.students.findUnique({
+        where: { userId: ctx.session.user.id },
+        select: { passOutYear: true },
+      });
+    
+      if (!student?.passOutYear) throw new Error("Pass out year not found");
+      return student.passOutYear;
+    }),
+    
 });

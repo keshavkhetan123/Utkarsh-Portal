@@ -6,7 +6,7 @@ import { roleProtectedProcedure, createTRPCRouter } from "~/server/api/trpc";
 export const userRouter = createTRPCRouter({
   getUserGroups: roleProtectedProcedure('superAdmin').query(async ({ ctx }) => {
     const data = await ctx.db.students.groupBy({
-      by: ["admissionYear", "program"],
+      by: ["passOutYear", "program"],
     });
 
     let result = data;

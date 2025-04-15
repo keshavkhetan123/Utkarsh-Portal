@@ -29,12 +29,12 @@ export const jobOpeningRouter = createTRPCRouter({
         extraApplicationFields: z.any(),
         noResumes: z.boolean().optional().default(false),
         hidden: z.boolean().optional().default(false),
-        autoApprove: z.boolean().optional().default(false),
+        autoApprove: z.boolean().optional().default(true),
         autoVisible: z.boolean().optional().default(false),
         allowSelected: z.boolean().optional().default(false),
         participatingGroups: z.array(
           z.object({
-            admissionYear: z.number(),
+            passOutYear: z.number(),
             program: z.string(),
             minCgpa: z.number().max(10).optional().default(0),
             // minCredits: z.number().optional().default(0),
@@ -63,7 +63,7 @@ export const jobOpeningRouter = createTRPCRouter({
 
       await ctx.db.jobOpening.create({
         data: {
-          year : 2026,
+          year : input.participatingGroups[0].passOutYear,
           title: input.title,
           description: input.description,
           location: input.location,
@@ -93,7 +93,7 @@ export const jobOpeningRouter = createTRPCRouter({
           JobOpeningParticipantGroups: {
             createMany: {
               data: input.participatingGroups.map((group) => ({
-                admissionYear: group.admissionYear,
+                passOutYear: group.passOutYear,
                 program: group.program,
                 minCgpa: group.minCgpa,
                 // minCredits: group.minCredits,
@@ -135,12 +135,10 @@ export const jobOpeningRouter = createTRPCRouter({
         participatingGroups: z.array(
           z.object({
             id: z.string().optional(),
-            admissionYear: z.number(),
+            passOutYear: z.number(),
             program: z.string(),
             minCgpa: z.number().max(10).optional().default(0),
-            // minCredits: z.number().optional().default(0),
-            backlog:z.boolean().default(false),
-
+            backlog:z.boolean().default(true),
           }),
         ),
       }),
@@ -187,10 +185,9 @@ export const jobOpeningRouter = createTRPCRouter({
                 id: group.id,
               },
               data: {
-                admissionYear: group.admissionYear,
+                passOutYear: group.passOutYear,
                 program: group.program,
                 minCgpa: group.minCgpa,
-                // minCredits: group.minCredits,
                 backlog:group.backlog,
               },
             }),
@@ -234,10 +231,9 @@ export const jobOpeningRouter = createTRPCRouter({
                 data: input.participatingGroups
                   .filter((group) => !group.id)
                   .map((group) => ({
-                    admissionYear: group.admissionYear,
+                    passOutYear: group.passOutYear,
                     program: group.program,
                     minCgpa: group.minCgpa,
-                    // minCredits: group.minCredits,
                     backlog:group.backlog,
                   })),
               },
@@ -280,7 +276,7 @@ export const jobOpeningRouter = createTRPCRouter({
         select: {
           student: {
             select: {
-              admissionYear: true,
+              passOutYear: true,
               program: true,
               cgpa: true,
               completedCredits: true,
@@ -294,7 +290,7 @@ export const jobOpeningRouter = createTRPCRouter({
         },
       });
       const query = {
-        admissionYear: userDetails.student.admissionYear,
+        passOutYear: userDetails.student.passOutYear,
         program: userDetails.student.program,
         ...(input.onlyApplicable && {
           minCgpa: {
@@ -335,7 +331,7 @@ export const jobOpeningRouter = createTRPCRouter({
         ctx.db.jobOpeningParticipantGroups.findMany({
           where: query,
           select: {
-            admissionYear: true,
+            passOutYear: true,
             program: true,
             minCgpa: true,
             // minCredits: true,
@@ -398,7 +394,7 @@ export const jobOpeningRouter = createTRPCRouter({
               (sel) => sel.jobType === jobOpening.jobOpening.placementType.id
             )) {
           whyNotRegister = "Already selected for this job type.";
-        } else if (jobOpening.admissionYear !== userDetails.student.admissionYear) {
+        } else if (jobOpening.passOutYear !== userDetails.student.passOutYear) {
           whyNotRegister = "Admission year does not match.";
         } else if (jobOpening.program !== userDetails.student.program) {
           whyNotRegister = "Program does not match.";
@@ -440,7 +436,7 @@ export const jobOpeningRouter = createTRPCRouter({
         select: {
           student: {
             select: {
-              admissionYear: true,
+              passOutYear: true,
               program: true,
               cgpa: true,
               completedCredits: true,
@@ -499,7 +495,7 @@ export const jobOpeningRouter = createTRPCRouter({
           JobOpeningParticipantGroups: {
             select: {
               id: true,
-              admissionYear: true,
+              passOutYear: true,
               program: true,
               minCgpa: true,
               // minCredits: true,
@@ -534,7 +530,7 @@ export const jobOpeningRouter = createTRPCRouter({
             ).length === 0) &&
           jobOpening.JobOpeningParticipantGroups.some(
             (group) =>
-              group.admissionYear === userDetails.student.admissionYear &&
+              group.passOutYear === userDetails.student.passOutYear &&
               group.program === userDetails.student.program &&
               group.minCgpa <= userDetails.student.cgpa &&
               ((group.backlog == 0) ? !userDetails.student.backlog : true)
@@ -547,10 +543,10 @@ export const jobOpeningRouter = createTRPCRouter({
       return jobOpening;
     }),
 
-  adminGetJobOpenings: roleProtectedProcedure('superAdmin')
+  adminGetJobOpenings: roleProtectedProcedure(['superAdmin', 'PlacementCoreTeam', 'PlacementTeamMember'])
     .input(
       z.object({
-        limit: z.number().default(10),
+        limit: z.number().default(2),
         page: z.number().default(1),
       }),
     )
@@ -558,6 +554,9 @@ export const jobOpeningRouter = createTRPCRouter({
       const [count, jobOpenings] = await ctx.db.$transaction([
         ctx.db.jobOpening.count(),
         ctx.db.jobOpening.findMany({
+          where: {
+            year: ctx.session.user.year,
+          },
           select: {
             id: true,
             title: true,
@@ -595,7 +594,7 @@ export const jobOpeningRouter = createTRPCRouter({
       };
     }),
 
-  adminGetJobOpening: roleProtectedProcedure('superAdmin')
+  adminGetJobOpening: roleProtectedProcedure(['superAdmin', 'PlacementCoreTeam', 'PlacementTeamMember'])
     .input(z.string())
     .query(async ({ ctx, input }) => {
       return await ctx.db.jobOpening.findUnique({
@@ -635,7 +634,7 @@ export const jobOpeningRouter = createTRPCRouter({
           JobOpeningParticipantGroups: {
             select: {
               id: true,
-              admissionYear: true,
+              passOutYear: true,
               program: true,
               minCgpa: true,
               // minCredits: true,
@@ -646,11 +645,11 @@ export const jobOpeningRouter = createTRPCRouter({
       });
     }),
 
-  adminGetRegDetails: roleProtectedProcedure('superAdmin')
+  adminGetRegDetails: roleProtectedProcedure(['superAdmin', 'PlacementCoreTeam', 'PlacementTeamMember'])
     .input(z.string())
     .query(async ({ ctx, input }) => {
       return await ctx.db.students.groupBy({
-        by: ["admissionYear", "program"],
+        by: ["passOutYear", "program"],
         where: {
           applications: {
             some: {

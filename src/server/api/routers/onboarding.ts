@@ -30,5 +30,14 @@ export const onboardingRouter = createTRPCRouter({
           isOnboardingComplete: true,
         },
       });
+
+      await ctx.db.user.update({
+        where: {
+          id :  ctx.session.user.id,
+        },
+        data: {
+          year : input.passOutYear,
+        }
+      });
     }),
 });

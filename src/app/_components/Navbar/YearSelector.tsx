@@ -29,8 +29,17 @@ export default function YearSelector() {
 
   const { data: adminYears, isLoading: isAdminYearsLoading } =
     api.placementConfig.getAdminPlacementYears.useQuery(null, {
-      enabled: session?.user?.role.name === "superAdmin" && pathname.includes("/admin"),
+      enabled: ((session?.user?.role.name === "superAdmin" && pathname.includes("/admin")) || (session?.user?.role.name === 'PlacementCoreTeam' && pathname.includes("/placement-core")) || (session?.user?.role.name === 'PlacementTeamMember' && pathname.includes("/placement-team"))),
     });
+
+    const role = session?.user?.role.name;
+
+    const isAdminView = role === "superAdmin" && pathname.includes("/admin");
+    const isCoreView = role === "PlacementCoreTeam" && pathname.includes("/placement-core");
+    const isTeamView = role === "PlacementTeamMember" && pathname.includes("/placement-team");
+
+    const yearsToDisplay =
+      isAdminView || isCoreView || isTeamView ? adminYears : data;
 
   const changeYear = useCallback(
     (year: number) => {
@@ -47,6 +56,15 @@ export default function YearSelector() {
     },
     [update],
   );
+
+  const isYearSelectorDisabled = () => {
+    const role = session?.user?.role.name;
+    if (role === "superAdmin") return !pathname.includes("/admin");
+    if (role === "PlacementCoreTeam") return !pathname.includes("/placement-core");
+    if (role === "PlacementTeamMember") return !pathname.includes("/placement-team");
+    return true; // disable for all other roles
+  };
+  
 
   if (data && data.length == 0) {
     return <></>
@@ -71,31 +89,22 @@ export default function YearSelector() {
     <>
       <FormControl
         size="small"
-        disabled={
-          !(session?.user?.role.name === "superAdmin" && pathname.includes("/admin"))
-            ? true
-            : false
-        }
+        disabled={isYearSelectorDisabled()}
       >
         <InputLabel>Year</InputLabel>
         <Select
-          color="primary"
-          value={Number(session.user.year)}
-          label="Age"
-          onChange={(e) => changeYear(parseInt(e.target.value.toString()))}
+        color="primary"
+        value={Number(session.user.year)}
+        label="Age"
+        onChange={(e) => changeYear(parseInt(e.target.value.toString()))}
         >
-          {(session?.user?.role.name === "superAdmin" && pathname.includes("/admin"))
-            ? adminYears.map((el) => (
-              <MenuItem key={el} value={Number(el)}>
-                {el}
-              </MenuItem>
-            ))
-            : data?.map((el) => (
-              <MenuItem key={el} value={Number(el)}>
-                {el}
-              </MenuItem>
-            ))}
-        </Select>
+        {yearsToDisplay?.map((el) => (
+          <MenuItem key={el} value={Number(el)}>
+            {el}
+          </MenuItem>
+        ))}
+      </Select>
+
       </FormControl>
     </>
   );

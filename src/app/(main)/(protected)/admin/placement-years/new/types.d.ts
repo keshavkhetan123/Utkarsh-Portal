@@ -3,7 +3,7 @@ type PlacementConfig = {
   id?: string;
   batches?: {
     program?: string;
-    admissionYear?: number;
+    passOutYear?: number;
   }[];
 };
 

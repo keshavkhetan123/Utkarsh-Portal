@@ -1,6 +1,7 @@
 interface AdditionalFieldSelectorProps {
   value: extraApplicationField[];
   onChange: (v: extraApplicationField[]) => void;
+  disabled?: boolean
 }
 
 interface FieldRowProps {

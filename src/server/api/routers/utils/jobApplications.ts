@@ -87,9 +87,9 @@ export const getOrderQuery = (orderBy: string, sort: string) => {
         gender: sort,
       };
       break;
-    case "admissionYear":
+    case "passOutYear":
       order.student = {
-        admissionYear: sort,
+        passOutYear: sort,
       };
       break;
     case "createdAt":

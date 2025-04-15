@@ -111,34 +111,35 @@ export const authOptions: NextAuthOptions = {
             select: { //CHANGED
               userGroup: true,
               role: { select: { name: true } },
-              student: { select: { admissionYear: true, program: true } },
+              student: { select: { passOutYear: true, program: true } },
             },
             
           });
-          if (user.role.name == 'superAdmin') {
+          if (user.role.name !== 'student') {
             const newUser = { ...token.user };
             newUser.year = session.info.year;
             return {
               ...token,
               user: newUser,
             };
-          } else if (user.userGroup === "student") {
-            const yearExists = await db.participatingGroups.findFirst({
-              where: {
-                year: session.info.year,
-                admissionYear: user.student?.admissionYear || null,
-                program: user.student?.program || null,
-              },
-            });
-            if (yearExists) {
-              const newUser = { ...token.user };
-              newUser.year = session.info.year;
-              return {
-                ...token,
-                user: newUser,
-              };
-            }
-          }
+          } 
+          // else if (user.userGroup === "student") {
+          //   const yearExists = await db.participatingGroups.findFirst({
+          //     where: {
+          //       year: session.info.year,
+          //       passOutYear: user.student?.passOutYear || null,
+          //       program: user.student?.program || null,
+          //     },
+          //   });
+          //   if (yearExists) {
+          //     const newUser = { ...token.user };
+          //     newUser.year = session.info.year;
+          //     return {
+          //       ...token,
+          //       user: newUser,
+          //     };
+          //   }
+          // }
         } else if (session.info.onboardingComplete) {
           const user = await db.user.findFirst({
             where: {
@@ -217,10 +218,9 @@ export const authOptions: NextAuthOptions = {
             role: { select: { name: true } },
             student: {
               select: {
-                admissionYear: true,
+                passOutYear: true,
                 program: true,
                 isOnboardingComplete: true,
-                passOutYear : true
               },
             },
           },
@@ -252,7 +252,6 @@ export const authOptions: NextAuthOptions = {
                 student: {
                   create: {
                     program: 'ECE',
-                    admissionYear: 2022,
                     duration: 4,
                     currentSemester: '6',
                     completedCredits: 108,  
@@ -271,10 +270,9 @@ export const authOptions: NextAuthOptions = {
                 role: { select: { name: true } },
                 student: {
                   select: {
-                    admissionYear: true,
+                    passOutYear: true,
                     program: true,
                     isOnboardingComplete: true,
-                    passOutYear : true
                   },
                 },
               },
@@ -299,7 +297,7 @@ export const authOptions: NextAuthOptions = {
                     create: { name: "superAdmin" },
                   },
                 },
-                
+                year: 2026,
               },
               select: {
                 id: true,
@@ -310,7 +308,7 @@ export const authOptions: NextAuthOptions = {
                 role: { select: { name: true } },
                 student: {
                   select: {
-                    admissionYear: true,
+                    passOutYear: true,
                     program: true,
                     isOnboardingComplete: true,
                   },
@@ -328,7 +326,7 @@ export const authOptions: NextAuthOptions = {
         //   },
         //   where: {
         //     ...(user.student && {
-        //       admissionYear: user.student?.admissionYear,
+        //       passOutYear: user.student?.passOutYear,
         //       program: user.student?.program,
         //     }),
         //   },
@@ -339,7 +337,7 @@ export const authOptions: NextAuthOptions = {
 
         const latestYear = user.student?.passOutYear || user.year;
 
-        console.log(latestYear);
+        console.log("This is the passout year for the student : ",  latestYear);
 
         return {
           id: user.id,

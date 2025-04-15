@@ -29,12 +29,12 @@ export default function GroupCard(props: PostGroupCardProps) {
       <FormControl size="small" required disabled={props.disabled}>
         <InputLabel>Admission Year</InputLabel>
         <Select
-          value={props.group.admissionYear || ""}
+          value={props.group.passOutYear || ""}
           label="Admission Year"
           onChange={(event) => {
             props.onChange({
               ...props.group,
-              admissionYear: parseInt(event.target.value.toString()),
+              passOutYear: parseInt(event.target.value.toString()),
             });
           }}
         >
@@ -48,7 +48,7 @@ export default function GroupCard(props: PostGroupCardProps) {
       <FormControl
         size="small"
         required
-        disabled={props.disabled || !props.group.admissionYear}
+        disabled={props.disabled || !props.group.passOutYear}
       >
         <InputLabel>Program</InputLabel>
         <Select
@@ -61,7 +61,7 @@ export default function GroupCard(props: PostGroupCardProps) {
             });
           }}
         >
-          {props.allGroups[props.group.admissionYear]?.map((program) => (
+          {props.allGroups[props.group.passOutYear]?.map((program) => (
             <MenuItem value={program} key={program}>
               {program}
             </MenuItem>

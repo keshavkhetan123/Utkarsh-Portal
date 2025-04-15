@@ -3,7 +3,7 @@ import { z } from "zod";
 import { roleProtectedProcedure, createTRPCRouter } from "~/server/api/trpc";
 
 export const analyticsRouter = createTRPCRouter({
-  getJobTypes: roleProtectedProcedure('superAdmin').query(async ({ ctx }) => {
+  getJobTypes: roleProtectedProcedure(['superAdmin', 'PlacementCoreTeam', 'PlacementTeamMember']).query(async ({ ctx }) => {
     const data = await ctx.db.placementType.findMany({
       where: {
         ParticipatingGroups: {
@@ -16,7 +16,7 @@ export const analyticsRouter = createTRPCRouter({
     return data;
   }),
 
-  getJobTypeSelectionAnalytics: roleProtectedProcedure('superAdmin')
+  getJobTypeSelectionAnalytics: roleProtectedProcedure(['superAdmin', 'PlacementCoreTeam', 'PlacementTeamMember'])
     .input(z.string())
     .query(async ({ ctx, input }) => {
       const groups = await ctx.db.participatingGroups.findMany({
@@ -30,7 +30,7 @@ export const analyticsRouter = createTRPCRouter({
         ...groups.map((grp) => {
           return ctx.db.students.count({
             where: {
-              admissionYear: grp.admissionYear,
+              passOutYear: grp.passOutYear,
               program: grp.program,
             },
             select: {
@@ -41,7 +41,7 @@ export const analyticsRouter = createTRPCRouter({
         ...groups.map((grp) => {
           return ctx.db.students.count({
             where: {
-              admissionYear: grp.admissionYear,
+              passOutYear: grp.passOutYear,
               program: grp.program,
               selections: {
                 some: {
@@ -79,7 +79,7 @@ export const analyticsRouter = createTRPCRouter({
         group: {
           id: "total",
           year: ctx.session.user.year,
-          admissionYear: null,
+          passOutYear: null,
           program: "Unselected",
           placementTypeId: input,
         },
