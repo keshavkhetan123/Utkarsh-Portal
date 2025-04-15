@@ -105,12 +105,27 @@ export default function IndividualPlacementYear() {
           </ToggleButton>
         </div>
         <Divider />
-        <div className=" flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto pb-36">
           <div className="flex flex-col gap-4 py-4">
             <Typography variant="body1">
               Editing the following job types and batches will not affect
               already created Job Openings
             </Typography>
+            {placementTypes.length !== placementConfigs.length && (
+              <Button
+                variant="outlined"
+                className="border-dashed self-start"
+                onClick={() => {
+                  setPlacementConfigs([...placementConfigs, {}]);
+                }}
+                disabled={
+                  placementConfigs.length > 0 && !placementConfigs.at(-1).id
+                }
+                startIcon={<AddIcon />}
+              >
+                Add Job Type
+              </Button>
+            )}
             {placementConfigs.map((config, index) => (
               <JobTypeConfiguration
                 key={index}
@@ -134,20 +149,6 @@ export default function IndividualPlacementYear() {
                 }}
               />
             ))}
-            {placementTypes.length !== placementConfigs.length && (
-              <Button
-                variant="outlined"
-                className="border-dashed"
-                onClick={() => {
-                  setPlacementConfigs([...placementConfigs, {}]);
-                }}
-                disabled={
-                  placementConfigs.length > 0 && !placementConfigs.at(-1).id
-                }
-              >
-                <AddIcon fontSize="large" />
-              </Button>
-            )}
           </div>
         </div>
         {editMode && (
