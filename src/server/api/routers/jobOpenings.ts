@@ -32,6 +32,7 @@ export const jobOpeningRouter = createTRPCRouter({
         autoApprove: z.boolean().optional().default(true),
         autoVisible: z.boolean().optional().default(false),
         allowSelected: z.boolean().optional().default(false),
+        allowedJobTypes: z.array(z.string()).optional().default([]),
         participatingGroups: z.array(
           z.object({
             passOutYear: z.number(),
@@ -90,6 +91,7 @@ export const jobOpeningRouter = createTRPCRouter({
           autoApprove: input.autoApprove,
           autoVisible: input.autoVisible,
           allowSelected: input.allowSelected,
+          allowedJobTypes: input.allowedJobTypes,
           JobOpeningParticipantGroups: {
             createMany: {
               data: input.participatingGroups.map((group) => ({
@@ -132,6 +134,7 @@ export const jobOpeningRouter = createTRPCRouter({
         autoApprove: z.boolean().optional().default(false),
         autoVisible: z.boolean().optional().default(false),
         allowSelected: z.boolean().optional().default(false),
+        allowedJobTypes: z.array(z.string()).optional().default([]),
         participatingGroups: z.array(
           z.object({
             id: z.string().optional(),
@@ -226,6 +229,7 @@ export const jobOpeningRouter = createTRPCRouter({
             autoApprove: input.autoApprove,
             autoVisible: input.autoVisible,
             allowSelected: input.allowSelected,
+            allowedJobTypes: input.allowedJobTypes,
             JobOpeningParticipantGroups: {
               createMany: {
                 data: input.participatingGroups
@@ -279,11 +283,18 @@ export const jobOpeningRouter = createTRPCRouter({
               passOutYear: true,
               program: true,
               cgpa: true,
-              completedCredits: true,
+              backlog: true,
               selections: {
                 where: {
                   year: ctx.session.user.year,
                 },
+                select:{
+                  jobType: {
+                    select : {
+                      name : true,
+                    }
+                  }
+                }
               },
             },
           },
@@ -335,7 +346,7 @@ export const jobOpeningRouter = createTRPCRouter({
             program: true,
             minCgpa: true,
             // minCredits: true,
-            backlog:false,
+            backlog:true,
             jobOpening: {
               select: {
                 id: true,
@@ -370,6 +381,7 @@ export const jobOpeningRouter = createTRPCRouter({
                   },
                 },
                 allowSelected: true,
+                allowedJobTypes: true, 
                 registrationStart: true,
                 registrationEnd: true,
                 createdAt: true,
@@ -388,26 +400,28 @@ export const jobOpeningRouter = createTRPCRouter({
 
       const data = jobOpenings.map((jobOpening) => {
         let whyNotRegister = "";
-      
-        if (!jobOpening.jobOpening.allowSelected &&
-            userDetails.student.selections.some(
-              (sel) => sel.jobType === jobOpening.jobOpening.placementType.id
-            )) {
-          whyNotRegister = "Already selected for this job type.";
+
+        const allowedTypes = jobOpening.jobOpening.allowedJobTypes as string[] | null;
+
+        const isDisallowedByJobTypeSelection =
+          !jobOpening.jobOpening.allowSelected &&
+          Array.isArray(allowedTypes) &&
+          userDetails.student.selections.some(
+            (sel) => !allowedTypes.includes(sel.jobType.name)
+          );
+          
+        if (isDisallowedByJobTypeSelection) {
+          whyNotRegister = "Already selected for a disallowed job type.";
         } else if (jobOpening.passOutYear !== userDetails.student.passOutYear) {
           whyNotRegister = "Admission year does not match.";
         } else if (jobOpening.program !== userDetails.student.program) {
           whyNotRegister = "Program does not match.";
         } else if (jobOpening.minCgpa > userDetails.student.cgpa) {
           whyNotRegister = `Required CGPA: ${jobOpening.minCgpa}, Your CGPA: ${userDetails.student.cgpa}`;
-        } 
-        // else if (jobOpening.minCredits > userDetails.student.completedCredits) {
-        //   whyNotRegister = `Required Credits: ${jobOpening.minCredits}, Your Credits: ${userDetails.student.completedCredits}`;
-        // }
-        else if(jobOpening.backlog == false && userDetails.backlog == true){
-          whyNotRegister = `Company does not allow students with backlog`;
+        } else if (jobOpening.backlog === false && userDetails.student.backlog === true) {
+          whyNotRegister = `Company does not allow students with backlogs.`;
         }
-      
+        
         return {
           ...jobOpening.jobOpening,
           canRegister: whyNotRegister === "", // True if no reason exists
