@@ -16,7 +16,7 @@ import {
 import { api } from "~/trpc/react";
 import JobRow from "./_components/jobRow/JobRow";
 
-const LIMIT = 4; // Display 4 openings per page
+const LIMIT = 2;
 
 export default function JobOpeningsPage() {
   const [page, setPage] = useState(1);
@@ -71,13 +71,12 @@ export default function JobOpeningsPage() {
             ))}
           </Box>
 
-          {/* Pagination Controls moved to the bottom */}
-          <div className="flex justify-center items-center pb-10">
+          {/* Pagination Controls */}
+          <div className="flex justify-between items-center pt-4">
             <Button
               variant="outlined"
               onClick={handlePrev}
               disabled={page === 1 || isFetching}
-              className="mx-2" // Add margin for spacing
             >
               Previous
             </Button>
@@ -88,7 +87,6 @@ export default function JobOpeningsPage() {
               variant="outlined"
               onClick={handleNext}
               disabled={!data?.hasMore || isFetching}
-              className="mx-2" // Add margin for spacing
             >
               Next
             </Button>
