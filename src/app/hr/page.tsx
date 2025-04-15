@@ -28,7 +28,7 @@ import { useQuery } from "@tanstack/react-query";
 import TextEditor from "~/app/common/components/TextEditor";
 import { api } from "~/trpc/react";
 
-import AdditionalFieldSelector from "./_components/AdditionalFieldsSelector";
+// import AdditionalFieldSelector from "./_components/AdditionalFieldsSelector";
 import JobOpeningGroupSelector from "./_components/ParticipatingGroupsSelector";
 
 import { DEFAULT_JOB_OPENING } from "./constants";
@@ -403,12 +403,71 @@ export default function NewJobOpening() {
           value={jobOpening.description}
           ref={descEditorRef}
         />
-        <AdditionalFieldSelector
+        {/* <AdditionalFieldSelector
           value={jobOpening.extraApplicationFields}
           onChange={(value) =>
             setJobOpening({ ...jobOpening, extraApplicationFields: value })
           }
         />
+        <div className="flex flex-row gap-4 justify-end flex-wrap">
+          <FormControlLabel
+            label="Create Hidden"
+            control={
+              <Checkbox
+                size="small"
+                checked={jobOpening.hidden}
+                onChange={(e) =>
+                  setJobOpening({ ...jobOpening, hidden: e.target.checked })
+                }
+              />
+            }
+          />
+          <FormControlLabel
+            label="Auto Approve"
+            control={
+              <Checkbox
+                size="small"
+                checked={jobOpening.autoApprove}
+                onChange={(e) =>
+                  setJobOpening({
+                    ...jobOpening,
+                    autoApprove: e.target.checked,
+                  })
+                }
+              />
+            }
+          />
+          <FormControlLabel
+            label="Auto Visible"
+            control={
+              <Checkbox
+                size="small"
+                checked={jobOpening.autoVisible}
+                onChange={(e) =>
+                  setJobOpening({
+                    ...jobOpening,
+                    autoVisible: e.target.checked,
+                  })
+                }
+              />
+            }
+          />
+          <FormControlLabel
+            label="Allow Already Selected Students"
+            control={
+              <Checkbox
+                size="small"
+                checked={jobOpening.allowSelected}
+                onChange={(e) =>
+                  setJobOpening({
+                    ...jobOpening,
+                    allowSelected: e.target.checked,
+                  })
+                }
+              />
+            }
+          />
+        </div>
 
         <Divider className="mt-12" />
         <Container className="flex flex-row justify-end">
