@@ -106,7 +106,8 @@ model VerificationToken {
 
 enum Category {
   EWS
-  SC/ST
+  SC
+  ST
   PWD
   OBC
 }

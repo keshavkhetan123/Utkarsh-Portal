@@ -77,15 +77,6 @@ export const jobApplication = createTRPCRouter({
         },
       });
 
-      if (
-        !job.allowSelected &&
-        userDetails.student.selections.filter(
-          (sel) => sel.jobType === job.placementType.id,
-        ).length > 0
-      ) {
-        throw new Error("You have already selected a job for this year");
-      }
-
       if (!job) {
         throw new Error("Job not found");
       }
@@ -174,16 +165,6 @@ export const jobApplication = createTRPCRouter({
           allowSelected: true,
         },
       });
-
-      if (
-        !job.allowSelected &&
-        userDetails.student.selections.filter(
-          (sel) => sel.jobType === job.placementType.id,
-        ).length > 0
-      ) {
-        throw new Error("You have already selected a job for this year");
-      }
-      0;
 
       if (!job.noResumes && !userDetails.student.resume) {
         throw new Error("Resume not found");
@@ -495,7 +476,7 @@ export const jobApplication = createTRPCRouter({
       return { data: csvString, title: csvTitle };
     }),
 
-  upgradeStatus: roleProtectedProcedure('superAdmin')
+  upgradeStatus: roleProtectedProcedure(['superAdmin', 'PlacementCoreTeam', 'PlacementTeamMember'])
     .input(
       z.object({
         applicationId: z.array(z.string()),

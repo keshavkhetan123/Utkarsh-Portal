@@ -2,6 +2,8 @@
 
 import { useCallback, useMemo, useState } from "react";
 
+import { useSession } from "next-auth/react";
+
 import DeleteIcon from "@mui/icons-material/Delete";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import FilterListIcon from "@mui/icons-material/FilterList";
@@ -59,6 +61,19 @@ export default function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
     setColumnSelectAnchorEl(event.currentTarget);
   };
 
+  const { data: session } = useSession();
+  const isSuperAdmin = session?.user?.role?.name === "superAdmin";
+    
+  console.log("Session object:", session);
+  console.log("User role:", session?.user?.role?.name);
+  console.log("Is super admin:", isSuperAdmin);
+  if (session?.user) {
+    console.log("User:", session.user);
+  } else {
+    console.log("No session user found");
+  }
+
+
   const upgradeStatusMutation = api.jobApplication.upgradeStatus.useMutation({
     onSuccess: () => {
       utils.jobApplication.getJobApplicants.invalidate();
@@ -73,12 +88,19 @@ export default function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
     return (
       uniqStatuses.size === 1 &&
       (uniqStatuses.has("SHORTLISTED")
-        ? !props.selected.some((s) => s.alreadySelected)
+        ? (!props.selected.some((s) => s.alreadySelected)) && (isSuperAdmin)
         : true) &&
       !uniqStatuses.has("SELECTED") &&
       !uniqStatuses.has("REJECTED")
     );
-  }, [props.selected]);
+  }, [props.selected, isSuperAdmin]);
+  
+  const canReject = useMemo(() => {
+    if (!isSuperAdmin) return false;
+    const uniqStatuses = new Set(props.selected.map((s) => s.status));
+    return !uniqStatuses.has("SELECTED") && !uniqStatuses.has("REJECTED");
+  }, [props.selected,isSuperAdmin]);
+  
 
   const nextStatus = useMemo(() => {
     const uniqStatuses = new Set(props.selected.map((s) => s.status));
@@ -107,11 +129,6 @@ export default function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
       applicationId: props.selected.map((s) => s.id),
       status: nextStatus,
     });
-  }, [props.selected]);
-
-  const canReject = useMemo(() => {
-    const uniqStatuses = new Set(props.selected.map((s) => s.status));
-    return !uniqStatuses.has("SELECTED") && !uniqStatuses.has("REJECTED");
   }, [props.selected]);
 
   const handleReject = useCallback(() => {
