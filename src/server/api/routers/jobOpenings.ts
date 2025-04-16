@@ -283,8 +283,7 @@ export const jobOpeningRouter = createTRPCRouter({
             passOutYear: true,
             program: true,
             cgpa: true,
-            completedCredits: true,
-            backlog: true, // Ensure to fetch backlog from student details
+            backlog: true,
             selections: {
               where: {
                 year: ctx.session.user.year,
@@ -458,7 +457,6 @@ export const jobOpeningRouter = createTRPCRouter({
               passOutYear: true,
               program: true,
               cgpa: true,
-              completedCredits: true,
               selections: {
                 where: {
                   year: ctx.session.user.year,
@@ -553,7 +551,6 @@ export const jobOpeningRouter = createTRPCRouter({
               group.program === userDetails.student.program &&
               group.minCgpa <= userDetails.student.cgpa &&
               ((group.backlog == 0) ? !userDetails.student.backlog : true)
-              // group.minCredits <= userDetails.student.completedCredits,
           );
 
         data.alreadyRegistered = jobOpening.applications.length > 0;

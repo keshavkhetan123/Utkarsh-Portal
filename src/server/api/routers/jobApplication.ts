@@ -19,7 +19,6 @@ export const jobApplication = createTRPCRouter({
               passOutYear: true,
               program: true,
               cgpa: true,
-              completedCredits: true,
               selections: {
                 where: {
                   year: ctx.session.user.year,
@@ -41,9 +40,6 @@ export const jobApplication = createTRPCRouter({
               minCgpa: {
                 lte: userDetails.student.cgpa,
               },
-              // minCredits: {
-              //   lte: userDetails.student.completedCredits,
-              // },
               backlog : userDetails.student.backlog,
             },
           },
@@ -121,7 +117,6 @@ export const jobApplication = createTRPCRouter({
               passOutYear: true,
               program: true,
               cgpa: true,
-              completedCredits: true,
               selections: {
                 where: {
                   year: ctx.session.user.year,
@@ -151,9 +146,6 @@ export const jobApplication = createTRPCRouter({
               minCgpa: {
                 lte: userDetails.student.cgpa,
               },
-              // minCredits: {
-              //   lte: userDetails.student.completedCredits,
-              // },
               backlog : userDetails.student.backlog
             },
           },

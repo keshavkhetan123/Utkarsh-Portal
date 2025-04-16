@@ -11,8 +11,6 @@ type StudentAviralData = Promise<{
   rollNumber: string;
   mobile: string;
   cgpa: number;
-  completedCredits: number;
-  totalCredits: number;
   program: string;
   duration: number;
   passOutYear: number;
@@ -68,8 +66,6 @@ export const getStudentAviralData = async (
       rollNumber: res.data["student_id"] || "Default Roll",
       mobile: res.data["phone"] || "0000000000",
       cgpa: res.data["cgpi"] || 0,
-      completedCredits: res.data["completed_total"] || 0,
-      totalCredits: res.data["total_credits"] || 0,
       program: res.data["program"] || "Default Program",
       passOutYear: res.data["admission_year"] || 2022,
       duration: res.data["duration"] || 4,
@@ -86,8 +82,6 @@ export const getStudentAviralData = async (
       rollNumber: "Default Roll",
       mobile: "0000000000",
       cgpa: 0,
-      completedCredits: 0,
-      totalCredits: 0,
       program: "Default Program",
       passOutYear: 2022,
       duration: 4,

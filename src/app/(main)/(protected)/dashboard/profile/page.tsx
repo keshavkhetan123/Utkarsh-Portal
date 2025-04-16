@@ -139,23 +139,6 @@ export default function UserProfile() {
                   {Number(profile.cgpa)}
                 </Typography>
               </Box>
-              <Box
-                className="flex flex-row flex-nowrap gap-2 rounded-md border-solid  py-3.5 px-2 border-2 md:basis-[30%] sm:basis-[45%] basis-full "
-                sx={{
-                  borderColor: "divider",
-                }}
-              >
-                <Typography variant="body1" className="font-medium">
-                  Credits:
-                </Typography>
-                <Typography
-                  variant="body1"
-                  className="font-bold"
-                  color="primary"
-                >
-                  {`${profile.completedCredits} / ${profile.totalCredits}`}
-                </Typography>
-              </Box>
               <TextField
                 disabled
                 label="Current Semester"
