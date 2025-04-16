@@ -104,10 +104,16 @@ model VerificationToken {
     @@unique([identifier, token])
 }
 
+enum Category {
+  EWS
+  SC/ST
+  PWD
+  OBC
+}
+
 model Students {
     userId               String    @id @default(cuid())
     program              String
-    duration             Int
     currentSemester      String
     gender               String?
     dob                  DateTime?
@@ -120,9 +126,8 @@ model Students {
     city                 String?
     state                String?
     country              String?
+    category             Category?
     isOnboardingComplete Boolean   @default(false)
-    completedCredits     Int
-    totalCredits         Int
     backlog              Boolean   @default(false)
     cgpa                 Float
     email                String?

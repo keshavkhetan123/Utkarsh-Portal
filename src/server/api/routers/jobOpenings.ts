@@ -300,7 +300,6 @@ export const jobOpeningRouter = createTRPCRouter({
       program: userDetails.student.program,
       ...(input.onlyApplicable && {
         minCgpa: { lte: userDetails.student.cgpa },
-        // minCredits: { lte: userDetails.student.completedCredits },
         backlog: { lte: userDetails.student.backlog },
       }),
       jobOpening: {
@@ -333,8 +332,7 @@ export const jobOpeningRouter = createTRPCRouter({
           passOutYear: true,
           program: true,
           minCgpa: true,
-          // minCredits: true,
-          backlog: false,
+          backlog: true,
           jobOpening: {
             select: {
               id: true,
@@ -391,39 +389,35 @@ export const jobOpeningRouter = createTRPCRouter({
       const job = jobOpeningRecord.jobOpening;
       let whyNotRegister = "";
 
-      // New eligibility logic for registration:
-      if (job.allowSelected) {
-        // If allowSelected is true then all students can apply.
-        // No need to validate against previous selections.
-      } else {
+      // Extract student's selected job types (for the current year).
+      const studentSelectedJobTypes = userDetails.student.selections.map(
+        (sel) => sel.jobType
+      );
+
+      // If allowSelected is true then all students can apply.
+      if(!job.allowSelected) {
         // When allowSelected is false, check the allowedJobTypes field.
-        // If allowedJobTypes is defined and non-empty, then only allow the student to register if
-        // all the student’s previously selected job types are within that allowed list.
-        if (job.allowedJobTypes && Array.isArray(job.allowedJobTypes) && job.allowedJobTypes.length > 0) {
-          // Extract student's selected job types (for the current year).
-          const studentSelectedJobTypes = userDetails.student.selections.map(
-            (sel) => sel.jobType
-          );
+        if (job.allowedJobTypes && Array.isArray(job.allowedJobTypes)) { 
           // Check if every selection is in the allowedJobTypes array.
           const allSelectionsAllowed = studentSelectedJobTypes.every((jobType) =>
             job.allowedJobTypes.includes(jobType)
           );
-          if (!allSelectionsAllowed || userDetails.student.selections) {
+          if (!allSelectionsAllowed) {
             whyNotRegister = "Your previous selections include job types not allowed for this opening.";
           }
-        } 
-      }
+        }
+        else if(studentSelectedJobTypes.length > 0)
+          whyNotRegister = "Your previous selections include job types not allowed for this opening.";
+      } 
+      
       // Continue with the other validations already in place
       if (!whyNotRegister && jobOpeningRecord.passOutYear !== userDetails.student.passOutYear) {
-        whyNotRegister = "Admission year does not match.";
+        whyNotRegister = "Passout year does not match.";
       } else if (!whyNotRegister && jobOpeningRecord.program !== userDetails.student.program) {
         whyNotRegister = "Program does not match.";
       } else if (!whyNotRegister && job.minCgpa > userDetails.student.cgpa) {
         whyNotRegister = `Required CGPA: ${job.minCgpa}, Your CGPA: ${userDetails.student.cgpa}`;
       }
-      // else if (!whyNotRegister && job.minCredits > userDetails.student.completedCredits) {
-      //   whyNotRegister = `Required Credits: ${job.minCredits}, Your Credits: ${userDetails.student.completedCredits}`;
-      // }
       else if (
         !whyNotRegister &&
         jobOpeningRecord.backlog === false &&
