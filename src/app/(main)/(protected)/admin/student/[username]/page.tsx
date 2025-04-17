@@ -3,6 +3,9 @@
 import { useParams } from "next/navigation";
 import dayjs from "dayjs";
 
+import { useEffect, useState } from "react";
+import { Button } from "@mui/material";
+
 import PersonOffIcon from "@mui/icons-material/PersonOff";
 import { Container, Paper, Typography } from "@mui/material";
 
@@ -17,15 +20,27 @@ import SelectionsDataDisplay from "./_components/Selections";
 
 export default function TrackStudentPage() {
   const { username } = useParams();
-
   const decodedUsername = decodeURIComponent(decodeURIComponent(username as string));
 
+  const { data, isLoading, isError } =
+    api.student.getStudentDetails.useQuery(decodedUsername);
 
-  const { data, isLoading, isError } = api.student.getStudentDetails.useQuery(
-    
-    decodedUsername
-    //username as string,
-  );
+  const [isDebarred, setIsDebarred] = useState<boolean | null>(null);
+
+  api.student.getDebarStatus.useQuery(decodedUsername, {
+    enabled: !!decodedUsername,
+    onSuccess: (flag) => setIsDebarred(flag),
+    onError: () => setIsDebarred(null),
+  });
+
+  const toggleDebarMutation = api.student.toggleDebarStatus.useMutation({
+    onSuccess: (newFlag) => {
+      setIsDebarred(newFlag);
+    },
+    onError: () => {
+      /* show error toast/snackbar */
+    },
+  });
 
   if (isLoading) {
     return <FullPageLoader />;
@@ -72,6 +87,18 @@ console.log(data);
           <DataDisplay label="Twelveth Marks" value={data.twelvethMarks} />
         </div>
       </Paper>
+      {isDebarred !== null && (
+        <Button
+          variant="contained"
+          color={isDebarred ? "success" : "error"}
+          onClick={() =>
+            toggleDebarMutation.mutate(decodedUsername)
+          }
+          className="self-start"
+        >
+          {isDebarred ? "Undebar" : "Debar"}
+        </Button>
+      )}
       <ResumeSection resumes={data.resume} />
       <SelectionsDataDisplay data={data.selections} />
       <ApplicationsSection data={data.applications} />
