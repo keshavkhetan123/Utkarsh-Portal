@@ -53,26 +53,32 @@ export default function JobPage() {
             ))}
           </Box>
 
-          {/* Pagination Controls */}
-          <div className="flex justify-between items-center pt-4">
-            <Button
-              variant="outlined"
-              onClick={handlePrev}
-              disabled={page === 1 || isFetching}
-            >
-              Previous
-            </Button>
-            <Typography variant="body2" className="text-center px-4">
-              Page {page}
+          {data.debarred ? (
+            <Typography variant="body1" color="error" className="pt-4 text-center">
+              YOU ARE DEBARRED FROM THIS SEASON
             </Typography>
-            <Button
-              variant="outlined"
-              onClick={handleNext}
-              disabled={!data?.hasMore || isFetching}
-            >
-              Next
-            </Button>
-          </div>
+          ) : (
+            // Pagination Controls
+            <div className="flex justify-between items-center pt-4">
+              <Button
+                variant="outlined"
+                onClick={handlePrev}
+                disabled={page === 1 || isFetching}
+              >
+                Previous
+              </Button>
+              <Typography variant="body2" className="text-center px-4">
+                Page {page}
+              </Typography>
+              <Button
+                variant="outlined"
+                onClick={handleNext}
+                disabled={!data?.hasMore || isFetching}
+              >
+                Next
+              </Button>
+            </div>
+          )}
         </>
       )}
     </Container>

@@ -284,6 +284,7 @@ export const jobOpeningRouter = createTRPCRouter({
             program: true,
             cgpa: true,
             backlog: true,
+            isDebarred: true,
             selections: {
               where: {
                 year: ctx.session.user.year,
@@ -293,6 +294,10 @@ export const jobOpeningRouter = createTRPCRouter({
         },
       },
     });
+
+    if(userDetails.student.isDebarred){
+      return {data : undefined, total : undefined, hasMore : undefined, debarred : true};
+    }
 
     const query = {
       passOutYear: userDetails.student.passOutYear,
