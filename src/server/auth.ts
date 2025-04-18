@@ -11,6 +11,8 @@ import { db } from "~/server/db";
 import { getStudentAviralData, verifyPassword } from "~/server/utils/aviral";
 import { jwtHelper, tokenOneDay, tokenOnWeek } from "~/server/utils/jwtHelper";
 
+import bcrypt from 'bcryptjs';
+
 declare module "next-auth" {
   interface User {
     id?: string;
@@ -200,19 +202,15 @@ export const authOptions: NextAuthOptions = {
         if (!credentials?.username || !credentials?.password)
           throw new Error("Missing Credentials");
 
-        let authenticatedUserGroup = await verifyPassword(
-          credentials.username,
-          credentials.password,
-        );
+        const hashedPassword = await bcrypt.hash(credentials.password,10);
 
-        if (!authenticatedUserGroup) throw new Error("Invalid Credentials");
-
-        let user = await db.user.findFirst({  //CHANGED
-          where: { username: credentials.username },
+        let user = await db.user.findFirst({ 
+          where: {username: credentials.username},
           select: {
             id: true,
             name: true,
             username: true,
+            password: true,
             year: true,
             userGroup: true,
             role: { select: { name: true } },
@@ -225,11 +223,23 @@ export const authOptions: NextAuthOptions = {
             },
           },
         });
-        
 
-        if (!user) {
+        if(user){
+          if (!(await bcrypt.compare(credentials.password, user.password))) {
+            throw new Error("Invalid credentials");
+          }
+        }
+        else{
           const userCount = await db.user.count();
-          if (authenticatedUserGroup === "student" && userCount > 0) {
+          if (userCount > 0) {
+            let authenticatedUserGroup = await verifyPassword(
+              credentials.username,
+              credentials.password,
+            );
+    
+            if (!authenticatedUserGroup) throw new Error("Invalid Credentials");
+
+
             let userData = await getStudentAviralData(
               credentials.username,
               credentials.password,
@@ -238,9 +248,10 @@ export const authOptions: NextAuthOptions = {
 
             user = await db.user.create({
               data: {
-                userGroup: authenticatedUserGroup,
+                userGroup: 'student',
                 username: credentials.username,
-                name: 'sugam',  // or userData.name,
+                password: hashedPassword,
+                name: userData.name,
                 email: credentials.username + "@iiita.ac.in",
                 // New role logic:
                 role: {
@@ -251,10 +262,10 @@ export const authOptions: NextAuthOptions = {
                 },
                 student: {
                   create: {
-                    program: 'ECE',
-                    currentSemester: '6',
-                    cgpa: 7.6,
-                    backlog: false,
+                    program: userData.program,
+                    currentSemester: userData.currentSem,
+                    cgpa: userData.cgpa,
+                    backlog: userData.backlog,
                     email: credentials.username + "@iiita.ac.in",
                   },
                 },
@@ -278,16 +289,12 @@ export const authOptions: NextAuthOptions = {
             
           } else if (userCount === 0) {   //authenticatedUserGroup === "faculty"
             console.log("I have reached My destination");
-            let userData = await getStudentAviralData(
-              credentials.username,
-              credentials.password,
-            );
-            if (!userData) throw new Error("User Not Found");
             user = await db.user.create({
               data: {
                 userGroup: 'Admin',       //authenticatedUserGroup,
                 username: credentials.username,
-                name: userData.name,
+                password: hashedPassword,
+                name: 'Default Name',
                 email: credentials.username + "@iiita.ac.in",
                 role: {
                   connectOrCreate: {
@@ -303,35 +310,13 @@ export const authOptions: NextAuthOptions = {
                 year: true,
                 username: true,
                 userGroup: true,
-                role: { select: { name: true } },
-                student: {
-                  select: {
-                    passOutYear: true,
-                    program: true,
-                    isOnboardingComplete: true,
-                  },
-                },
+                role: { select: { name: true } }
               },
             });
           } else {
             throw new Error("Only students and faculties supported");
           }
         }
-
-        // const latestYear = await db.participatingGroups.findFirst({
-        //   select: {
-        //     year: true,
-        //   },
-        //   where: {
-        //     ...(user.student && {
-        //       passOutYear: user.student?.passOutYear,
-        //       program: user.student?.program,
-        //     }),
-        //   },
-        //   orderBy: {
-        //     year: "desc",
-        //   },
-        // });
 
         const latestYear = user.student?.passOutYear || user.year;
 

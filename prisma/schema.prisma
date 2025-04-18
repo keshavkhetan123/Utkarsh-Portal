@@ -77,6 +77,7 @@ model User {
     image         String?
 
     username  String @unique
+    password  String
     userGroup String
 
     accounts                    Account[]

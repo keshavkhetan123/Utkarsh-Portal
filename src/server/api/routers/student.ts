@@ -17,7 +17,6 @@ export const studentRouter = createTRPCRouter({
         passOutYear: true,
         cgpa: true,
         currentSemester: true,
-        totalCredits: true,
         program: true,
         email: true,
         phone: true,

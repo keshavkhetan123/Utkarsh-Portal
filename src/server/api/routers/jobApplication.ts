@@ -108,6 +108,7 @@ export const jobApplication = createTRPCRouter({
               passOutYear: true,
               program: true,
               cgpa: true,
+              isDebarred: true,
               selections: {
                 where: {
                   year: ctx.session.user.year,
@@ -124,6 +125,10 @@ export const jobApplication = createTRPCRouter({
 
       if (!userDetails.student) {
         throw new Error("Student not found");
+      }
+
+      if(userDetails.student.isDebarred){
+        throw new Error("Debarred students cannot apply for jobs");
       }
 
       const job = await ctx.db.jobOpening.findUnique({

@@ -39,6 +39,8 @@
     "@trpc/server": "^10.43.6",
     "@types/react-big-calendar": "^1.8.10",
     "axios": "^1.6.3",
+    "bcryptjs": "^3.0.2",
+    "csv-parse": "^5.6.0",
     "dayjs": "^1.11.10",
     "firebase": "^10.12.5",
     "firebase-admin": "^12.3.0",
