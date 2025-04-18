@@ -1,9 +1,8 @@
 "use client";
 import { useState } from "react";
 import Image from "next/image";
-import { signIn } from "next-auth/react";
-import { useRouter } from 'next/navigation';
-
+import { useRouter, useParams } from "next/navigation";
+import { api } from "~/trpc/react";
 
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
@@ -16,49 +15,44 @@ import {
   OutlinedInput,
   Paper,
   Typography,
-} from "@mui/material/index";
+} from "@mui/material";
 
 import vector from "~/assets/vectors/login.svg";
 
 export default function Login() {
-  const router = useRouter(); // Add the useRouter hook for navigation
+  const router = useRouter();
+  const params = useParams();
+  const username = params?.username as string;
+
+  const resetPassword = api.forgotPassword.resetPassword.useMutation();
 
   const [showPassword, setShowPassword] = useState(false);
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-
-  const [usernameError, setUsernameError] = useState(false);
+  const [pass, setPass] = useState("");
   const [passwordError, setPasswordError] = useState(false);
 
-  const [isLoading, setIsLoading] = useState(false);
-  // const router = useRouter(); // Add the useRouter hook for navigation
-
   const handleClickShowPassword = () => setShowPassword((show) => !show);
+  const handleMouseDownPassword = (event) => event.preventDefault();
 
-  const handleMouseDownPassword = (event) => {
-    event.preventDefault();
-  };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
-    signIn("credentials", {
-      callbackUrl: "/dashboard",
-      username,
-      password,
-    })
-      .then(() => {
-        setIsLoading(false);
-      })
-      .catch((e) => {
-        setIsLoading(false);
-        console.log(e);
-      });
+
+    if (pass.trim() === "") {
+      setPasswordError(true);
+      return;
+    }
+
+    setPasswordError(false);
+
+    try {
+      await resetPassword.mutateAsync({username, pass });
+      alert("Password reset successful.");
+      router.push("/login"); // or wherever you want
+    } catch (error) {
+      console.error("Reset error:", error);
+      alert("Error resetting password.");
+    }
   };
-  const handleForgotPassword = () => {
-    // Redirect to the Forgot Password page
-    router.push("/forgot_password");
-  };
+
   return (
     <div className="w-full h-full grid grid-cols-1 md:grid-cols-2 absolute top-0">
       <Container className="flex flex-col justify-center items-center">
@@ -72,38 +66,19 @@ export default function Login() {
             variant="h5"
             className="w-full text-center font-semibold mb-2"
           >
-            LDAP Login
+            Reset Password
           </Typography>
-          <FormControl margin="dense" error={usernameError} required>
-            <OutlinedInput
-              id="username"
-              name="username"
-              placeholder="Username"
-              value={username}
-              onChange={(e) => {
-                setUsername(e.target.value);
-                if (e.target.value.length === 0) setUsernameError(true);
-                else setUsernameError(false);
-              }}
-              fullWidth
-              autoComplete="on"
-            />
-          </FormControl>
 
           <FormControl margin="dense" error={passwordError} required>
             <OutlinedInput
               id="password"
               name="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => {
-                setPassword(e.target.value);
-                if (e.target.value.length === 0) setPasswordError(true);
-                else setPasswordError(false);
-              }}
+              placeholder="New Password"
+              value={pass}
+              onChange={(e) => setPass(e.target.value)}
               fullWidth
-              autoComplete="on"
               type={showPassword ? "text" : "password"}
+              autoComplete="on"
               endAdornment={
                 <InputAdornment position="end">
                   <IconButton
@@ -126,26 +101,20 @@ export default function Login() {
             className="mt-6"
             fullWidth
             size="large"
-            loading={isLoading}
+            loading={resetPassword.isLoading}
           >
-            <span>Login</span>
+            <span>Reset Password</span>
           </LoadingButton>
-          <Typography
-            variant="body2"
-            className="mt-4 text-center cursor-pointer text-blue-600 hover:underline"
-            onClick={handleForgotPassword} // This will redirect to forgot-password page
-          >
-            Forgot Password?
-          </Typography>
-          
         </Paper>
       </Container>
+
       <Container
         className="hidden md:flex flex-col justify-center items-center max-h-svh"
         sx={{ bgcolor: "primary.main" }}
       >
         <Image src={vector} alt="Login" className="max-w-full max-h-min" />
       </Container>
+
       <Container
         className="z-10 w-full h-5 absolute bottom-0"
         maxWidth={false}
