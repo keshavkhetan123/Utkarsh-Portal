@@ -20,7 +20,9 @@ export default function JobOpeningGroupSelector(
       program: "",
       minCgpa: null,
       backlog: true,
+      selected: true, // <-- default selected
     };
+    
     props.onChange([...(props.value || []), newGroup]);
   };
 

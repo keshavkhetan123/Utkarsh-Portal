@@ -15,18 +15,26 @@ import {
 
 export default function GroupCard(props: JobOpeningGroupCardProps) {
   return (
-    <Paper elevation={4} className="group flex flex-col p-4 gap-3">
+    <Paper elevation={4}  className={`group flex flex-col p-4 gap-3 ${!props.group.selected?"opacity-60":""}`}>
       <Typography variant="subtitle2" className="relative">
         <em>Group # {props.index + 1}</em>
         {!props.disabled && (
           <IconButton
-            onClick={props.onDelete}
-            className="absolute top-0 right-0 mt-[-4px]"
-            color="error"
-            size="small"
-          >
-          <CheckCircleIcon style={{ color: 'green' }} />
-          </IconButton>
+          onClick={() =>
+            props.onChange({
+              ...props.group,
+              selected: !props.group.selected, // Toggle selection
+            })
+          }
+          className="absolute top-0 right-0 mt-[-4px]"
+          color={props.group.selected ? "success" : "default"}
+          size="small"
+        >
+          <CheckCircleIcon
+            style={{ color: props.group.selected ? "green" : "gray" }} // visual color
+          />
+        </IconButton>
+        
         )}
       </Typography>
       <FormControl size="small" required disabled={props.disabled}>
