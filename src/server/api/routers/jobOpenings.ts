@@ -23,6 +23,7 @@ export const jobOpeningRouter = createTRPCRouter({
           domain: z.string(),
           logo: z.string(),
         }),
+        token: z.string(),
         jobType: z.string(),
         registrationStart: z.date(),
         registrationEnd: z.date(),
@@ -61,6 +62,21 @@ export const jobOpeningRouter = createTRPCRouter({
         });
       }
 
+      const decodedToken = decodeURIComponent(input.token)
+      .replace(/ /g, "+")
+      .replace(/-/g, "+")
+      .replace(/_/g, "/");
+
+    // ✅ Step 1: Find HR with that token
+    const hr = await ctx.db.hR.findUnique({
+      where: { token: decodedToken },
+    });
+
+    // ✅ Step 2: Check if HR is valid
+    if (!hr || !hr.isValid) {
+      throw new Error("Invalid or unauthorized HR token");
+    }
+
       await ctx.db.jobOpening.create({
         data: {
           year : input.participatingGroups[0].passOutYear,
@@ -77,6 +93,11 @@ export const jobOpeningRouter = createTRPCRouter({
           placementType: {
             connect: {
               id: input.jobType,
+            },
+          },
+          hr: {
+            connect: {
+              token: decodeURIComponent(input.token).replace(/ /g, "+").replace(/-/g, "+").replace(/_/g, "/"),
             },
           },
           registrationStart: input.registrationStart,
@@ -101,6 +122,18 @@ export const jobOpeningRouter = createTRPCRouter({
         },
       });
 
+      await ctx.db.hR.update({
+        where:{
+          token: decodeURIComponent(input.token)
+          .replace(/ /g, "+")
+          .replace(/-/g, "+")
+          .replace(/_/g, "/")
+        },
+        data:{
+          isValid:false
+        }
+      });
+
       return true;
     }),
 
@@ -120,6 +153,7 @@ export const jobOpeningRouter = createTRPCRouter({
           domain: z.string(),
           logo: z.string(),
         }),
+        token: z.string(),
         jobType: z.string(),
         registrationStart: z.date(),
         registrationEnd: z.date(),
@@ -678,4 +712,127 @@ export const jobOpeningRouter = createTRPCRouter({
         },
       });
     }),
+    hrGetJobOpenings: publicProcedure
+    .input(
+      z.object({
+        token: z.string()
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+
+    async function jobID() {
+      const encodedDesiredToken = encodeURI(input.token.toString().trim());
+      const records = await ctx.db.jobOpening.findMany();
+      const matchedRecord = records.find(record => encodeURI(record.token) === encodedDesiredToken);
+      console.log("token==========="+encodedDesiredToken+"\n"+"records============="+records+"\n"+"matched records=============="+matchedRecord)
+      return matchedRecord.id;
+    }
+
+    // const record = await jobID();
+
+    // if(typeof(record)!="string")
+    //   throw new Error("Invalid Token");
+    
+            
+    const jobOpenings = await ctx.db.jobOpening.findMany({
+      where: {
+        token:decodeURIComponent(input.token)
+        .replace(/ /g, "+")
+        .replace(/-/g, "+")
+        .replace(/_/g, "/")
+      },
+      select: {
+        id: true,
+        title: true,
+        location: true,
+        role: true,
+        pay: true,
+        company: {
+          select: {
+            name: true,
+            website: true,
+            logo: true,
+          },
+        },
+        placementType: {
+          select: {
+            name: true,
+          },
+        },
+        registrationStart: true,
+        registrationEnd: true,
+      }
+    });
+    return {
+      data:jobOpenings,
+      // jobid:record
+    };
+  }),
+    hrGetJobOpening: publicProcedure
+    .input(z.string())
+    .query(async ({ ctx, input }) => {
+      return await ctx.db.jobOpening.findUnique({
+        where: {
+          id: input,
+        },
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          location: true,
+          role: true,
+          pay: true,
+          payNumeric: true,
+          empBenefits: true,
+          company: {
+            select: {
+              name: true,
+              website: true,
+              logo: true,
+            },
+          },
+          placementType: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+          registrationStart: true,
+          registrationEnd: true,
+          extraApplicationFields: true,
+          noResumes: true,
+          hidden: true,
+          autoApprove: true,
+          autoVisible: true,
+          allowSelected: true,
+          JobOpeningParticipantGroups: {
+            select: {
+              id: true,
+              admissionYear: true,
+              program: true,
+              minCgpa: true,
+              minCredits: true,
+            },
+          },
+        },
+      });
+    }),
+
+    hrGetRegDetails: publicProcedure
+    .input(z.string())
+    .query(async ({ ctx, input }) => {
+      return await ctx.db.students.groupBy({
+        by: ["admissionYear", "program"],
+        where: {
+          applications: {
+            some: {
+              jobId: input,
+            },
+          },
+        },
+        _count: {
+          _all: true,
+        },
+      });
+    })
 });

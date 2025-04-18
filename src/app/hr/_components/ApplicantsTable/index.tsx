@@ -50,7 +50,7 @@ export default function ApplicantsTable(props: ApplicantsTableProps) {
     return cols;
   }, [props.extraApplicationFields]);
 
-  const { data, isLoading } = api.jobApplication.getJobApplicants.useQuery({
+  const { data, isLoading } = api.jobApplication.hrGetJobApplicants.useQuery({
     jobId: props.jobId,
     filterColumn,
     filterValue,
@@ -62,7 +62,7 @@ export default function ApplicantsTable(props: ApplicantsTableProps) {
   });
 
   const downloadCSVMutation =
-    api.jobApplication.getJobApplicantsCSV.useMutation({
+    api.jobApplication.hrGetJobApplicantsCSV.useMutation({
       onSuccess: (data) => {
         const url = window.URL.createObjectURL(
           new Blob([data.data], { type: "text/csv" }),

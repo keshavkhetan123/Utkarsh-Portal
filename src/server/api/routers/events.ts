@@ -378,6 +378,7 @@ export const eventsRouter = createTRPCRouter({
         link: z.string().nullable(),
         hidden: z.boolean().nullable().default(true),
         jobOpeningId: z.string().nullable().default(null),
+        token: z.string(),
         company: z
           .object({
             name: z.string(),
@@ -404,7 +405,7 @@ export const eventsRouter = createTRPCRouter({
             data: {
               name: input.company.name,
               website: input.company.website,
-              logo: input.company.logo,
+              logo: input.company.logo
             },
             select: { id: true },
           });
@@ -462,6 +463,7 @@ export const eventsRouter = createTRPCRouter({
         link: z.string().nullable(),
         hidden: z.boolean().nullable().default(true),
         jobOpeningId: z.string().nullable().default(null),
+        token: z.string(),
         company: z
           .object({
             name: z.string(),
@@ -488,7 +490,7 @@ export const eventsRouter = createTRPCRouter({
             data: {
               name: input.company.name,
               website: input.company.website,
-              logo: input.company.logo,
+              logo: input.company.logo
             },
             select: { id: true },
           });

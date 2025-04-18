@@ -12,7 +12,7 @@ import { api } from "~/trpc/react";
 import JobAnalyticsRow from "./_components/JobAnalyticsRow";
 
 export default function AdminHomePage() {
-  const { data: jobTypes, isLoading } = api.analytics.getJobTypes.useQuery();
+  const { data: jobTypes=[], isLoading } = api.analytics.getJobTypes.useQuery();
   if (isLoading) {
     return <FullPageLoader />;
   }

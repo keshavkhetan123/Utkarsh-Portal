@@ -10,11 +10,11 @@ export const DEFAULT_JOB_OPENING: NewJobOpening = {
   jobType: "",
   registrationStart: null,
   registrationEnd: null,
+  extraApplicationFields: [],
   hidden: false,
   autoApprove: false,
   autoVisible: false,
   allowSelected: false,
-  allowedJobTypes: [],
   participatingGroups: [],
 };
 
