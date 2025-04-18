@@ -1,135 +1,60 @@
-import axios from "axios";
-
-import { db } from "~/server/db";
-
-const BASE_URL = 'https://aviral.iiita.ac.in/api/';
+import fs from "fs";
+import path from "path";
+import { parse } from "csv-parse/sync";
 
 type StudentAviralData = Promise<{
   username: string;
+  randomPassword: string;
   name: string;
   currentSem: string;
-  rollNumber: string;
-  mobile: string;
   cgpa: number;
   program: string;
-  duration: number;
   passOutYear: number;
+  backlog: boolean;
 } | null>;
 
-type FacultyAviralData = Promise<{
-  username: string;
-  name: string;
-  interest: string;
-} | null>;
+const CSV_FILE_PATH = path.join(process.cwd(), "src/server/utils/student_data.csv");
 
+let cachedStudents: Record<string, any>[] | null = null;
+
+async function loadStudentCSVData(): Promise<Record<string, any>[]> {
+  if (cachedStudents) return cachedStudents;
+
+  const fileContent = fs.readFileSync(CSV_FILE_PATH, "utf-8");
+  const records = parse(fileContent, {
+    columns: true,
+    skip_empty_lines: true,
+    trim: true,
+  });
+
+  cachedStudents = records;
+  return records;
+}
 
 export const getStudentAviralData = async (
   username: string,
   password: string
 ): StudentAviralData => {
   try {
-    const aviralSession = await db.config.findFirst({
-      where: { key: "AVIRAL_SESSION" },
-    });
-    let res = await axios.post(BASE_URL + "login/", {
-      username: username?.toLowerCase(),
-      password,
-    });
+    const students = await loadStudentCSVData();
+    const student = students.find(
+      (s) => s.username.toLowerCase() === username.toLowerCase() && s.randomPassword === password
+    );
 
-    if (res.status !== 200) {
-      throw new Error("Invalid Credentials");
-    }
+    if (!student) return null;
 
-    res = await axios.get(BASE_URL + "student/dashboard/", {
-      headers: {
-        Authorization: res.data["jwt_token"],
-        // Use aviralSession.value if it exists, otherwise an empty string.
-        Session: aviralSession?.value || "",
-      },
-    });
-
-    if (res.status !== 200) {
-      throw new Error("Invalid Credentials");
-    }
-
-    const data = {
-      username: username,
-      name: (
-        (res.data["first_name"] || "") +
-        " " +
-        (res.data["middle_name"] || "") +
-        " " +
-        (res.data["last_name"] || "")
-      )
-        .trim(),
-      currentSem: res.data["semester"] || "1",
-      rollNumber: res.data["student_id"] || "Default Roll",
-      mobile: res.data["phone"] || "0000000000",
-      cgpa: res.data["cgpi"] || 0,
-      program: res.data["program"] || "Default Program",
-      passOutYear: res.data["admission_year"] || 2022,
-      duration: res.data["duration"] || 4,
-    };
-
-    return data;
-  } catch (error) {
-    console.log("Error in getStudentAviralData:", error);
-    // Return a default object if anything fails
     return {
-      username,
-      name: "Default Name",
-      currentSem: "1",
-      rollNumber: "Default Roll",
-      mobile: "0000000000",
-      cgpa: 0,
-      program: "Default Program",
-      passOutYear: 2022,
-      duration: 4,
+      username: student.username,
+      randomPassword: student.randomPassword,
+      name: student.name,
+      currentSem: student.currentSemester,
+      cgpa: parseFloat(student.CGPA),
+      program: student.program,
+      passOutYear: parseInt(student.passOutYear),
+      backlog: student.Backlog.toLowerCase() === "true",
     };
-  }
-};
-
-export const getFacultyAviralData = async (username: string, password: string): FacultyAviralData => {
-  try {
-    const aviralSession = await db.config.findFirst({
-      where: {
-        key: 'AVIRAL_SESSION',
-      },
-    });
-    let res = await axios.post(BASE_URL + 'login/', {
-      username: username?.toLowerCase(),
-      password,
-    });
-
-    if (res.status !== 200) {
-      throw new Error('Invalid Credentials');
-    }
-
-    res = await axios.get(BASE_URL + 'faculty/dashboard/', {
-      headers: {
-        Authorization: res.data['jwt_token'],
-        Session: aviralSession.value,
-      },
-    });
-
-    if (res.status !== 200) {
-      throw new Error('Invalid Credentials');
-    }
-
-    const data = {
-      username: username,
-      name:
-        (res.data['first_name'] +
-          ' ' +
-          res.data['middle_name'] +
-          ' ' +
-          res.data['last_name']).trim(),
-      interest: res.data['interest'],
-    };
-
-    return data;
   } catch (error) {
-    console.log(error);
+    console.error("Error in getStudentAviralData:", error);
     return null;
   }
 };
