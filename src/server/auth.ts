@@ -252,11 +252,9 @@ export const authOptions: NextAuthOptions = {
                 student: {
                   create: {
                     program: 'ECE',
-                    duration: 4,
                     currentSemester: '6',
-                    completedCredits: 108,  
-                    totalCredits: 150,//userData.totalCredits,
                     cgpa: 7.6,
+                    backlog: false,
                     email: credentials.username + "@iiita.ac.in",
                   },
                 },

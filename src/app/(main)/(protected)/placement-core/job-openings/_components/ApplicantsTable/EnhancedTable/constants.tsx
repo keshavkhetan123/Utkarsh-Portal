@@ -99,20 +99,6 @@ export const BASE_COLUMNS: DataColumn[] = [
     label: "CGPA",
     disableSort: false,
   },
-  {
-    id: "completedCredits",
-    numeric: false,
-    disablePadding: false,
-    label: "Completed Credits",
-    disableSort: false,
-  },
-  {
-    id: "totalCredits",
-    numeric: false,
-    disablePadding: false,
-    label: "Total Credits",
-    disableSort: true,
-  },
 ];
 
 export const STATUS_ORDER = [

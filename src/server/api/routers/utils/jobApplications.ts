@@ -105,11 +105,6 @@ export const getOrderQuery = (orderBy: string, sort: string) => {
         cgpa: sort,
       };
       break;
-    case "completedCredits":
-      order.student = {
-        completedCredits: sort,
-      };
-      break;
     default:
       order.createdAt = sort;
   }

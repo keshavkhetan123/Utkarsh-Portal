@@ -18,7 +18,6 @@ export const studentRouter = createTRPCRouter({
         cgpa: true,
         currentSemester: true,
         totalCredits: true,
-        completedCredits: true,
         program: true,
         email: true,
         phone: true,
@@ -48,8 +47,6 @@ export const studentRouter = createTRPCRouter({
           passOutYear: userData.passOutYear,
           duration: userData.duration,
           currentSemester: userData.currentSem,
-          completedCredits: userData.completedCredits,
-          totalCredits: userData.totalCredits,
           cgpa: userData.cgpa,
         },
       });
@@ -130,8 +127,6 @@ export const studentRouter = createTRPCRouter({
           passOutYear: true,
           cgpa: true,
           currentSemester: true,
-          totalCredits: true,
-          completedCredits: true,
           tenthMarks: true,
           twelvethMarks: true,
           addressLine1: true,
@@ -246,4 +241,68 @@ export const studentRouter = createTRPCRouter({
       return student.passOutYear;
     }),
     
+    getDebarStatus: roleProtectedProcedure("superAdmin")
+    .input(z.string()) 
+    .query(async ({ input, ctx }) => {
+      const user = await ctx.db.user.findUnique({
+        where: {
+          username: input,
+        },
+        select: { id: true },
+      });
+
+      const student = await ctx.db.students.findUnique({
+        where: {
+          userId : user.id
+        },
+        select: {
+          isDebarred : true,
+        }
+      });
+  
+      if (!student) {
+        throw new Error("Student not found");
+      }
+
+      return student.isDebarred;
+    }),
+
+    toggleDebarStatus: roleProtectedProcedure("superAdmin")
+    .input(z.string())
+    .mutation(async ({ input, ctx }) => {
+      const user = await ctx.db.user.findUnique({
+        where: {
+          username: input,
+        },
+        select: { id: true },
+      });
+  
+      if (!user) {
+        throw new Error("User not found");
+      }
+  
+      const student = await ctx.db.students.findUnique({
+        where: {
+          userId: user.id,
+        },
+        select: {
+          isDebarred: true,
+        },
+      });
+  
+      if (!student) {
+        throw new Error("Student not found");
+      }
+  
+      await ctx.db.students.update({
+        where: {
+          userId: user.id,
+        },
+        data: {
+          isDebarred: !student.isDebarred,
+        },
+      });
+  
+      return !student.isDebarred;
+    }),
 });
