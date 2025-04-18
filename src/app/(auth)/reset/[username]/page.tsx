@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import Image from "next/image";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { api } from "~/trpc/react";
 
 import Visibility from "@mui/icons-material/Visibility";
@@ -23,8 +23,13 @@ export default function Login() {
   const router = useRouter();
   const params = useParams();
   const username = params?.username as string;
+  const searchParams = useSearchParams();
+  const token = searchParams.get('token');
+
+  console.log(token);
 
   const resetPassword = api.forgotPassword.resetPassword.useMutation();
+
 
   const [showPassword, setShowPassword] = useState(false);
   const [pass, setPass] = useState("");
@@ -44,9 +49,9 @@ export default function Login() {
     setPasswordError(false);
 
     try {
-      await resetPassword.mutateAsync({username, pass });
+      await resetPassword.mutateAsync({username, pass, token });
       alert("Password reset successful.");
-      router.push("/login"); // or wherever you want
+      router.push("/login"); 
     } catch (error) {
       console.error("Reset error:", error);
       alert("Error resetting password.");

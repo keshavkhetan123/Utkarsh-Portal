@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter} from "next/navigation";
 import {
   Container,
   Paper,
@@ -14,7 +14,7 @@ import { api } from "~/trpc/react"; // <-- Import tRPC
 
 export default function ForgotPassword() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [emailError, setEmailError] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
@@ -30,13 +30,7 @@ export default function ForgotPassword() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
-    // if (!email || !email.includes("@")) {
-    //   setEmailError(true);
-    //   return;
-    // }
-
-    sendResetEmail.mutate({ email: email });
+    sendResetEmail.mutate({ username: username });
 };
 
   return (
@@ -63,9 +57,9 @@ export default function ForgotPassword() {
                   id="Username"
                   name="Username"
                   placeholder="Username"
-                  value={email}
+                  value={username}
                   onChange={(e) => {
-                    setEmail(e.target.value);
+                    setUsername(e.target.value);
                     setEmailError(false);
                   }}
                   fullWidth
