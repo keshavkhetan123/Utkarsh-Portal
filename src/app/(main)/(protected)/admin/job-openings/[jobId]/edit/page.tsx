@@ -49,6 +49,7 @@ export default function UpdateJobOpening() {
       setJobOpening({
         ...originalJobOpening,
         allowSelected: originalJobOpening.allowSelected,
+        allowedJobTypes: originalJobOpening.allowedJobTypes ?? [],
         company: {
           ...originalJobOpening.company,
           domain: originalJobOpening.company.website,
@@ -141,7 +142,10 @@ export default function UpdateJobOpening() {
         className="flex flex-col gap-3"
         onSubmit={(e) => {
           e.preventDefault();
-          const reqData: any = jobOpening;
+          const reqData: any = {
+            ...jobOpening,
+            allowedJobTypes: jobOpening.allowedJobTypes,
+          };          
           reqData.registrationStart = new Date(
             reqData.registrationStart.toISOString(),
           );
@@ -415,6 +419,31 @@ export default function UpdateJobOpening() {
             }
           />
         </div>
+
+        <Typography variant="body2" className="mt-2">
+          Allow already selected students from the following job types:
+        </Typography>
+        <div className="flex flex-col gap-1 ml-2">
+          {jobTypes?.map((jobType) => (
+            <FormControlLabel
+              key={jobType.id}
+              label={`Students already placed in: ${jobType.name}`}
+              control={
+                <Checkbox
+                  size="small"
+                  checked={jobOpening.allowedJobTypes.includes(jobType.id)}
+                  onChange={(e) => {
+                    const updated = e.target.checked
+                      ? [...jobOpening.allowedJobTypes, jobType.id]
+                      : jobOpening.allowedJobTypes.filter((id) => id !== jobType.id);
+                    setJobOpening({ ...jobOpening, allowedJobTypes: updated });
+                  }}
+                />
+              }
+            />
+          ))}
+        </div>
+
 
         <Divider className="mt-12" />
         <Container className="flex flex-row justify-end">

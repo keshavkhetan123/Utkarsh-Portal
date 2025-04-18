@@ -32,6 +32,7 @@ export const jobOpeningRouter = createTRPCRouter({
         autoApprove: z.boolean().optional().default(true),
         autoVisible: z.boolean().optional().default(false),
         allowSelected: z.boolean().optional().default(false),
+        allowedJobTypes: z.array(z.string()).optional().default([]),
         participatingGroups: z.array(
           z.object({
             passOutYear: z.number(),
@@ -90,6 +91,7 @@ export const jobOpeningRouter = createTRPCRouter({
           autoApprove: input.autoApprove,
           autoVisible: input.autoVisible,
           allowSelected: input.allowSelected,
+          allowedJobTypes: input.allowedJobTypes,
           JobOpeningParticipantGroups: {
             createMany: {
               data: input.participatingGroups.map((group) => ({
@@ -132,6 +134,7 @@ export const jobOpeningRouter = createTRPCRouter({
         autoApprove: z.boolean().optional().default(false),
         autoVisible: z.boolean().optional().default(false),
         allowSelected: z.boolean().optional().default(false),
+        allowedJobTypes: z.array(z.string()).optional().default([]),
         participatingGroups: z.array(
           z.object({
             id: z.string().optional(),
@@ -226,6 +229,7 @@ export const jobOpeningRouter = createTRPCRouter({
             autoApprove: input.autoApprove,
             autoVisible: input.autoVisible,
             allowSelected: input.allowSelected,
+            allowedJobTypes: input.allowedJobTypes,
             JobOpeningParticipantGroups: {
               createMany: {
                 data: input.participatingGroups
@@ -257,171 +261,190 @@ export const jobOpeningRouter = createTRPCRouter({
       return true;
     }),
 
-  getLatestJobOpenings: protectedProcedure
-    .input(
-      z.object({
-        onlyApplicable: z.boolean().default(false),
-        limit: z.number().default(10),
-        page: z.number().default(1),
-      }),
-    )
-    .query(async ({ ctx, input }) => {
-      if (ctx.session.user.userGroup !== "student") {
-        throw new Error("Only students can view job openings");
-      }
-      const userDetails = await ctx.db.user.findUnique({
-        where: {
-          id: ctx.session.user.id,
-        },
-        select: {
-          student: {
-            select: {
-              passOutYear: true,
-              program: true,
-              cgpa: true,
-              completedCredits: true,
-              selections: {
-                where: {
-                  year: ctx.session.user.year,
-                },
-              },
-            },
-          },
-        },
-      });
-      const query = {
-        passOutYear: userDetails.student.passOutYear,
-        program: userDetails.student.program,
-        ...(input.onlyApplicable && {
-          minCgpa: {
-            lte: userDetails.student.cgpa,
-          },
-          // minCredits: {
-          //   lte: userDetails.student.completedCredits,
-          // },
-          backlog:{
-            lte:userDetails.student.backlog,
-          }
-        }),
-        jobOpening: {
-          year: ctx.session.user.year,
-          OR: [
-            {
-              hidden: false,
-            },
-            {
-              AND: [
-                {
-                  registrationStart: {
-                    lte: new Date(),
-                  },
-                },
-                {
-                  autoVisible: true,
-                },
-              ],
-            },
-          ],
-        },
-      };
-      const [total, jobOpenings] = await ctx.db.$transaction([
-        ctx.db.jobOpeningParticipantGroups.count({
-          where: query,
-        }),
-        ctx.db.jobOpeningParticipantGroups.findMany({
-          where: query,
+    getLatestJobOpenings: protectedProcedure
+  .input(
+    z.object({
+      onlyApplicable: z.boolean().default(false),
+      limit: z.number().default(10),
+      page: z.number().default(1),
+    }),
+  )
+  .query(async ({ ctx, input }) => {
+    if (ctx.session.user.userGroup !== "student") {
+      throw new Error("Only students can view job openings");
+    }
+    const userDetails = await ctx.db.user.findUnique({
+      where: {
+        id: ctx.session.user.id,
+      },
+      select: {
+        student: {
           select: {
             passOutYear: true,
             program: true,
-            minCgpa: true,
-            // minCredits: true,
-            backlog:false,
-            jobOpening: {
-              select: {
-                id: true,
-                title: true,
-                location: true,
-                role: true,
-                pay: true,
-                company: {
-                  select: {
-                    name: true,
-                    website: true,
-                    logo: true,
-                  },
-                },
-                placementType: {
-                  select: {
-                    id: true,
-                    name: true,
-                  },
-                },
-                applications: {
-                  where: {
-                    userId: ctx.session.user.id,
-                  },
-                  select: {
-                    id: true,
-                    latestStatus: {
-                      select: {
-                        status: true,
-                      },
-                    },
-                  },
-                },
-                allowSelected: true,
-                registrationStart: true,
-                registrationEnd: true,
-                createdAt: true,
+            cgpa: true,
+            backlog: true,
+            isDebarred: true,
+            selections: {
+              where: {
+                year: ctx.session.user.year,
               },
             },
           },
-          orderBy: {
-            jobOpening: {
-              registrationStart: "desc",
+        },
+      },
+    });
+
+    if(userDetails.student.isDebarred){
+      return {data : undefined, total : undefined, hasMore : undefined, debarred : true};
+    }
+
+    const query = {
+      passOutYear: userDetails.student.passOutYear,
+      program: userDetails.student.program,
+      ...(input.onlyApplicable && {
+        minCgpa: { lte: userDetails.student.cgpa },
+        backlog: { lte: userDetails.student.backlog },
+      }),
+      jobOpening: {
+        year: ctx.session.user.year,
+        OR: [
+          {
+            hidden: false,
+          },
+          {
+            AND: [
+              {
+                registrationStart: { lte: new Date() },
+              },
+              {
+                autoVisible: true,
+              },
+            ],
+          },
+        ],
+      },
+    };
+
+    const [total, jobOpenings] = await ctx.db.$transaction([
+      ctx.db.jobOpeningParticipantGroups.count({
+        where: query,
+      }),
+      ctx.db.jobOpeningParticipantGroups.findMany({
+        where: query,
+        select: {
+          passOutYear: true,
+          program: true,
+          minCgpa: true,
+          backlog: true,
+          jobOpening: {
+            select: {
+              id: true,
+              title: true,
+              location: true,
+              role: true,
+              pay: true,
+              company: {
+                select: {
+                  name: true,
+                  website: true,
+                  logo: true,
+                },
+              },
+              placementType: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
+              // IMPORTANT: allowedJobTypes comes from the JobOpening model (as JSON array)
+              allowedJobTypes: true,
+              applications: {
+                where: {
+                  userId: ctx.session.user.id,
+                },
+                select: {
+                  id: true,
+                  latestStatus: {
+                    select: {
+                      status: true,
+                    },
+                  },
+                },
+              },
+              allowSelected: true,
+              registrationStart: true,
+              registrationEnd: true,
+              createdAt: true,
             },
           },
-          take: input.limit + 1,
-          skip: (input.page - 1) * input.limit,
-        }),
-      ]);
+        },
+        orderBy: {
+          jobOpening: {
+            registrationStart: "desc",
+          },
+        },
+        take: input.limit + 1,
+        skip: (input.page - 1) * input.limit,
+      }),
+    ]);
 
-      const data = jobOpenings.map((jobOpening) => {
-        let whyNotRegister = "";
-      
-        if (!jobOpening.jobOpening.allowSelected &&
-            userDetails.student.selections.some(
-              (sel) => sel.jobType === jobOpening.jobOpening.placementType.id
-            )) {
-          whyNotRegister = "Already selected for this job type.";
-        } else if (jobOpening.passOutYear !== userDetails.student.passOutYear) {
-          whyNotRegister = "Admission year does not match.";
-        } else if (jobOpening.program !== userDetails.student.program) {
-          whyNotRegister = "Program does not match.";
-        } else if (jobOpening.minCgpa > userDetails.student.cgpa) {
-          whyNotRegister = `Required CGPA: ${jobOpening.minCgpa}, Your CGPA: ${userDetails.student.cgpa}`;
-        } 
-        // else if (jobOpening.minCredits > userDetails.student.completedCredits) {
-        //   whyNotRegister = `Required Credits: ${jobOpening.minCredits}, Your Credits: ${userDetails.student.completedCredits}`;
-        // }
-        else if(jobOpening.backlog == false && userDetails.backlog == true){
-          whyNotRegister = `Company does not allow students with backlog`;
+    const data = jobOpenings.map((jobOpeningRecord) => {
+      const job = jobOpeningRecord.jobOpening;
+      let whyNotRegister = "";
+
+      // Extract student's selected job types (for the current year).
+      const studentSelectedJobTypes = userDetails.student.selections.map(
+        (sel) => sel.jobType
+      );
+
+      // If allowSelected is true then all students can apply.
+      if(!job.allowSelected) {
+        // When allowSelected is false, check the allowedJobTypes field.
+        if (job.allowedJobTypes && Array.isArray(job.allowedJobTypes)) { 
+          // Check if every selection is in the allowedJobTypes array.
+          const allSelectionsAllowed = studentSelectedJobTypes.every((jobType) =>
+            job.allowedJobTypes.includes(jobType)
+          );
+          if (!allSelectionsAllowed) {
+            whyNotRegister = "Your previous selections include job types not allowed for this opening.";
+          }
         }
+        else if(studentSelectedJobTypes.length > 0)
+          whyNotRegister = "Your previous selections include job types not allowed for this opening.";
+      } 
       
-        return {
-          ...jobOpening.jobOpening,
-          canRegister: whyNotRegister === "", // True if no reason exists
-          whyNotRegister, // Store the reason
-          alreadyRegistered: jobOpening.jobOpening.applications.length > 0,
-        };
-      });
+      // Continue with the other validations already in place
+      if (!whyNotRegister && jobOpeningRecord.passOutYear !== userDetails.student.passOutYear) {
+        whyNotRegister = "Passout year does not match.";
+      } else if (!whyNotRegister && jobOpeningRecord.program !== userDetails.student.program) {
+        whyNotRegister = "Program does not match.";
+      } else if (!whyNotRegister && job.minCgpa > userDetails.student.cgpa) {
+        whyNotRegister = `Required CGPA: ${job.minCgpa}, Your CGPA: ${userDetails.student.cgpa}`;
+      }
+      else if (
+        !whyNotRegister &&
+        jobOpeningRecord.backlog === false &&
+        userDetails.student.backlog === true
+      ) {
+        whyNotRegister = `Company does not allow students with backlog`;
+      }
 
       return {
-        data: data.slice(0, input.limit),
-        total,
-        hasMore: data.length > input.limit,
+        ...job,
+        canRegister: whyNotRegister === "", // True if no disqualifying reason exists
+        whyNotRegister,
+        alreadyRegistered: job.applications.length > 0,
       };
-    }),
+    });
+
+    return {
+      data: data.slice(0, input.limit),
+      total,
+      hasMore: data.length > input.limit,
+    };
+  }),
+
 
   getJobOpening: protectedProcedure
     .input(z.string())
@@ -439,7 +462,6 @@ export const jobOpeningRouter = createTRPCRouter({
               passOutYear: true,
               program: true,
               cgpa: true,
-              completedCredits: true,
               selections: {
                 where: {
                   year: ctx.session.user.year,
@@ -534,7 +556,6 @@ export const jobOpeningRouter = createTRPCRouter({
               group.program === userDetails.student.program &&
               group.minCgpa <= userDetails.student.cgpa &&
               ((group.backlog == 0) ? !userDetails.student.backlog : true)
-              // group.minCredits <= userDetails.student.completedCredits,
           );
 
         data.alreadyRegistered = jobOpening.applications.length > 0;

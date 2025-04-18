@@ -1,7 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import { CircularProgress, Paper, Typography, Button } from "@mui/material";
+import { useEffect } from "react";
+import {
+  CircularProgress,
+  Paper,
+  Typography,
+  Button,
+} from "@mui/material";
 
 import { api } from "~/trpc/react";
 import GroupCard from "./GroupCard";
@@ -14,15 +19,38 @@ export default function JobOpeningGroupSelector(
       props.jobTypeId,
     );
 
+  useEffect(() => {
+    if (yearWisePrograms) {
+      const participatingGroups = [];
+
+      Object.keys(yearWisePrograms).forEach((year) => {
+        const numericYear = Number(year);
+
+        yearWisePrograms[numericYear].forEach((program) => {
+          const existingGroup = props.value?.find(
+            (g) => g.passOutYear === numericYear && g.program === program,
+          );
+
+          participatingGroups.push({
+            passOutYear: numericYear,
+            program,
+            backlog: existingGroup?.backlog ?? true,
+            minCgpa: existingGroup?.minCgpa ?? null,
+          });
+        });
+      });
+
+      props.onChange(participatingGroups);
+    }
+  }, [yearWisePrograms]);
+
   const handleAddGroup = () => {
     const newGroup = {
       passOutYear: null,
       program: "",
       minCgpa: null,
       backlog: true,
-      selected: true, // <-- default selected
     };
-    
     props.onChange([...(props.value || []), newGroup]);
   };
 
@@ -34,14 +62,14 @@ export default function JobOpeningGroupSelector(
         <Typography textAlign="center" color="text.disabled" className="py-8">
           Please select a job type first
         </Typography>
-      ) : isLoading || !yearWisePrograms ? (
+      ) : !yearWisePrograms || isLoading ? (
         <div className="flex items-center justify-center p-8">
           <CircularProgress />
         </div>
       ) : (
         <>
           <div className="grid gap-2 grid-cols-1 md:auto-rows-fr sm:grid-cols-[repeat(auto-fill,minmax(240px,1fr))]">
-            {(props.value || []).map((group, index) => (
+            {props.value.map((group, index) => (
               <GroupCard
                 key={props.jobTypeId + index}
                 index={index}
@@ -50,9 +78,9 @@ export default function JobOpeningGroupSelector(
                   Object.keys(yearWisePrograms)
                     .filter((key) => {
                       return (
-                        (props.value || []).filter((el, elIdx) =>
-                          elIdx !== index && el.passOutYear === Number(key),
-                        ).length !== yearWisePrograms[Number(key)].length
+                        props.value?.filter((el, elIdx) => {
+                          elIdx !== index && el.passOutYear === Number(key);
+                        }).length !== yearWisePrograms[Number(key)].length
                       );
                     })
                     .map((key) => [
@@ -65,10 +93,10 @@ export default function JobOpeningGroupSelector(
                             el.passOutYear === Number(key),
                         );
                       }),
-                    ])
+                    ]),
                 )}
                 onDelete={() => {
-                  props.onChange((props.value || []).filter((_, i) => i !== index));
+                  props.onChange(props.value?.filter((_, i) => i !== index));
                 }}
                 onChange={(newGroup) => {
                   const newValue = [...(props.value || [])];
@@ -78,6 +106,7 @@ export default function JobOpeningGroupSelector(
               />
             ))}
           </div>
+
           <Button
             variant="outlined"
             onClick={handleAddGroup}

@@ -7,14 +7,14 @@ import {
   Paper,
   Select,
   TextField,
-  Checkbox,
   Typography,
+  Checkbox,
   FormControlLabel
 } from "@mui/material";
 
 export default function GroupCard(props: JobOpeningGroupCardProps) {
   return (
-    <Paper elevation={4}  className={`group flex flex-col p-4 gap-3 ${!props.group.selected?"opacity-60":""}`}>
+    <Paper elevation={4} className="group flex flex-col p-4 gap-3">
       <Typography variant="subtitle2" className="relative">
         <em>Group # {props.index + 1}</em>
         {!props.disabled && (
@@ -24,7 +24,7 @@ export default function GroupCard(props: JobOpeningGroupCardProps) {
             color="error"
             size="small"
           >
-          <CheckCircleIcon style={{ color: 'green' }} />
+            <CloseIcon />
           </IconButton>
         )}
       </Typography>
@@ -82,21 +82,6 @@ export default function GroupCard(props: JobOpeningGroupCardProps) {
           })
         }
       />
-      {/* <TextField
-        label="Min. Credits"
-        value={props.group.minCredits}
-        type="number"
-        size="small"
-        inputProps={{
-          step: 1,
-        }}
-        onChange={(e) =>
-          props.onChange({
-            ...props.group,
-            minCredits: Number(e.target.value),
-          })
-        }
-      /> */}
       <FormControlLabel
       control={
         <Checkbox
@@ -113,7 +98,6 @@ export default function GroupCard(props: JobOpeningGroupCardProps) {
       label="Allow students with backlog?"
       disabled={props.disabled}
     />
-
     </Paper>
   );
 }

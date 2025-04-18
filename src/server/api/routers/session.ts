@@ -41,7 +41,6 @@ export const placementSessionRouter = createTRPCRouter({
   //           where: {
   //             program: group.program,
   //             passOutYear: group.year,
-  //             completedCredits: { gte: group.minCredits },
   //             cgpa: { gte: group.minCGPA },
   //           },
   //           select: {
