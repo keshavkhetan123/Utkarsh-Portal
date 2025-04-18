@@ -42,7 +42,7 @@ export const appRouter = createTRPCRouter({
   selections: selectedStudentsRouter,
   hrToken : hrTokenRouter, 
   noc: nocRouter,
-  forgotPasword : forgotPasswordRouter,
+  forgotPassword : forgotPasswordRouter,
 
 });
 
