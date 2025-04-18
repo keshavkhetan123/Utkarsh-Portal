@@ -84,6 +84,8 @@ model User {
     sessions                    Session[]
     student                     Students?
 
+    passwordResetToken  String?
+
     roleId String
     role   Role @relation(fields: [roleId], references: [id])
 
