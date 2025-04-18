@@ -1,8 +1,9 @@
 "use client";
-
 import { useState } from "react";
 import Image from "next/image";
 import { signIn } from "next-auth/react";
+import { useRouter } from 'next/navigation';
+
 
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
@@ -20,6 +21,8 @@ import {
 import vector from "~/assets/vectors/login.svg";
 
 export default function Login() {
+  const router = useRouter(); // Add the useRouter hook for navigation
+
   const [showPassword, setShowPassword] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -28,6 +31,7 @@ export default function Login() {
   const [passwordError, setPasswordError] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
+  // const router = useRouter(); // Add the useRouter hook for navigation
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -50,6 +54,10 @@ export default function Login() {
         setIsLoading(false);
         console.log(e);
       });
+  };
+  const handleForgotPassword = () => {
+    // Redirect to the Forgot Password page
+    router.push("/forgot_password");
   };
   return (
     <div className="w-full h-full grid grid-cols-1 md:grid-cols-2 absolute top-0">
@@ -122,6 +130,14 @@ export default function Login() {
           >
             <span>Login</span>
           </LoadingButton>
+          <Typography
+            variant="body2"
+            className="mt-4 text-center cursor-pointer text-blue-600 hover:underline"
+            onClick={handleForgotPassword} // This will redirect to forgot-password page
+          >
+            Forgot Password?
+          </Typography>
+          
         </Paper>
       </Container>
       <Container
@@ -143,7 +159,7 @@ export default function Login() {
           backdropFilter: "blur(10px)",
         }}
       >
-        Created by Team GeekHaven anurag jain
+        Created by Sugam Sareen and his team
       </Container>
     </div>
   );
