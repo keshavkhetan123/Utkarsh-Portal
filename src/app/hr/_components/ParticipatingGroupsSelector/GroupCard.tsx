@@ -9,7 +9,8 @@ import {
   TextField,
   Checkbox,
   Typography,
-  FormControlLabel
+  FormControlLabel,
+  CheckCircleIcon
 } from "@mui/material";
 
 export default function GroupCard(props: JobOpeningGroupCardProps) {
