@@ -14,7 +14,6 @@ interface NewJobOpening {
   jobType: string | null;
   registrationStart: Dayjs | null;
   registrationEnd: Dayjs | null;
-  extraApplicationFields: extraApplicationField[] | null;
   hidden: boolean;
   autoApprove: boolean;
   autoVisible: boolean;
