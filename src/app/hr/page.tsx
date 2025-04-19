@@ -98,13 +98,6 @@ export default function NewJobOpening() {
     if (jobOpening.registrationStart > jobOpening.registrationEnd) return true;
 
     if (
-      jobOpening.extraApplicationFields.some(
-        (field) => !field.title || !field.format
-      )
-    )
-      return true;
-
-    if (
       jobOpening.participatingGroups.some(
         (group) => !group.passOutYear || !group.program
       )
