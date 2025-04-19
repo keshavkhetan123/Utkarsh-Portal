@@ -10,11 +10,9 @@ import {
   Checkbox,
   Typography,
   FormControlLabel,
-  CheckCircleIcon
 } from "@mui/material";
 import {CheckCircle} from "@mui/icons-material";
 
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
 export default function GroupCard(props: JobOpeningGroupCardProps) {
   return (

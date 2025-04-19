@@ -38,6 +38,7 @@ export const env = createEnv({
     S3_SECRET_KEY: z.string(),
     S3_PUBLIC_URL: z.string(),
     GOOGLE_APPLICATION_CREDENTIALS: z.string(),
+    ENCRYPTION_KEY: z.string()
   },
 
   /**
@@ -68,6 +69,7 @@ export const env = createEnv({
     S3_SECRET_KEY: process.env.S3_SECRET_KEY,
     S3_PUBLIC_URL: process.env.S3_PUBLIC_URL,
     GOOGLE_APPLICATION_CREDENTIALS: process.env.GOOGLE_APPLICATION_CREDENTIALS,
+    ENCRYPTION_KEY: process.env.ENCRYPTION_KEY
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially
