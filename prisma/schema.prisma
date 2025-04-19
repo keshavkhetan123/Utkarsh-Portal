@@ -84,6 +84,8 @@ model User {
     sessions                    Session[]
     student                     Students?
 
+    passwordResetToken  String?
+
     roleId String
     role   Role @relation(fields: [roleId], references: [id])
 
@@ -225,14 +227,13 @@ model JobOpening {
 
     registrationStart      DateTime
     registrationEnd        DateTime
-    extraApplicationFields Json?
     noResumes              Boolean  @default(false)
 
     hidden        Boolean @default(false)
     autoApprove   Boolean @default(false)
     autoVisible   Boolean @default(false)
     allowSelected Boolean @default(false)
-    allowedJobTypes Json? // Array of jobType IDs
+    allowedJobTypes Json? // Back to Json
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt

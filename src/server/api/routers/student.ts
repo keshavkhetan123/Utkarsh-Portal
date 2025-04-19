@@ -44,7 +44,6 @@ export const studentRouter = createTRPCRouter({
         data: {
           program: userData.program,
           passOutYear: userData.passOutYear,
-          duration: userData.duration,
           currentSemester: userData.currentSem,
           cgpa: userData.cgpa,
         },

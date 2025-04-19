@@ -12,6 +12,8 @@ import {
   FormControlLabel
 } from "@mui/material";
 
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+
 export default function GroupCard(props: JobOpeningGroupCardProps) {
   return (
     <Paper elevation={4}  className={`group flex flex-col p-4 gap-3 ${!props.group.selected?"opacity-60":""}`}>

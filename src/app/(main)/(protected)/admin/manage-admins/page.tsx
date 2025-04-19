@@ -11,7 +11,6 @@ import SearchFilter from "~/app/common/SearchFilter";
 
 import AdminList from "./AdminList";
 import NewAdminModal from "./NewAdminModal";
-import RequestModal from "./RequestModal";
 
 export default async function ManageAdminsPage({
   searchParams,

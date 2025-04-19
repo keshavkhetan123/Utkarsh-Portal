@@ -2,7 +2,7 @@
 
 import { Container, Divider, Typography } from "@mui/material";
 
-import NOCCard from "./_components/NOCCard.tsx"; // You should create this component similar to ResumeCard
+import NOCCard from "./_components/NOCCard"; // You should create this component similar to ResumeCard
 
 interface INOCSection {
   nocs: { name: string; src: string; id: string; createdAt: Date }[];
