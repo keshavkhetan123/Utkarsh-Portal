@@ -246,10 +246,6 @@ export const jobOpeningRouter = createTRPCRouter({
             },
             registrationStart: input.registrationStart,
             registrationEnd: input.registrationEnd,
-            extraApplicationFields:
-              typeof input.extraApplicationFields === "object"
-                ? input.extraApplicationFields
-                : undefined,
             noResumes: input.noResumes,
             hidden: input.hidden,
             autoApprove: input.autoApprove,
@@ -802,7 +798,6 @@ export const jobOpeningRouter = createTRPCRouter({
           },
           registrationStart: true,
           registrationEnd: true,
-          extraApplicationFields: true,
           noResumes: true,
           hidden: true,
           autoApprove: true,

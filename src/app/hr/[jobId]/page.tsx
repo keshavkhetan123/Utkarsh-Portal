@@ -24,7 +24,7 @@ export default async function Page({
         <RegDetails jobId={params.jobId} />
         <ApplicantsTable
           jobId={params.jobId}
-          extraApplicationFields={opening.extraApplicationFields}
+          extraApplicationFields={null}
         />
       </Container>
       :<Container className="flex flex-col gap-4 py-4">
