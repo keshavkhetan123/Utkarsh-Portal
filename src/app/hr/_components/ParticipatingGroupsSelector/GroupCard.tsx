@@ -9,7 +9,8 @@ import {
   TextField,
   Checkbox,
   Typography,
-  FormControlLabel
+  FormControlLabel,
+  CheckCircleIcon
 } from "@mui/material";
 
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
