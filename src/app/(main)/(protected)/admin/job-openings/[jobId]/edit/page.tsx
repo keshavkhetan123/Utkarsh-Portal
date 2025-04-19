@@ -63,7 +63,6 @@ export default function UpdateJobOpening() {
         // @ts-ignore
         registrationEnd: dayjs(originalJobOpening.registrationEnd),
         // @ts-ignore
-        extraApplicationFields: originalJobOpening.extraApplicationFields,
         jobType: originalJobOpening.placementType.id,
         participatingGroups: originalJobOpening.JobOpeningParticipantGroups,
       });

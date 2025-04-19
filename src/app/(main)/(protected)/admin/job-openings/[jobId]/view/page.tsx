@@ -37,9 +37,11 @@ export default function ViewJobOpening() {
         },
         registrationStart: dayjs(originalJobOpening.registrationStart),
         registrationEnd: dayjs(originalJobOpening.registrationEnd),
-        allowedJobTypes: JSON.parse(
-          originalJobOpening.allowedJobTypes as string
-        ) as string[],
+        allowedJobTypes:
+        Array.isArray(originalJobOpening.allowedJobTypes) &&
+        originalJobOpening.allowedJobTypes.every((x) => typeof x === "string")
+          ? (originalJobOpening.allowedJobTypes as string[])
+          : [],
         jobType: originalJobOpening.placementType.id,
         participatingGroups: originalJobOpening.JobOpeningParticipantGroups,
       });
