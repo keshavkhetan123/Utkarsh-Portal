@@ -67,12 +67,10 @@ export const jobOpeningRouter = createTRPCRouter({
       .replace(/-/g, "+")
       .replace(/_/g, "/");
 
-    // ✅ Step 1: Find HR with that token
     const hr = await ctx.db.hR.findUnique({
       where: { token: decodedToken },
     });
 
-    // ✅ Step 2: Check if HR is valid
     if (!hr || !hr.isValid) {
       throw new Error("Invalid or unauthorized HR token");
     }
@@ -114,7 +112,6 @@ export const jobOpeningRouter = createTRPCRouter({
                 passOutYear: group.passOutYear,
                 program: group.program,
                 minCgpa: group.minCgpa,
-                // minCredits: group.minCredits,
                 backlog:group.backlog,
               })),
             },
@@ -333,7 +330,7 @@ export const jobOpeningRouter = createTRPCRouter({
       program: userDetails.student.program,
       ...(input.onlyApplicable && {
         minCgpa: { lte: userDetails.student.cgpa },
-        backlog: { lte: userDetails.student.backlog },
+        backlog: userDetails.student.backlog,
       }),
       jobOpening: {
         year: ctx.session.user.year,
@@ -418,8 +415,13 @@ export const jobOpeningRouter = createTRPCRouter({
       }),
     ]);
 
-    const data = jobOpenings.map((jobOpeningRecord) => {
-      const job = jobOpeningRecord.jobOpening;
+    const data = jobOpenings.map(async (jobOpeningRecord) => {
+      const jobWithoutCgpa = jobOpeningRecord.jobOpening;
+      const job = {
+        ...jobWithoutCgpa,
+        minCgpa:jobOpeningRecord.minCgpa,
+      }
+      
       let whyNotRegister = "";
 
       // Extract student's selected job types (for the current year).
@@ -433,7 +435,7 @@ export const jobOpeningRouter = createTRPCRouter({
         if (job.allowedJobTypes && Array.isArray(job.allowedJobTypes)) { 
           // Check if every selection is in the allowedJobTypes array.
           const allSelectionsAllowed = studentSelectedJobTypes.every((jobType) =>
-            job.allowedJobTypes.includes(jobType)
+            Array.isArray(job.allowedJobTypes) && (job.allowedJobTypes as string[]).includes(jobType)
           );
           if (!allSelectionsAllowed) {
             whyNotRegister = "Your previous selections include job types not allowed for this opening.";
@@ -496,6 +498,7 @@ export const jobOpeningRouter = createTRPCRouter({
                   year: ctx.session.user.year,
                 },
               },
+              backlog: true,
             },
           },
         },
@@ -584,7 +587,7 @@ export const jobOpeningRouter = createTRPCRouter({
               group.passOutYear === userDetails.student.passOutYear &&
               group.program === userDetails.student.program &&
               group.minCgpa <= userDetails.student.cgpa &&
-              ((group.backlog == 0) ? !userDetails.student.backlog : true)
+              ((group.backlog == false) ? !userDetails.student.backlog : true)
           );
 
         data.alreadyRegistered = jobOpening.applications.length > 0;
@@ -805,13 +808,17 @@ export const jobOpeningRouter = createTRPCRouter({
           autoApprove: true,
           autoVisible: true,
           allowSelected: true,
+          hr:{
+            select:{
+              viewPermissions:true
+            }
+          },
           JobOpeningParticipantGroups: {
             select: {
               id: true,
-              admissionYear: true,
+              passOutYear: true,
               program: true,
               minCgpa: true,
-              minCredits: true,
             },
           },
         },
@@ -822,7 +829,7 @@ export const jobOpeningRouter = createTRPCRouter({
     .input(z.string())
     .query(async ({ ctx, input }) => {
       return await ctx.db.students.groupBy({
-        by: ["admissionYear", "program"],
+        by: ["passOutYear", "program"],
         where: {
           applications: {
             some: {
@@ -834,5 +841,5 @@ export const jobOpeningRouter = createTRPCRouter({
           _all: true,
         },
       });
-    })
+    }),
 });

@@ -15,11 +15,11 @@ import {
 
 import { api } from "~/trpc/react";
 
-import JobRow from "../_components/jobRow/JobRow";
+import Token from "../_components/tokenManage";
 
 export default function managePage() {
   const { data: openings, isLoading } =
-    api.jobOpenings.adminGetJobOpenings.useQuery({});
+    api.hrToken.adminGetHrToken.useQuery();
 
   return (
     <Container className="flex flex-col gap-4 py-4">
@@ -46,10 +46,8 @@ export default function managePage() {
       {
         <Box className="flex flex-col gap-2">
           {openings &&
-            openings.data.map((jobs) => (
-              <Link key={jobs.id} href={"./job-openings/" + jobs.id}>
-                <JobRow {...jobs} />
-              </Link>
+            openings.data.map((token) => (
+                <Token {...token} />
             ))}
         </Box>
       }

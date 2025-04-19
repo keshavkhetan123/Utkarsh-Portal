@@ -1,7 +1,7 @@
 // In a new HRToken router file (e.g., src/server/api/routers/hrToken.ts):
 
 import { z } from "zod";
-import { createTRPCRouter, protectedProcedure, publicProcedure } from "~/server/api/trpc";
+import { createTRPCRouter, protectedProcedure, publicProcedure, roleProtectedProcedure } from "~/server/api/trpc";
 import { db } from "~/server/db";
 import {randomBytes} from "crypto"
 
@@ -94,6 +94,11 @@ export const hrTokenRouter = createTRPCRouter({
     if (!hrToken) {
       throw new Error("Invalid token");
     }
+    if(!hrToken.viewPermissions){
+      return {
+        viewPermission:false
+      }
+    }
     if (!hrToken.isValid) {
       return { valid: false , company:{
         name: "This token has already been used.",
@@ -112,4 +117,77 @@ export const hrTokenRouter = createTRPCRouter({
 
     return { valid: true , company:company};
   }),
+  adminGetHrToken: roleProtectedProcedure('superAdmin')
+      .query(async ({ ctx, input }) => {
+        const tokenData = await ctx.db.jobOpening.findMany({
+          select:{
+            token:true,
+            company:{
+              select:{
+                logo:true,
+                name:true
+              }
+            }
+          }
+        });
+        return {
+          data: tokenData
+        }
+      }),
+      adminDisableToken: roleProtectedProcedure('superAdmin')
+      .input(
+        z.object({
+          token:z.string()
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        await ctx.db.hR.update({
+          where:{
+            token:input.token
+          },
+          data:{
+            isValid:false,
+            viewPermissions: false
+          }
+        });
+        return {
+          status:"success"
+        }
+      }),
+      adminGetTokenStatus: roleProtectedProcedure('superAdmin')
+      .input(
+        z.object({
+          token:z.string()
+        })
+      )
+      .query(async ({ ctx, input }) => {
+        const tokenData = await ctx.db.hR.findUnique({
+          where:{
+            token:input.token
+          }
+        });
+        return {
+          data: tokenData
+        }
+      }
+      ),
+      adminEnableToken: roleProtectedProcedure('superAdmin')
+      .input(
+        z.object({
+          token:z.string()
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        await ctx.db.hR.update({
+          where:{
+            token:input.token
+          },
+          data:{
+            viewPermissions: true
+          }
+        });
+        return {
+          status:"success"
+        }
+      }),
 });

@@ -252,6 +252,7 @@ model HR {
   nonce    String   // a key required to verify the authenticity of the token
   isValid  Boolean  @default(true)
   createdAt DateTime @default(now())
+  viewPermissions Boolean @default(true)
 
   jobOpenings JobOpening?
 

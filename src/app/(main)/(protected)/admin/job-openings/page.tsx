@@ -16,7 +16,7 @@ import {
 import { api } from "~/trpc/react";
 import JobRow from "./_components/jobRow/JobRow";
 
-const LIMIT = 2;
+export const LIMIT = 2;
 
 export default function JobOpeningsPage() {
   const [page, setPage] = useState(1);

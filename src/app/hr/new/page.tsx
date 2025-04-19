@@ -94,7 +94,7 @@ export default function NewJobOpening() {
 
     if (
       jobOpening.participatingGroups.some(
-        (group) => !group.admissionYear || !group.program
+        (group) => !group.passOutYear || !group.program
       )
     )
       return true;
@@ -111,16 +111,20 @@ export default function NewJobOpening() {
     );
   }
 
-  console.log("Token Data: ", tokenData);
-  console.log("Token Error: ", tokenError);
-  
-
   if (tokenError) {
     return (
       <Container className="flex flex-col gap-4 py-4">
         <Alert severity="error">Wrong link</Alert>
       </Container>
     );
+  }
+
+  if(tokenData?.viewPermission === false) {
+    return (
+      <Container className="flex flex-col gap-4 py-4">
+        <Alert severity="info">This token has been disabled by Admin. Please Contact IIITA Placement cell for Enabling this token </Alert>
+      </Container>
+    )
   }
 
   if (!tokenData.valid) {
@@ -152,10 +156,10 @@ export default function NewJobOpening() {
           reqData.description = descEditorRef.current.getContent();
           reqData.participatingGroups = reqData.participatingGroups.map(
             (group) => ({
-              admissionYear: parseInt(group.admissionYear),
+              passOutYear: parseInt(group.passOutYear.toString()),
               program: group.program,
               minCgpa: group.minCgpa,
-              minCredits: group.minCredits
+              backlog: group.backlog
             })
           );
 
@@ -377,9 +381,9 @@ export default function NewJobOpening() {
         <JobOpeningGroupSelector
           jobTypeId={jobOpening.jobType}
           value={jobOpening.participatingGroups}
-          onChange={(value) =>
+          onChange={(value) =>{
             setJobOpening({ ...jobOpening, participatingGroups: value })
-          }
+          }}
         />
         <Typography variant="body1" color="text.disabled">
           Detailed Job Description:
