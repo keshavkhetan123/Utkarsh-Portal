@@ -29,9 +29,12 @@ function PieCenterLabel({ children }: { children: React.ReactNode }) {
 }
 
 export default function RegDetails(props: RegDetailsProps) {
-  const { data, isLoading } = api.jobOpenings.adminGetRegDetails.useQuery(
-    props.jobId,
+  const { data , isLoading } = api.jobOpenings.hrGetRegDetails.useQuery(
+    props.jobId
   );
+
+  console.log(data);
+  
   const theme = useTheme();
 
   return (

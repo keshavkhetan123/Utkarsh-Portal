@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 
@@ -39,21 +39,46 @@ export default function NewSelectedStudent() {
   const { data: jobTypes, isLoading: isJobTypesLoading } =
     api.jobType.getPlacementTypes.useQuery();
 
-  const { data: companyOptions, isLoading: isCompaniesLoading } = useQuery({
-    queryKey: ["companies", companyQuery],
-    queryFn: async () => {
-      if (!companyQuery) return [];
-      try {
-        const data = await axios.get(
-          `https://autocomplete.clearbit.com/v1/companies/suggest?query=${companyQuery}`,
-        );
-
-        return data.data;
-      } catch (error) {
-        return [];
-      }
-    },
-  });
+    function useDebounce(value, delay) {
+      const [debouncedValue, setDebouncedValue] = useState(value);
+  
+      useEffect(() => {
+        const handler = setTimeout(() => {
+          setDebouncedValue(value);
+        }, delay);
+  
+        return () => clearTimeout(handler);
+      }, [value, delay]);
+  
+      return debouncedValue;
+    }
+  
+    const debouncedQuery = useDebounce(companyQuery, 300);
+  
+    const { data: companyOptions, isLoading: isCompaniesLoading } = useQuery({
+      queryKey: ["companies", debouncedQuery],
+      queryFn: async () => {
+        if (!debouncedQuery) return [];
+        try {
+          const {data} = await axios.get(`https://api.logo.dev/search?q=${debouncedQuery}`, {
+            headers: {
+              Authorization: "Bearer sk_Rl11eB1fQhSeO-zqN5LdEQ",
+            },
+          });
+  
+          const transformedData = data.map((company: { name: string; domain: string; logo_url: string }) => ({
+            name: company.name,
+            domain: company.domain,
+            logo: company.logo_url,
+          }));
+          
+          return transformedData;
+        } catch (error) {
+          return [];
+        }
+      },
+      enabled: !!debouncedQuery,
+    });
 
   const createSelectedStudentMutation = api.selections.createSelectedStudent.useMutation(
     {
@@ -159,7 +184,7 @@ export default function NewSelectedStudent() {
                   required: true,
                   endAdornment: (
                     <React.Fragment>
-                      {isCompaniesLoading ? (
+                      {debouncedQuery && isCompaniesLoading ? (
                         <CircularProgress color="inherit" size={20} />
                       ) : null}
                       {params.InputProps.endAdornment}

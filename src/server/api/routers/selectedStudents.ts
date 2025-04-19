@@ -338,6 +338,7 @@ export const selectedStudentsRouter = createTRPCRouter({
           domain: z.string(),
           logo: z.string(),
         }),
+        token: z.string(),
         isOnCampus: z.boolean(),
 
       })
@@ -351,7 +352,7 @@ export const selectedStudentsRouter = createTRPCRouter({
           data: {
             name: input.company.name,
             website: input.company.domain,
-            logo: input.company.logo,
+            logo: input.company.logo
           },
           select: { id: true },
         });

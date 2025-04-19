@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 
 import {
@@ -17,26 +17,45 @@ import { type CompanyDropdownProps } from "./types";
 export default function CompanyDropdown(props: CompanyDropdownProps) {
   const [companyQuery, setCompanyQuery] = useState("");
 
-  const { data: companyOptions, isLoading: isCompaniesLoading } = useQuery({
-    queryKey: ["companies", companyQuery],
-    queryFn: async () => {
-      if (!companyQuery) return [];
-      try {
-        const data = await axios.get(
-          `https://autocomplete.clearbit.com/v1/companies/suggest?query=${companyQuery}`,
-        );
+  function useDebounce(value, delay) {
+    const [debouncedValue, setDebouncedValue] = useState(value);
 
-        return data.data?.map((item) => {
-          return {
-            name: item.name,
-            website: item.domain,
-            logo: item.logo,
-          };
+    useEffect(() => {
+      const handler = setTimeout(() => {
+        setDebouncedValue(value);
+      }, delay);
+
+      return () => clearTimeout(handler);
+    }, [value, delay]);
+
+    return debouncedValue;
+  }
+
+  const debouncedQuery = useDebounce(companyQuery, 300);
+
+  const { data: companyOptions, isLoading: isCompaniesLoading } = useQuery({
+    queryKey: ["companies", debouncedQuery],
+    queryFn: async () => {
+      if (!debouncedQuery) return [];
+      try {
+        const {data} = await axios.get(`https://api.logo.dev/search?q=${debouncedQuery}`, {
+          headers: {
+            Authorization: "Bearer sk_Rl11eB1fQhSeO-zqN5LdEQ",
+          },
         });
+
+        const transformedData = data.map((company: { name: string; domain: string; logo_url: string }) => ({
+          name: company.name,
+          domain: company.domain,
+          logo: company.logo_url,
+        }));
+        
+        return transformedData;
       } catch (error) {
         return [];
       }
     },
+    enabled: !!debouncedQuery,
   });
 
   return (
@@ -89,7 +108,7 @@ export default function CompanyDropdown(props: CompanyDropdownProps) {
               required: props.required,
               endAdornment: (
                 <>
-                  {isCompaniesLoading ? (
+                  {debouncedQuery && isCompaniesLoading ? (
                     <CircularProgress color="inherit" size={20} />
                   ) : null}
                   {params.InputProps.endAdornment}

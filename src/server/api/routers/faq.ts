@@ -23,7 +23,7 @@ export const faqRouter = createTRPCRouter({
         });
         return data;
     }),
-    addFaq: roleProtectedProcedure('superAdmin').input(z.object({
+    addFaq: roleProtectedProcedure(['superAdmin','PlacementTeamMember','PlacementCoreTeam']).input(z.object({
         question: z.string(),
         answer: z.string(),
     })).mutation(async ({ ctx, input }) => {
@@ -36,7 +36,7 @@ export const faqRouter = createTRPCRouter({
         });
         return true;
     }),
-    deleteFaq: roleProtectedProcedure('superAdmin')
+    deleteFaq: roleProtectedProcedure(['superAdmin','PlacementCoreTeam','PlacementTeamMember'])
         .input(z.string())
         .mutation(async ({ ctx, input }) => {
             await ctx.db.faq.delete({
