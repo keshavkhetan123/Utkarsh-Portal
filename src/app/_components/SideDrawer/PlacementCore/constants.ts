@@ -45,16 +45,16 @@ export const PLACEMENT_CORE_SIDEBAR = [
     base: "/placement-core",
     title: "",
     links: [
-      {
-        label: "Placement Years",
-        path: "/placement-years",
-        icon: CalendarMonthIcon,
-      },
-      {
-        label: "Job Types",
-        path: "/job-types",
-        icon: ClassIcon,
-      },
+      // {
+      //   label: "Placement Years",
+      //   path: "/placement-years",
+      //   icon: CalendarMonthIcon,
+      // },
+      // {
+      //   label: "Job Types",
+      //   path: "/job-types",
+      //   icon: ClassIcon,
+      // },
       {
          label: "Help Chat",
          path: "/help-chat",

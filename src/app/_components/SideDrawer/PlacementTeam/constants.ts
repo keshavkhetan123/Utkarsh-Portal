@@ -55,16 +55,16 @@ export const PL_TEAM = [
         path: "/faq",
         icon: LiveHelpIcon,
       },
-      {
-        label: "Placement Years",
-        path: "/placement-years",
-        icon: CalendarMonthIcon,
-      },
-      {
-        label: "Job Types",
-        path: "/job-types",
-        icon: ClassIcon,
-      },
+      // {
+      //   label: "Placement Years",
+      //   path: "/placement-years",
+      //   icon: CalendarMonthIcon,
+      // },
+      // {
+      //   label: "Job Types",
+      //   path: "/job-types",
+      //   icon: ClassIcon,
+      // },
     ],
   },
 ];

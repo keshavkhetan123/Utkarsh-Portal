@@ -111,7 +111,7 @@ export default function UpdateJobOpening() {
     if (jobOpening.registrationStart > jobOpening.registrationEnd) return true;
 
     if (
-      jobOpening.extraApplicationFields.some(
+      jobOpening.extraApplicationFields?.some(
         (field) => !field.title || !field.format,
       )
     )
