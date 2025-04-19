@@ -103,8 +103,8 @@ export default function NocAdminPage() {
               <Typography><strong>Offer Letter Date:</strong> {new Date(noc.offerLetterDate).toDateString()}</Typography>
               <Typography><strong>Submitted On:</strong> {new Date(noc.todaysDate).toDateString()}</Typography>
               <Typography><strong>Salary:</strong> ₹{noc.salary}</Typography>
-              {noc.reason && <Typography><strong>Reason:</strong> {noc.reason}</Typography>}
-              {noc.details && <Typography><strong>Details:</strong> {noc.details}</Typography>}
+              {/* {noc.reason && <Typography><strong>Reason:</strong> {noc.reason}</Typography>} */}
+              {/* {noc.details && <Typography><strong>Details:</strong> {noc.details}</Typography>} */}
 
               {noc.status === "Pending" && (
                 <Box className="flex gap-4 pt-2">

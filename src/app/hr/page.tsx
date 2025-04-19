@@ -404,14 +404,14 @@ export default function NewJobOpening() {
           ref={descEditorRef}
         />
 
-        {/* <AdditionalFieldSelector
+        {/* {/* <AdditionalFieldSelector
           value={jobOpening.extraApplicationFields}
           onChange={(value) =>
             setJobOpening({ ...jobOpening, extraApplicationFields: value })
           }
-        /> 
+        /> */} 
 
-        <div className="flex flex-row gap-4 justify-end flex-wrap">
+        {/* <div className="flex flex-row gap-4 justify-end flex-wrap">
           <FormControlLabel
             label="Create Hidden"
             control={
@@ -469,7 +469,7 @@ export default function NewJobOpening() {
               />
             }
           />
-        </div>*/}
+        </div> */}
 
         <Divider className="mt-12" />
         <Container className="flex flex-row justify-end">

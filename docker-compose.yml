@@ -9,7 +9,6 @@ services:
       - ./src/:/app/src/
       - ./prisma:/app/prisma
       - ./public:/app/public
-      - ./google_application_credentials.json:/app/google_application_credentials.json
     environment:
       - DATABASE_URL=mysql://utkarsh:utkarsh@db/utkarsh
       - REDIS_URL=redis://cache:6379
@@ -23,7 +22,6 @@ services:
       - S3_SECRET_KEY=b+IkwGJinjRhDDNW8aoLI29V12GksWmk0HxrVEO2
       - S3_PUBLIC_URL=https://getting-started-withs3.s3.ap-south-1.amazonaws.com
       - USE_AVIRAL=true
-      - GOOGLE_APPLICATION_CREDENTIALS=/app/google_application_credentials.json
     env_file:
       - .env
     ports:

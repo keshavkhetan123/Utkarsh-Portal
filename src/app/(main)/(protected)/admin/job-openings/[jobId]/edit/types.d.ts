@@ -14,10 +14,10 @@ interface NewJobOpening {
   jobType: string | null;
   registrationStart: Dayjs | null;
   registrationEnd: Dayjs | null;
-  extraApplicationFields: extraApplicationField[] | null;
   hidden: boolean;
   autoApprove: boolean;
   autoVisible: boolean;
+  allowedJobTypes: string[];
   participatingGroups: {
     passOutYear?: number;
     program?: string;
@@ -26,13 +26,6 @@ interface NewJobOpening {
     backlog?: boolean;
   }[];
 }
-
-type extraApplicationField = {
-  title: string;
-  description: string;
-  format: string;
-  required: boolean;
-};
 
 type Company = {
   name: string;

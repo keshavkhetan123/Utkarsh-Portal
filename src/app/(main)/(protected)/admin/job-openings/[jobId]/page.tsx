@@ -23,7 +23,6 @@ export default async function Page({
         <RegDetails jobId={params.jobId} />
         <ApplicantsTable
           jobId={params.jobId}
-          extraApplicationFields={opening.extraApplicationFields}
         />
         <div className="flex flex-row gap-4 justify-end">
           <DeleteJobOpening jobId={params.jobId} />

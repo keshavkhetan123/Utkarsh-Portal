@@ -5,8 +5,6 @@ import { Container, Typography } from "@mui/material/index";
 
 import { getServerAuthSession } from "~/server/auth";
 
-import RequestAdminAccess from "./_components/RequestAdminAcess";
-
 export default async function AdminLayout({
   children,
 }: {
