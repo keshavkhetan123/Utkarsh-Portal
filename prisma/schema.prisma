@@ -50,15 +50,6 @@ enum RoleName {
   student
 }
 
-model HRToken {
-  id       String   @id @default(cuid())
-  token    String   @unique
-  isValid  Boolean  @default(true)
-  // Optionally, add a createdAt for expiration logic later:
-  createdAt DateTime @default(now())
-}
-
-
 model Role {
   id          String   @id @default(cuid())
   name        RoleName @unique
@@ -228,6 +219,11 @@ model JobOpening {
     registrationStart      DateTime
     registrationEnd        DateTime
     noResumes              Boolean  @default(false)
+    token    String   @db.LongText
+
+    @@unique([token(length: 255)]) 
+
+    hr HR     @relation(fields: [token], references: [token])
 
     hidden        Boolean @default(false)
     autoApprove   Boolean @default(false)
@@ -247,6 +243,21 @@ model JobOpening {
 
     @@index([companyId])
     @@index([jobType])
+}
+
+model HR {
+  id       String   @id @default(cuid())
+  token    String   @db.LongText
+
+  nonce    String   // a key required to verify the authenticity of the token
+  isValid  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  viewPermissions Boolean @default(true)
+
+  jobOpenings JobOpening?
+
+
+  @@unique([token(length: 255)]) 
 }
 
 model JobOpeningParticipantGroups {

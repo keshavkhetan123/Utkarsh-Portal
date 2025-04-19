@@ -16,7 +16,7 @@ import {
 import { api } from "~/trpc/react";
 import JobRow from "./_components/jobRow/JobRow";
 
-const LIMIT = 2;
+export const LIMIT = 2;
 
 export default function JobOpeningsPage() {
   const [page, setPage] = useState(1);
@@ -44,6 +44,15 @@ export default function JobOpeningsPage() {
           Job Openings
         </Typography>
         <div className="flex gap-2">
+          <Link href="./job-openings/manage">
+            <Button
+              variant="outlined"
+              color="primary"
+              className="inline-flex p-2 min-w-0"
+            >
+              Manage HR Tokens
+            </Button>
+          </Link>
           <Link href="./job-openings/new">
             <Button
               variant="outlined"

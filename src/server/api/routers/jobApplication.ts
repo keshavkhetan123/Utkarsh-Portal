@@ -1,7 +1,7 @@
 import dayjs from "dayjs";
 import { z } from "zod";
 
-import { roleProtectedProcedure, createTRPCRouter, protectedProcedure } from "../trpc";
+import { roleProtectedProcedure, createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 
 import { getFilterQuery, getOrderQuery } from "./utils/jobApplications";
 
@@ -19,6 +19,7 @@ export const jobApplication = createTRPCRouter({
               passOutYear: true,
               program: true,
               cgpa: true,
+              backlog: true,
               selections: {
                 where: {
                   year: ctx.session.user.year,
@@ -67,7 +68,6 @@ export const jobApplication = createTRPCRouter({
             },
           },
           allowSelected: true,
-          extraApplicationFields: true,
           noResumes: true,
           placementType: {
             select: {
@@ -105,6 +105,7 @@ export const jobApplication = createTRPCRouter({
                   id: input.resumeId,
                 },
               },
+              backlog: true,
               passOutYear: true,
               program: true,
               cgpa: true,
@@ -642,5 +643,255 @@ export const jobApplication = createTRPCRouter({
       });
 
       return application;
+    }),
+    hrGetJobApplicants: publicProcedure
+    .input(
+      z.object({
+        jobId: z.string(),
+        filterColumn: z.string().optional(),
+        filterValue: z.string().optional(),
+        page: z.number().optional(),
+        pageSize: z.number().optional(),
+        orderBy: z.string().optional(),
+        sort: z.string().optional(),
+        query: z.string().optional(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const filters = getFilterQuery(input.filterColumn, input.filterValue);
+      const jobPlacementType = await ctx.db.jobOpening.findUnique({
+        where: {
+          id: input.jobId,
+        },
+        select: {
+          placementType: {
+            select: {
+              id: true,
+            },
+          },
+        },
+      });
+      const [total, data] = await ctx.db.$transaction([
+        ctx.db.application.count({
+          where: {
+            jobId: input.jobId,
+            ...(input.query
+              ? {
+                student: {
+                  user: {
+                    OR: [
+                      {
+                        name: {
+                          contains: input.query,
+                        },
+                      },
+                      {
+                        username: {
+                          contains: input.query,
+                        },
+                      },
+                    ],
+                  },
+                },
+              }
+              : {}),
+            ...filters,
+          },
+        }),
+        ctx.db.application.findMany({
+          where: {
+            jobId: input.jobId,
+            ...(input.query
+              ? {
+                student: {
+                  user: {
+                    OR: [
+                      {
+                        name: {
+                          contains: input.query,
+                        },
+                      },
+                      {
+                        username: {
+                          contains: input.query,
+                        },
+                      },
+                    ],
+                  },
+                },
+              }
+              : {}),
+            ...filters,
+          },
+          include: {
+            student: {
+              include: {
+                user: {
+                  select: {
+                    name: true,
+                    username: true,
+                  },
+                },
+                selections: {
+                  where: {
+                    year: ctx.session.user.year,
+                    jobType: jobPlacementType.placementType.id,
+                    jobOpeningId: {
+                      not: input.jobId,
+                    },
+                  },
+                },
+              },
+            },
+            latestStatus: {
+              select: {
+                status: true,
+              },
+            },
+            resume: {
+              select: {
+                src: true,
+              },
+            },
+          },
+          orderBy: [getOrderQuery(input.orderBy, input.sort)],
+          skip: input.page * input.pageSize,
+          take: input.pageSize + 1,
+        }),
+      ]);
+      const hasMore = data.length > input.pageSize;
+      if (hasMore) {
+        data.pop();
+      }
+      return {
+        total,
+        data: data.map((application) => ({
+          ...application.student.user,
+          ...application.student,
+          alreadySelected: application.student.selections.length > 0,
+          resume: application.resume.src,
+          status: application.latestStatus.status,
+          additionalInfo: application.additionalInfo,
+          createdAt: application.createdAt,
+          id: application.id,
+        })),
+        hasMore,
+      };
+    }),
+  hrGetJobApplicantsCSV: publicProcedure
+    .input(z.string())
+    .mutation(async ({ ctx, input }) => {
+      const jobPlacementType = await ctx.db.jobOpening.findUnique({
+        where: {
+          id: input,
+        },
+        select: {
+          title: true,
+          company: {
+            select: {
+              name: true,
+            },
+          },
+          placementType: {
+            select: {
+              id: true,
+            },
+          },
+        },
+      });
+      const data = await ctx.db.application.findMany({
+        where: {
+          jobId: input,
+        },
+        include: {
+          student: {
+            include: {
+              user: {
+                select: {
+                  name: true,
+                  username: true,
+                },
+              },
+              selections: {
+                where: {
+                  year: ctx.session.user.year,
+                  jobType: jobPlacementType.placementType.id,
+                  jobOpeningId: {
+                    not: input,
+                  },
+                },
+              },
+            },
+          },
+          latestStatus: {
+            select: {
+              status: true,
+            },
+          },
+          resume: {
+            select: {
+              src: true,
+            },
+          },
+        },
+      });
+
+      const csvHeaders = [
+        "Name",
+        "Enrollment No.",
+        "Status",
+        "Resume",
+        "Program",
+        "CGPA",
+        "Email",
+        "Phone",
+        "Gender",
+        "Tenth Score",
+        "Twelfth Score",
+        "Admission Year",
+        "Submitted At",
+      ];
+
+      const extraCols = [];
+
+      const csvData = data.map((application) => {
+        let rowData = [
+          application.student.user.name,
+          application.student.user.username,
+          application.latestStatus.status,
+          application.resume.src,
+          application.student.program,
+          application.student.cgpa,
+          application.student.email,
+          application.student.phone,
+          application.student.gender,
+          application.student.tenthMarks,
+          application.student.twelvethMarks,
+          application.student.passOutYear,
+          application.createdAt,
+        ];
+        if (
+          application.additionalInfo &&
+          Object.keys(application.additionalInfo).length > 0
+        ) {
+          Object.keys(application.additionalInfo).forEach((key) => {
+            if (!extraCols.includes(key)) {
+              extraCols.push(key);
+            }
+          });
+        }
+        extraCols.forEach((col) => {
+          rowData.push(application.additionalInfo[col] || "");
+        });
+
+        return rowData;
+      });
+
+      const csv = [[...csvHeaders, ...extraCols], ...csvData];
+      const csvString = csv.map((row) => row.join(",")).join("\n");
+      const csvTitle = `${jobPlacementType.company.name}-${
+        jobPlacementType.title
+      }-${dayjs().format("DD_MM_YYYY_HH_mm_ss_a")}.csv`;
+      return { data: csvString, title: csvTitle };
     }),
 });
