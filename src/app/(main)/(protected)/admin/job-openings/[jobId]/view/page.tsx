@@ -13,7 +13,7 @@ import FullPageLoader from "~/app/common/components/FullPageLoader";
 import TextEditor from "~/app/common/components/TextEditor";
 import { api } from "~/trpc/react";
 
-import AdditionalFieldSelector from "../../_components/AdditionalFieldsSelector";
+
 import JobOpeningGroupSelector from "../../_components/ParticipatingGroupsSelector";
 
 import { DEFAULT_JOB_OPENING } from "../edit/constants";
@@ -37,12 +37,17 @@ export default function ViewJobOpening() {
         },
         registrationStart: dayjs(originalJobOpening.registrationStart),
         registrationEnd: dayjs(originalJobOpening.registrationEnd),
-        extraApplicationFields: originalJobOpening.extraApplicationFields,
+        allowedJobTypes:
+        Array.isArray(originalJobOpening.allowedJobTypes) &&
+        originalJobOpening.allowedJobTypes.every((x) => typeof x === "string")
+          ? (originalJobOpening.allowedJobTypes as string[])
+          : [],
         jobType: originalJobOpening.placementType.id,
         participatingGroups: originalJobOpening.JobOpeningParticipantGroups,
       });
     }
   }, [originalJobOpening]);
+  
 
   if (isLoading) return <FullPageLoader />;
 
@@ -133,14 +138,14 @@ export default function ViewJobOpening() {
       <Typography variant="body1" color="text.disabled">
         Detailed Job Description
       </Typography>
-      <TextEditor value={jobOpening.description} readOnly height="40vh" />
+      <TextEditor value={jobOpening.description} height="40vh" />
 
       {/* Additional Fields */}
-      <AdditionalFieldSelector
+      {/* <AdditionalFieldSelector
         value={jobOpening.extraApplicationFields}
         onChange={() => {}}
         disabled
-      />
+      /> */}
 
       {/* Flags */}
       <FormControlLabel

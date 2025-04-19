@@ -26,7 +26,6 @@ export const jobOpeningRouter = createTRPCRouter({
         jobType: z.string(),
         registrationStart: z.date(),
         registrationEnd: z.date(),
-        extraApplicationFields: z.any(),
         noResumes: z.boolean().optional().default(false),
         hidden: z.boolean().optional().default(false),
         autoApprove: z.boolean().optional().default(true),
@@ -82,10 +81,6 @@ export const jobOpeningRouter = createTRPCRouter({
           },
           registrationStart: input.registrationStart,
           registrationEnd: input.registrationEnd,
-          extraApplicationFields:
-            typeof input.extraApplicationFields === "object"
-              ? input.extraApplicationFields
-              : undefined,
           noResumes: input.noResumes,
           hidden: input.hidden,
           autoApprove: input.autoApprove,
@@ -646,12 +641,12 @@ export const jobOpeningRouter = createTRPCRouter({
           },
           registrationStart: true,
           registrationEnd: true,
-          extraApplicationFields: true,
           noResumes: true,
           hidden: true,
           autoApprove: true,
           autoVisible: true,
           allowSelected: true,
+          allowedJobTypes: true,
           JobOpeningParticipantGroups: {
             select: {
               id: true,
