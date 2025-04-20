@@ -26,13 +26,6 @@ interface NewJobOpening {
   }[];
 }
 
-type extraApplicationField = {
-  title: string;
-  description: string;
-  format: string;
-  required: boolean;
-};
-
 type Company = {
   name: string;
   website: string;
