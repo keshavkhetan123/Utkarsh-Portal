@@ -46,7 +46,7 @@ function decryptObject(encryptedData: string, nonce: string) {
 
 
 export const hrTokenRouter = createTRPCRouter({
-  generateHRToken: protectedProcedure
+  generateHRToken: roleProtectedProcedure(['superAdmin', 'PlacementCoreTeam'])
   .input(
     z.object({
       name: z.string(),
@@ -117,7 +117,7 @@ export const hrTokenRouter = createTRPCRouter({
 
     return { valid: true , company:company};
   }),
-  adminGetHrToken: roleProtectedProcedure('superAdmin')
+  adminGetHrToken: roleProtectedProcedure(['superAdmin', 'PlacementCoreTeam'])
       .query(async ({ ctx, input }) => {
         const tokenData = await ctx.db.jobOpening.findMany({
           select:{
@@ -134,7 +134,7 @@ export const hrTokenRouter = createTRPCRouter({
           data: tokenData
         }
       }),
-      adminDisableToken: roleProtectedProcedure('superAdmin')
+      adminDisableToken: roleProtectedProcedure(['superAdmin', 'PlacementCoreTeam'])
       .input(
         z.object({
           token:z.string()
@@ -154,7 +154,7 @@ export const hrTokenRouter = createTRPCRouter({
           status:"success"
         }
       }),
-      adminGetTokenStatus: roleProtectedProcedure('superAdmin')
+      adminGetTokenStatus: roleProtectedProcedure(['superAdmin', 'PlacementCoreTeam'])
       .input(
         z.object({
           token:z.string()
@@ -171,7 +171,7 @@ export const hrTokenRouter = createTRPCRouter({
         }
       }
       ),
-      adminEnableToken: roleProtectedProcedure('superAdmin')
+      adminEnableToken: roleProtectedProcedure(['superAdmin', 'PlacementCoreTeam'])
       .input(
         z.object({
           token:z.string()

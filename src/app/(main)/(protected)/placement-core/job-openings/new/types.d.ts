@@ -22,9 +22,17 @@ interface NewJobOpening {
     passOutYear?: number;
     program?: string;
     minCgpa?: number;
-    minCredits?: number;
+    // minCredits?: number;
+    backlog?: boolean;
   }[];
 }
+
+type extraApplicationField = {
+  title: string;
+  description: string;
+  format: string;
+  required: boolean;
+};
 
 type Company = {
   name: string;

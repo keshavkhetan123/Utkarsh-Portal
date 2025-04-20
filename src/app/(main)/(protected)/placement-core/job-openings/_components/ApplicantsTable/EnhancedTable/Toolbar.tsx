@@ -61,18 +61,9 @@ export default function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
     setColumnSelectAnchorEl(event.currentTarget);
   };
 
-  const { data: session } = useSession();
-  const isSuperAdmin = session?.user?.role?.name === "superAdmin";
-    
-  console.log("Session object:", session);
-  console.log("User role:", session?.user?.role?.name);
-  console.log("Is super admin:", isSuperAdmin);
-  if (session?.user) {
-    console.log("User:", session.user);
-  } else {
-    console.log("No session user found");
-  }
+  const { data: session, status } = useSession();
 
+  const isSuperAdmin = session?.user?.role?.name === "superAdmin";
 
   const upgradeStatusMutation = api.jobApplication.upgradeStatus.useMutation({
     onSuccess: () => {
@@ -84,11 +75,12 @@ export default function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
   });
 
   const canUpgradeStatus = useMemo(() => {
+    if (!isSuperAdmin) return false;
     const uniqStatuses = new Set(props.selected.map((s) => s.status));
     return (
       uniqStatuses.size === 1 &&
       (uniqStatuses.has("SHORTLISTED")
-        ? (!props.selected.some((s) => s.alreadySelected)) && (isSuperAdmin)
+        ? !props.selected.some((s) => s.alreadySelected)
         : true) &&
       !uniqStatuses.has("SELECTED") &&
       !uniqStatuses.has("REJECTED")

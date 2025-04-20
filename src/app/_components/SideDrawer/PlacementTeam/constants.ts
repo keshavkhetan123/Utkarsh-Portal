@@ -20,11 +20,6 @@ export const PL_TEAM = [
         icon: DashboardIcon,
       },
       {
-        label: "Job Openings",
-        path: "/job-openings",
-        icon: WorkIcon,
-      },
-      {
         label: "Post",
         path: "/post",
         icon: EmailIcon,
