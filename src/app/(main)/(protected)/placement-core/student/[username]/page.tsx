@@ -3,6 +3,9 @@
 import { useParams } from "next/navigation";
 import dayjs from "dayjs";
 
+import { useEffect, useState } from "react";
+import { Button } from "@mui/material";
+
 import PersonOffIcon from "@mui/icons-material/PersonOff";
 import { Container, Paper, Typography } from "@mui/material";
 
@@ -12,19 +15,32 @@ import { api } from "~/trpc/react";
 import ApplicationsSection from "./_components/Applications";
 import DataDisplay from "./_components/DataDisplay";
 import ResumeSection from "./_components/resume";
+import NOCSection from "./_components/noc";
 import SelectionsDataDisplay from "./_components/Selections";
 
 export default function TrackStudentPage() {
   const { username } = useParams();
-
   const decodedUsername = decodeURIComponent(decodeURIComponent(username as string));
 
+  const { data, isLoading, isError } =
+    api.student.getStudentDetails.useQuery(decodedUsername);
 
-  const { data, isLoading, isError } = api.student.getStudentDetails.useQuery(
-    
-    decodedUsername
-    //username as string,
-  );
+  const [isDebarred, setIsDebarred] = useState<boolean | null>(null);
+
+  api.student.getDebarStatus.useQuery(decodedUsername, {
+    enabled: !!decodedUsername,
+    onSuccess: (flag) => setIsDebarred(flag),
+    onError: () => setIsDebarred(null),
+  });
+
+  const toggleDebarMutation = api.student.toggleDebarStatus.useMutation({
+    onSuccess: (newFlag) => {
+      setIsDebarred(newFlag);
+    },
+    onError: () => {
+      /* show error toast/snackbar */
+    },
+  });
 
   if (isLoading) {
     return <FullPageLoader />;
@@ -40,7 +56,7 @@ export default function TrackStudentPage() {
       </Container>
     );
   }
-
+console.log(data);
   return (
     <Container className="py-2 max-w-[inherit] flex flex-col gap-6">
       <Paper className="p-3 flex flex-col gap-2" elevation={4}>
@@ -71,9 +87,22 @@ export default function TrackStudentPage() {
           <DataDisplay label="Twelveth Marks" value={data.twelvethMarks} />
         </div>
       </Paper>
+      {isDebarred !== null && (
+        <Button
+          variant="contained"
+          color={isDebarred ? "success" : "error"}
+          onClick={() =>
+            toggleDebarMutation.mutate(decodedUsername)
+          }
+          className="self-start"
+        >
+          {isDebarred ? "Undebar" : "Debar"}
+        </Button>
+      )}
       <ResumeSection resumes={data.resume} />
       <SelectionsDataDisplay data={data.selections} />
       <ApplicationsSection data={data.applications} />
+      <NOCSection nocs={data.noc} />
     </Container>
   );
 }

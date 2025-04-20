@@ -40,11 +40,11 @@ export const PL_TEAM = [
     base: "/placement-team",
     title: "",
     links: [
-      {
-        label: "Track Student",
-        path: "/student",
-        icon: PersonSearchIcon,
-      },
+      // {
+      //   label: "Track Student",
+      //   path: "/student",
+      //   icon: PersonSearchIcon,
+      // },
       {
         label: "Help Chat",
         path: "/help-chat",
