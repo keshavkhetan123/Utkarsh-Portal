@@ -1,15 +1,9 @@
 "use client";
 
-import CurrencyRupeeIcon from "@mui/icons-material/CurrencyRupee";
-import LocationOnIcon from "@mui/icons-material/LocationOn";
-import WorkOutlineIcon from "@mui/icons-material/WorkOutline";
 import { Avatar, Button, Container, Paper, Typography } from "@mui/material";
 import Alert from "@mui/material/Alert";
 import React, { useEffect, useState } from "react";
 import { api } from "~/trpc/react";
-// import { LIMIT } from "../../page";
-
-const LIMIT = 2;
 
 interface TokenProps {
   company: {
