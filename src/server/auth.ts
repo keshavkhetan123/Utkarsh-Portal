@@ -274,6 +274,8 @@ export const authOptions: NextAuthOptions = {
                 id: true,
                 name: true,
                 username: true,
+                password: true,
+                year: true,
                 userGroup: true,
                 // Remove admin and include role:
                 role: { select: { name: true } },
@@ -308,9 +310,17 @@ export const authOptions: NextAuthOptions = {
                 id: true,
                 name: true,
                 year: true,
+                password: true,
                 username: true,
                 userGroup: true,
-                role: { select: { name: true } }
+                role: { select: { name: true } },
+                student: {
+                  select: {
+                    program: true,
+                    passOutYear: true,
+                    isOnboardingComplete: true,
+                  },
+                },
               },
             });
           } else {
