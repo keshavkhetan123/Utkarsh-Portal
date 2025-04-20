@@ -46,7 +46,7 @@ function decryptObject(encryptedData: string, nonce: string) {
 
 
 export const hrTokenRouter = createTRPCRouter({
-  generateHRToken: protectedProcedure
+  generateHRToken: roleProtectedProcedure(['superAdmin', 'PlacementCoreTeam'])
   .input(
     z.object({
       name: z.string(),

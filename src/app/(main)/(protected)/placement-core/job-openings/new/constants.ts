@@ -17,3 +17,11 @@ export const DEFAULT_JOB_OPENING: NewJobOpening = {
   allowedJobTypes: [],
   participatingGroups: [],
 };
+
+export const DEFAULT_COMPANY: Company = {
+  name: "",
+  website: "",
+  logo: ""
+}
+
+
