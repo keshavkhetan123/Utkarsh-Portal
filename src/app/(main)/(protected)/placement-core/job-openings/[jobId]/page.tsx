@@ -22,8 +22,6 @@ export default async function Page({
         <ApplicantsTable
           jobId={params.jobId}
         />
-        <div className="flex flex-row gap-4 justify-end">
-        </div>
       </Container>
     </>
   );
