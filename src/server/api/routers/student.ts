@@ -72,7 +72,7 @@ export const studentRouter = createTRPCRouter({
       return "Ok";
     }),
     
-  searchStudent: roleProtectedProcedure('superAdmin')
+  searchStudent: roleProtectedProcedure(['superAdmin','PlacementCoreTeam'])
     .input(z.string())
     .query(async ({ input, ctx }) => {
       const students = await ctx.db.students.findMany({
@@ -107,7 +107,7 @@ export const studentRouter = createTRPCRouter({
 
       return students;
     }),
-  getStudentDetails: roleProtectedProcedure('superAdmin')
+  getStudentDetails: roleProtectedProcedure(['superAdmin','PlacementCoreTeam'])
     .input(z.string())
     .query(async ({ input, ctx }) => {
       const user = await ctx.db.user.findUnique({
