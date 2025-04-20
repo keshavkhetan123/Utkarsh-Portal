@@ -102,7 +102,7 @@ console.log(data);
       <ResumeSection resumes={data.resume} />
       <SelectionsDataDisplay data={data.selections} />
       <ApplicationsSection data={data.applications} />
-      <NOCSection nocs={data.noc} />
+      {/* <NOCSection nocs={data.noc} /> */}
     </Container>
   );
 }
