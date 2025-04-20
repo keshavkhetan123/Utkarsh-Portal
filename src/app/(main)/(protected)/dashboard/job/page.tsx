@@ -48,7 +48,7 @@ export default function JobPage() {
       ) : (
         <>
           <Box className="flex flex-col gap-2">
-            {openings.map((jobs) => (
+            {openings && openings.map((jobs) => (
               <JobDetails key={jobs.id} {...jobs} />
             ))}
           </Box>

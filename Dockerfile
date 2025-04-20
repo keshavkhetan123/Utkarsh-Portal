@@ -15,7 +15,7 @@ WORKDIR /app
 # install app dependencies
 COPY package.json ./
 COPY package-lock.json ./
-RUN npm i --verbose
+RUN npm i
 
 COPY . ./
 RUN npx prisma generate

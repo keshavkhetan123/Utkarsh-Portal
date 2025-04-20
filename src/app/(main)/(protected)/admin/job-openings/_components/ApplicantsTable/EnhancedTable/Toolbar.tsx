@@ -61,13 +61,9 @@ export default function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
     setColumnSelectAnchorEl(event.currentTarget);
   };
 
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
+
   const isSuperAdmin = session?.user?.role?.name === "superAdmin";
-    
-  console.log("User role:", session?.user?.role?.name); 
-  console.log("Is super admin:", isSuperAdmin);
-  console.log("Helllllllo");
-  console.log(session.user);
 
   const upgradeStatusMutation = api.jobApplication.upgradeStatus.useMutation({
     onSuccess: () => {

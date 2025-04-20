@@ -30,35 +30,36 @@ export const jobApplication = createTRPCRouter({
         },
       });
 
-      const job = await ctx.db.jobOpening.findUnique({
-        where: {
-          id: input,
-          year: ctx.session.user.year,
-          JobOpeningParticipantGroups: {
-            some: {
-              passOutYear: userDetails.student.passOutYear,
-              program: userDetails.student.program,
-              minCgpa: {
-                lte: userDetails.student.cgpa,
-              },
-              backlog : userDetails.student.backlog,
+      const whereClause = {
+        id: input,
+        year: ctx.session.user.year,
+        JobOpeningParticipantGroups: {
+          some: {
+            passOutYear: userDetails.student.passOutYear,
+            program: userDetails.student.program,
+            minCgpa: {
+              lte: userDetails.student.cgpa,
             },
+            // backlog: userDetails.student.backlog,
           },
-          registrationEnd: {
-            gte: new Date(),
-          },
-          registrationStart: {
-            lte: new Date(),
-          },
-
-          applications: {
-            none: {
-              student: {
-                userId: ctx.session.user.id,
-              },
+        },
+        registrationEnd: {
+          gte: new Date(),
+        },
+        registrationStart: {
+          lte: new Date(),
+        },
+        applications: {
+          none: {
+            student: {
+              userId: ctx.session.user.id,
             },
           },
         },
+      };
+
+      const job = await ctx.db.jobOpening.findFirst({
+        where: whereClause,
         select: {
           id: true,
           title: true,
@@ -132,7 +133,7 @@ export const jobApplication = createTRPCRouter({
         throw new Error("Debarred students cannot apply for jobs");
       }
 
-      const job = await ctx.db.jobOpening.findUnique({
+      const job = await ctx.db.jobOpening.findFirst({
         where: {
           id: input.jobId,
           year: ctx.session.user.year,
@@ -142,8 +143,7 @@ export const jobApplication = createTRPCRouter({
               program: userDetails.student.program,
               minCgpa: {
                 lte: userDetails.student.cgpa,
-              },
-              backlog : userDetails.student.backlog
+              }
             },
           },
           registrationEnd: {

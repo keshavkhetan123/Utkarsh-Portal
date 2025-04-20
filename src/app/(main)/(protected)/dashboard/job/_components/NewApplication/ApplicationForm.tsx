@@ -21,8 +21,6 @@ import {
 
 import { api } from "~/trpc/react";
 
-import ExtraApplicationFields from "./ExtraApplicationFields";
-
 export default function ApplicationForm(props: ApplicationFormProps) {
   const utils = api.useUtils();
 
@@ -94,12 +92,6 @@ export default function ApplicationForm(props: ApplicationFormProps) {
               <DialogContentText>
                 Please fill the following fields to apply for the job opening.
               </DialogContentText>
-              <ExtraApplicationFields
-                extraApplicationFields={jobOpening.extraApplicationFields}
-                extraData={extraData}
-                setExtraData={setExtraData}
-                setIsExtraDataRemaining={setIsExtraDataRemaining}
-              />
               {!jobOpening.noResumes && (
                 <FormControl>
                   <InputLabel>Select your Resume *</InputLabel>
