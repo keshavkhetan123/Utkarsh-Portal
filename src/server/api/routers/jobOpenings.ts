@@ -411,7 +411,7 @@ export const jobOpeningRouter = createTRPCRouter({
       }),
     ]);
 
-    const data = jobOpenings.map(async (jobOpeningRecord) => {
+    const data = await Promise.all(jobOpenings.map(async (jobOpeningRecord) => {
       const jobWithoutCgpa = jobOpeningRecord.jobOpening;
       const job = {
         ...jobWithoutCgpa,
@@ -463,7 +463,7 @@ export const jobOpeningRouter = createTRPCRouter({
         whyNotRegister,
         alreadyRegistered: job.applications.length > 0,
       };
-    });
+    }));
 
     return {
       data: data.slice(0, input.limit),

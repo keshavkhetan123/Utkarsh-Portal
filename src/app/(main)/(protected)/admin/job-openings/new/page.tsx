@@ -149,7 +149,7 @@ export default function GenerateHRLinkPage() {
                   )}
                   renderInput={(params) => (
                     <div className="flex flex-row gap-2 items-center">
-                      {companyDetails.logo && (
+                      {companyDetails?.logo && (
                         <Avatar
                           sx={{ borderRadius: 1, height: 54, width: 54 }}
                           variant="square"

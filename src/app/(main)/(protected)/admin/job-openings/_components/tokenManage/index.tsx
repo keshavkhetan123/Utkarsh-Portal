@@ -7,7 +7,9 @@ import { Avatar, Button, Container, Paper, Typography } from "@mui/material";
 import Alert from "@mui/material/Alert";
 import React, { useEffect, useState } from "react";
 import { api } from "~/trpc/react";
-import { LIMIT } from "../../page";
+// import { LIMIT } from "../../page";
+
+const LIMIT = 2;
 
 interface TokenProps {
   company: {

@@ -38,12 +38,12 @@ export default function JobDetails(props: JobDetailsProps) {
             <Typography variant="h6" color="primary">
               <strong>{props.title}</strong>
             </Typography>
-            <Typography variant="body2">{props.company.name}</Typography>
+            <Typography variant="body2">{props.company?.name}</Typography>
           </div>
 
           <Avatar
             alt="Remy Sharp"
-            src={props.company.logo}
+            src={props.company?.logo}
             variant="square"
             style={{
               borderRadius: "8px",
