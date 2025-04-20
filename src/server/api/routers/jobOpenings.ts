@@ -150,7 +150,6 @@ export const jobOpeningRouter = createTRPCRouter({
           domain: z.string(),
           logo: z.string(),
         }),
-        token: z.string(),
         jobType: z.string(),
         registrationStart: z.date(),
         registrationEnd: z.date(),

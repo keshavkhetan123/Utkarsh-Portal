@@ -44,32 +44,27 @@ export default function UpdateJobOpening() {
   const { data: originalJobOpening, isLoading: isPageLoading } =
     api.jobOpenings.adminGetJobOpening.useQuery(jobId);
 
-  useEffect(() => {
-    if (originalJobOpening) {
-      setJobOpening({
-        ...originalJobOpening,
-        allowSelected: originalJobOpening.allowSelected,
-        allowedJobTypes:
-        Array.isArray(originalJobOpening.allowedJobTypes) &&
-        originalJobOpening.allowedJobTypes.every((x) => typeof x === "string")
-          ? (originalJobOpening.allowedJobTypes as string[])
-          : [],
-        company: {
-          ...originalJobOpening.company,
-          domain: originalJobOpening.company.website,
-        },
-        // @ts-ignore
-        registrationStart: dayjs(originalJobOpening.registrationStart),
-        // @ts-ignore
-        registrationEnd: dayjs(originalJobOpening.registrationEnd),
-        // @ts-ignore
-        jobType: originalJobOpening.placementType.id,
-        participatingGroups: originalJobOpening.JobOpeningParticipantGroups,
-      });
-    }
-
-    console.log("Here are participating groups : ", jobOpening.participatingGroups);
-  }, [originalJobOpening]);
+    useEffect(() => {
+      if (originalJobOpening && jobOpening === DEFAULT_JOB_OPENING) {
+        setJobOpening({
+          ...originalJobOpening,
+          allowSelected: originalJobOpening.allowSelected,
+          allowedJobTypes:
+            Array.isArray(originalJobOpening.allowedJobTypes) &&
+            originalJobOpening.allowedJobTypes.every((x) => typeof x === "string")
+              ? (originalJobOpening.allowedJobTypes as string[])
+              : [],
+          company: {
+            ...originalJobOpening.company,
+            domain: originalJobOpening.company.website,
+          },
+          registrationStart: dayjs(originalJobOpening.registrationStart),
+          registrationEnd: dayjs(originalJobOpening.registrationEnd),
+          jobType: originalJobOpening.placementType.id,
+          participatingGroups: originalJobOpening.JobOpeningParticipantGroups,
+        });
+      }
+    }, [originalJobOpening]);    
 
   const { data: jobTypes, isLoading: isJobTypesLoading } =
     api.jobType.getPlacementTypes.useQuery();
