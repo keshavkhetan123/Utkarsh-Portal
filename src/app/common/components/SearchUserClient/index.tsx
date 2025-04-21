@@ -67,9 +67,6 @@ export default function SearchUserInput<
     include: Array.isArray(value) ? value : value ? [value] : undefined,
     year,
     ...customAPIFilters,
-  },
-  {
-    enabled: !!year,
   });
 
   const options = React.useMemo(() => {
