@@ -1,32 +1,98 @@
 version: "3.8"
+
 services:
-  app:
-    image: buddylonglegs/utkarsh-webapp:latest
-    restart: always
-    command: sh -c "npm run db:seed && npm run start"
-    ports:
-      - 3000:3000
-      - 5555:5555
+  webapp1:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: webapp1
+    restart: unless-stopped
+
     environment:
-      - NODE_ENV=production
-      - NEXT_PUBLIC_CLIENTVAR=clientvar
+      - DATABASE_URL=mysql://utkarsh:Utkarsh@123@localhost/utkarsh
+      - REDIS_URL=redis://cache:6379
+      - NODE_ENV=development
+      - NEXTAUTH_URL=http://localhost:3000
+      - NEXTAUTH_SECRET=secret
+      - S3_ENDPOINT=https://s3.ap-south-1.amazonaws.com
+      - S3_BUCKET_REGION=ap-south-1
+      - S3_BUCKET_NAME=getting-started-withs3
+      - S3_ACCESS_KEY=AKIAWAA66PH54XCVHK5S
+      - S3_SECRET_KEY=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
+      - S3_PUBLIC_URL=https://getting-started-withs3.s3.ap-south-1.amazonaws.com
+      - USE_AVIRAL=true
       - GOOGLE_APPLICATION_CREDENTIALS=/app/google_application_credentials.json
-    volumes:
-      - ./google_application_credentials.json:/app/google_application_credentials.json
+      - GOOGLE_CLIENT_ID=321970025954-ucn2hpg6j9ojhos2njddgne0kgt4bma3.apps.googleusercontent.com
+      - GOOGLE_CLIENT_SECRET=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
+      - ENCRYPTION_KEY=foEj2dBZb6TrUsD0Z42LbAnK1JfIuc5Q1iOTMj6yEKw=
     env_file:
       - .env
     networks:
-      default:
-      internal:
-    deploy:
-      resources:
-        limits:
-          cpus: "0.6"
-          memory: 400M
+      - internal
 
-volumes:
-  app-node-cache:
+  webapp2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: webapp2
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=mysql://utkarsh:Utkarsh@123@localhost/utkarsh
+      - REDIS_URL=redis://cache:6379
+      - NODE_ENV=development
+      - NEXTAUTH_URL=http://localhost:3000
+      - NEXTAUTH_SECRET=secret
+      - S3_ENDPOINT=https://s3.ap-south-1.amazonaws.com
+      - S3_BUCKET_REGION=ap-south-1
+      - S3_BUCKET_NAME=getting-started-withs3
+      - S3_ACCESS_KEY=AKIAWAA66PH54XCVHK5S
+      - S3_SECRET_KEY=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
+      - S3_PUBLIC_URL=https://getting-started-withs3.s3.ap-south-1.amazonaws.com
+      - USE_AVIRAL=true
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/google_application_credentials.json
+      - GOOGLE_CLIENT_ID=321970025954-ucn2hpg6j9ojhos2njddgne0kgt4bma3.apps.googleusercontent.com
+      - GOOGLE_CLIENT_SECRET=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
+      - ENCRYPTION_KEY=foEj2dBZb6TrUsD0Z42LbAnK1JfIuc5Q1iOTMj6yEKw=
+    env_file:
+      - .env
+    networks:
+      - internal
+
+  nginx:
+    image: nginx:stable-alpine
+    container_name: nginx_reverse_proxy
+    restart: unless-stopped
+    ports:
+      - "80:80"  # HTTP
+      - "443:443"  # HTTPS
+    depends_on:
+      - webapp1
+      - webapp2
+    networks:
+      - internal
+
+  db:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: utkarsh
+      MYSQL_DATABASE: utkarsh
+      MYSQL_USER: utkarsh
+      MYSQL_PASSWORD: utkarsh
+    volumes:
+      - mysql:/var/lib/mysql
+    networks:
+      - internal
+
+  cache:
+    image: redis:7
+    container_name: redis_cache
+    restart: unless-stopped
+    networks:
+      - internal
 
 networks:
-  default:
   internal:
+
+volumes:
+  mysql:

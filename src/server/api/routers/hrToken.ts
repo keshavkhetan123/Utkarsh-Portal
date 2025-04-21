@@ -72,7 +72,7 @@ export const hrTokenRouter = createTRPCRouter({
 
     // Here you might also store the title/company if needed (or later associate them)
     // For now, simply return the token or the generated link (for example, a URL with the token as query parameter)
-    return { token , link: `http://localhost:3000/hr/new?token=${token}` };
+    return { token , link: `${process.env.NEXTAUTH_URL}/hr/new?token=${token}` };
   }),
 
   // This procedure verifies a token, marks it as used (or simply returns valid) and allows access to the job opening form
