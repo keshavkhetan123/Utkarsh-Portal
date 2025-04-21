@@ -366,7 +366,7 @@ export const eventsRouter = createTRPCRouter({
       return event;
     }),
 
-  createEvent: roleProtectedProcedure('superAdmin')
+  createEvent: roleProtectedProcedure(['superAdmin','PlacementCoreTeam','PlacementTeamMember'])
     .input(
       z.object({
         title: z.string(),
@@ -378,7 +378,6 @@ export const eventsRouter = createTRPCRouter({
         link: z.string().nullable(),
         hidden: z.boolean().nullable().default(true),
         jobOpeningId: z.string().nullable().default(null),
-        token: z.string(),
         company: z
           .object({
             name: z.string(),
@@ -450,6 +449,7 @@ export const eventsRouter = createTRPCRouter({
 
       return event;
     }),
+
   updateEvent: roleProtectedProcedure('superAdmin')
     .input(
       z.object({
@@ -463,7 +463,6 @@ export const eventsRouter = createTRPCRouter({
         link: z.string().nullable(),
         hidden: z.boolean().nullable().default(true),
         jobOpeningId: z.string().nullable().default(null),
-        token: z.string(),
         company: z
           .object({
             name: z.string(),
