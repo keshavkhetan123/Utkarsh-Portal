@@ -46,7 +46,7 @@ export default function CompanyDropdown(props: CompanyDropdownProps) {
 
         const transformedData = data.map((company: { name: string; domain: string; logo_url: string }) => ({
           name: company.name,
-          domain: company.domain,
+          website: company.domain,
           logo: company.logo_url,
         }));
         

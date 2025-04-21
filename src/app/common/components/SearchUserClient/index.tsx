@@ -37,6 +37,7 @@ interface SearchUserInputProps<Value, Multiple extends boolean | undefined> {
   multiple?: Multiple;
   disabled?: boolean;
   required?: boolean;
+  year?: number;
 }
 
 export default function SearchUserInput<
@@ -50,6 +51,7 @@ export default function SearchUserInput<
   multiple,
   required,
   customAPIFilters,
+  year,
 }: SearchUserInputProps<Value, Multiple>) {
   const [inputValue, setInputValue] = React.useState("");
   const [names, setNames] = React.useState<{ [key: string]: string }>({});
@@ -63,6 +65,7 @@ export default function SearchUserInput<
   const { isLoading, data } = api.user.searchUser.useQuery({
     q: !value ? inputValue : "",
     include: Array.isArray(value) ? value : value ? [value] : undefined,
+    year,
     ...customAPIFilters,
   });
 

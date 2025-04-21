@@ -22,12 +22,14 @@ export const userRouter = createTRPCRouter({
       exclude: z.array(z.string()).optional(),
       include: z.array(z.string()).optional(),
       isAdmin: z.boolean().optional(),
+      year: z.number().optional(),
     })
   ).query(async ({ ctx, input }) => {
     const data = await ctx.db.user.findMany({
       where: {
         AND: [
           // Search users where name or username contains input.q
+          ...(input.year ? [{ year: input.year }] : []),
           {
             OR: [
               { name: { contains: input.q } },
