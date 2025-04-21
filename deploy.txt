@@ -1,1 +1,43 @@
-sudo docker compose -f docker-compose.prod.yml up --build -d
+how to deploy
+
+1) curl -fsSL https://deb.nodesource.com/setup_current.x | sudo -E bash -
+sudo apt-get install -y nodejs
+
+2)clone the project
+3)sudo apt update
+sudo apt install mysql-server -y
+
+4)sudo mysql_secure_installation
+5)sudo mysql
+6)CREATE DATABASE utkarsh;
+
+-- Create the user with the specified password
+CREATE USER 'utkarsh'@'localhost' IDENTIFIED BY 'Utkarsh@123';
+
+-- Grant privileges to the user
+GRANT ALL PRIVILEGES ON utkarsh.* TO 'utkarsh'@'localhost';
+
+-- Apply the changes
+FLUSH PRIVILEGES;
+
+-- Exit MySQL
+EXIT;
+
+7) db connection string = mysql://utkarsh:Utkarsh@123@localhost/utkarsh
+8)sudo ufw enable
+sudo ufw status
+sudo ufw allow ssh (Port 22)
+sudo ufw allow http (Port 80)
+sudo ufw allow https (Port 443)
+9) sudo apt install nginx
+10) configure ip with dns server and also create a subdomain of type a with name "www" only and ip = public ip
+11) sudo snap install --classic certbot
+12) sudo ln -s /snap/bin/certbot /usr/bin/certbot
+13) sudo apt-get update
+14) sudo apt-get install python3-certbot-nginx
+15) sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com
+16) certbot renew --dry-run (this will renew ssl certificate every 90 days)
+17) now replace http://localhost:3000 with https://your.domain.name
+18) open docker file and uncomment the code from line 24 and comment code above it
+19) in project root folder open nginx.conf file and un comment the above code and comment the lower code 
+20) run the following command sudo docker compose -f docker-compose.prod.yml up --build -d
