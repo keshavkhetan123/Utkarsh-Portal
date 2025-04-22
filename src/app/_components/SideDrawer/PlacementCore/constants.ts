@@ -31,7 +31,7 @@ export const PLACEMENT_CORE_SIDEBAR = [
        },
       {
         label: "Events",
-        path: "/events",
+        path: "/event",
         icon: EventIcon,
       },
       {

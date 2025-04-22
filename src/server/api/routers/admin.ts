@@ -10,7 +10,7 @@ export const adminRouter = createTRPCRouter({
   getAdmins: roleProtectedProcedure("superAdmin")
   .input(
     z.object({
-      query: z.string().optional(),
+      query: z.string().optional().default(undefined),
     })
   )
   .query(async ({ ctx, input }) => {

@@ -57,7 +57,7 @@ export const placementConfigRouter = createTRPCRouter({
 
     return yearWisePrograms;
   }),
-  getParticipatingGroups: roleProtectedProcedure('superAdmin')
+  getParticipatingGroups: roleProtectedProcedure(['superAdmin','PlacementCoreTeam','PlacementTeamMember'])
     .input(z.number())
     .query(async ({ ctx, input }) => {
       const data = await ctx.db.participatingGroups.findMany({
