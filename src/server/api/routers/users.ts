@@ -16,7 +16,7 @@ export const userRouter = createTRPCRouter({
     return result;
   }),
 
-  searchUser: roleProtectedProcedure('superAdmin').input(
+  searchUser: roleProtectedProcedure(['superAdmin','PlacementCoreTeam','PlacementTeamMember']).input(
     z.object({
       q: z.string(),
       exclude: z.array(z.string()).optional(),

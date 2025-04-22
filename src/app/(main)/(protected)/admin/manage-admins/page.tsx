@@ -28,7 +28,6 @@ export default async function ManageAdminsPage({
         </Typography>
         <div className="flex gap-2">
           <NewAdminModal />
-          {/* <RequestModal /> */}
         </div>
       </div>
       <Divider />
