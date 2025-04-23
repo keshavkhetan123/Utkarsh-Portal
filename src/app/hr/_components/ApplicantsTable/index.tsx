@@ -13,7 +13,6 @@ import EnhancedTable from "./EnhancedTable";
 
 interface ApplicantsTableProps {
   jobId: string;
-  extraApplicationFields: any;
 }
 
 export default function ApplicantsTable(props: ApplicantsTableProps) {
@@ -34,23 +33,10 @@ export default function ApplicantsTable(props: ApplicantsTableProps) {
 
   const allColumns = useMemo(() => {
     const cols: DataColumn[] = [...BASE_COLUMNS];
-    if (props.extraApplicationFields) {
-      props.extraApplicationFields.forEach((field) => {
-        const newCol = {
-          id: field.title,
-          numeric: field.format === "Number",
-          disablePadding: false,
-          label: field.title,
-          disableSort: true,
-          isExtraData: true,
-        };
-        cols.push(newCol);
-      });
-    }
     return cols;
-  }, [props.extraApplicationFields]);
+  }, []);
 
-  const { data, isLoading } = api.jobApplication.hrGetJobApplicants.useQuery({
+  const { data, isLoading } = api.jobApplication.getJobApplicants.useQuery({
     jobId: props.jobId,
     filterColumn,
     filterValue,
@@ -62,7 +48,7 @@ export default function ApplicantsTable(props: ApplicantsTableProps) {
   });
 
   const downloadCSVMutation =
-    api.jobApplication.hrGetJobApplicantsCSV.useMutation({
+    api.jobApplication.getJobApplicantsCSV.useMutation({
       onSuccess: (data) => {
         const url = window.URL.createObjectURL(
           new Blob([data.data], { type: "text/csv" }),

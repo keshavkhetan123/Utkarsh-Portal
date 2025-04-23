@@ -333,7 +333,7 @@ export default function ResponsiveDrawer({
     )}
 
     {user.role.name === "PlacementCoreTeam" && (
-      <>
+      pathname.includes('/dashboard') ? (
       <Link href="/placement-core" onClick={() => setOpen(false)}>
         <ListItemButton>
           <ListItemIcon>
@@ -342,16 +342,15 @@ export default function ResponsiveDrawer({
           <ListItemText primary={"Placement Core Panel"} />
         </ListItemButton>
       </Link>
-
+      ) : (
       <ListItemButton onClick={goToStudentPanel} disabled={isYearLoading}>
         <ListItemIcon><VerifiedUserIcon /></ListItemIcon>
         <ListItemText primary={"Student Panel"} />
       </ListItemButton>
-    </>
-    )}
+    ))}
 
     {user.role.name === "PlacementTeamMember" && (
-      <>
+      pathname.includes('/dashboard') ? (
         <Link href="/placement-team" onClick={() => setOpen(false)}>
           <ListItemButton>
             <ListItemIcon>
@@ -360,12 +359,12 @@ export default function ResponsiveDrawer({
             <ListItemText primary={"Placement Team Panel"} />
           </ListItemButton>
         </Link>
-
+      ) : (
         <ListItemButton onClick={goToStudentPanel} disabled={isYearLoading}>
           <ListItemIcon><VerifiedUserIcon /></ListItemIcon>
           <ListItemText primary={"Student Panel"} />
         </ListItemButton>
-      </>
+      )
     )}
 
     {user.role.name === "student" && (
