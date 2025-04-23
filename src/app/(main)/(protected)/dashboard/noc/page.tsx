@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import {
   Container,
-  Checkbox,  
+  Checkbox,
   FormControlLabel,
   Link as MuiLink,
   Typography,
@@ -26,11 +26,10 @@ export default function NocRequestPage() {
     companyName: "",
     salary: "",
     location: "",
-    reason: "",
     details: "",
   });
   const [acceptedTnC, setAcceptedTnC] = useState(false);
-  const [file, setFile] = useState<File | null>(null);
+  const [offerLetterFile, setOfferLetterFile] = useState<File | null>(null);
 
   const {
     data: myNoc,
@@ -47,7 +46,7 @@ export default function NocRequestPage() {
     },
   });
 
-  const uploadNocFile =api.studentResume.uploadNoc.useMutation();
+  const uploadOfferLetter = api.studentResume.uploadNoc.useMutation();
 
   useEffect(() => {
     const today = new Date().toISOString().split("T")[0];
@@ -59,27 +58,37 @@ export default function NocRequestPage() {
   };
 
   const handleSubmit = async () => {
-    if (file) {
+    let offerLetterUrl = "";
+
+    if (offerLetterFile) {
       const reader = new FileReader();
       reader.onload = async (e) => {
         const fileDataUrl = e.target?.result as string;
-        const fileName = "noc_" + Date.now();
+        const fileName = "offer_letter_" + Date.now();
 
         try {
-          const res = await uploadNocFile.mutateAsync({
+          const res = await uploadOfferLetter.mutateAsync({
             key: fileName,
             fileDataUrl,
           });
-          console.log("Uploaded NOC PDF URL:", res.url);
+          offerLetterUrl = res.url;
         } catch (err) {
-          console.error("NOC upload failed", err);
+          console.error("Offer Letter upload failed", err);
+          alert("Failed to upload offer letter");
+          return;
         }
 
-        createNoc.mutate(formData);
+        createNoc.mutate({
+          ...formData,
+          offerLetter: offerLetterUrl,
+        });
       };
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(offerLetterFile);
     } else {
-      createNoc.mutate(formData);
+      createNoc.mutate({
+        ...formData,
+        offerLetter: "",
+      });
     }
   };
 
@@ -134,6 +143,7 @@ export default function NocRequestPage() {
             value={formData.name}
             onChange={(e) => handleChange("name", e.target.value)}
             fullWidth
+            required
           />
         </Grid>
         <Grid item xs={12} sm={6}>
@@ -142,6 +152,7 @@ export default function NocRequestPage() {
             value={formData.rollNo}
             onChange={(e) => handleChange("rollNo", e.target.value)}
             fullWidth
+            required
           />
         </Grid>
         <Grid item xs={12} sm={6}>
@@ -152,6 +163,7 @@ export default function NocRequestPage() {
             onChange={(e) => handleChange("offerLetterDate", e.target.value)}
             InputLabelProps={{ shrink: true }}
             fullWidth
+            required
           />
         </Grid>
         <Grid item xs={12} sm={6}>
@@ -170,6 +182,7 @@ export default function NocRequestPage() {
             value={formData.companyName}
             onChange={(e) => handleChange("companyName", e.target.value)}
             fullWidth
+            required
           />
         </Grid>
         <Grid item xs={12} sm={6}>
@@ -179,6 +192,7 @@ export default function NocRequestPage() {
             value={formData.salary}
             onChange={(e) => handleChange("salary", e.target.value)}
             fullWidth
+            required
           />
         </Grid>
         <Grid item xs={12} sm={6}>
@@ -187,21 +201,12 @@ export default function NocRequestPage() {
             value={formData.location}
             onChange={(e) => handleChange("location", e.target.value)}
             fullWidth
+            required
           />
         </Grid>
         <Grid item xs={12}>
           <TextField
-            label="Reason for NOC"
-            multiline
-            rows={3}
-            value={formData.reason}
-            onChange={(e) => handleChange("reason", e.target.value)}
-            fullWidth
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <TextField
-            label="Additional Details"
+            label="Additional Details (How did you land the Job)"
             multiline
             rows={3}
             value={formData.details}
@@ -212,48 +217,48 @@ export default function NocRequestPage() {
 
         <Grid item xs={12}>
           <Button variant="outlined" component="label">
-            Upload Offer Letter(Only Offcampus offers)
+            Upload Offer Letter PDF
             <input
               type="file"
               hidden
               accept="application/pdf"
               onChange={(e) => {
                 const f = e.target.files?.[0];
-                if (f && f.type === "application/pdf") setFile(f);
+                if (f && f.type === "application/pdf") setOfferLetterFile(f);
               }}
             />
           </Button>
           <Typography variant="body2" className="mt-2">
-            {file ? `Selected: ${file.name}` : "No file selected"}
+            {offerLetterFile ? `Selected: ${offerLetterFile.name}` : "No file selected"}
           </Typography>
         </Grid>
-        <Grid item xs={12}>
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={acceptedTnC}
-              onChange={(e) => setAcceptedTnC(e.target.checked)}
-            />
-          }
-          label={
-            <Typography variant="body2">
-              I have read and agree to the{" "}
-              <MuiLink href="https://utkarsh-resume.buddylonglegs.tech/Terms%20and%20Conditions.pdf" target="_blank" rel="noopener noreferrer">
-                Terms and Conditions
-              </MuiLink>
-            </Typography>
-          }
-        />
-      </Grid>
 
+        <Grid item xs={12}>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={acceptedTnC}
+                onChange={(e) => setAcceptedTnC(e.target.checked)}
+              />
+            }
+            label={
+              <Typography variant="body2">
+                I have read and agree to the{" "}
+                <MuiLink href="https://utkarsh-resume.buddylonglegs.tech/Terms%20and%20Conditions.pdf" target="_blank" rel="noopener noreferrer">
+                  Terms and Conditions
+                </MuiLink>
+              </Typography>
+            }
+          />
+        </Grid>
       </Grid>
 
       <Button
         variant="contained"
         onClick={handleSubmit}
-        disabled={createNoc.isLoading || uploadNocFile.isLoading || !acceptedTnC} // Disable if not checked}
+        disabled={createNoc.isLoading || uploadOfferLetter.isLoading || !acceptedTnC}
       >
-        {createNoc.isLoading || uploadNocFile.isLoading
+        {createNoc.isLoading || uploadOfferLetter.isLoading
           ? "Submitting..."
           : "Submit NOC Request"}
       </Button>
