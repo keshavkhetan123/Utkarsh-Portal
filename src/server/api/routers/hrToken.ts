@@ -120,6 +120,9 @@ export const hrTokenRouter = createTRPCRouter({
   adminGetHrToken: roleProtectedProcedure(['superAdmin', 'PlacementCoreTeam'])
       .query(async ({ ctx, input }) => {
         const tokenData = await ctx.db.jobOpening.findMany({
+          where: {
+            year : ctx.session.user.year,
+          },
           select:{
             token:true,
             id:true,

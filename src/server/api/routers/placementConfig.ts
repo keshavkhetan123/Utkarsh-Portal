@@ -158,7 +158,6 @@ export const placementConfigRouter = createTRPCRouter({
         by: ["passOutYear", "program"],
         where: {
           placementTypeId: input,
-          year: 2026,
         },
       });
       const yearWisePrograms: {
