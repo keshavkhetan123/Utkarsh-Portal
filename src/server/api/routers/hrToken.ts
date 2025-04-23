@@ -122,6 +122,7 @@ export const hrTokenRouter = createTRPCRouter({
         const tokenData = await ctx.db.jobOpening.findMany({
           select:{
             token:true,
+            id:true,
             company:{
               select:{
                 logo:true,
