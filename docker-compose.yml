@@ -25,7 +25,7 @@ services:
       - GOOGLE_APPLICATION_CREDENTIALS=/app/google_application_credentials.json
       - GOOGLE_CLIENT_ID=321970025954-ucn2hpg6j9ojhos2njddgne0kgt4bma3.apps.googleusercontent.com
       - GOOGLE_CLIENT_SECRET=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
-      - ENCRYPTION_KEY = foEj2dBZb6TrUsD0Z42LbAnK1JfIuc5Q1iOTMj6yEKw=
+      - ENCRYPTION_KEY=foEj2dBZb6TrUsD0Z42LbAnK1JfIuc5Q1iOTMj6yEKw=
     env_file:
       - .env
     ports:
