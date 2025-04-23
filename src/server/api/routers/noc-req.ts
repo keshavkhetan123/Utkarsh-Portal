@@ -3,7 +3,7 @@ import { createTRPCRouter, roleProtectedProcedure, publicProcedure } from "../tr
 
 export const nocRouter = createTRPCRouter({
   // Create a NOC request
-  createNoc: roleProtectedProcedure(["student",'PlacementCoreTeam',"PlacementTeamMember"])
+  createNoc: roleProtectedProcedure(["student","PlacementCoreTeam","PlacementTeamMember"])
     .input(
       z.object({
         name: z.string(),
@@ -17,14 +17,16 @@ export const nocRouter = createTRPCRouter({
         companyName: z.string(),
         salary: z.union([z.string(), z.number()]),
         location: z.string(),
+        offerLetter: z.string().optional(), // ✅ Optional field for offer letter URL
       })
     )
     .mutation(async ({ ctx, input }) => {
-        const existing = await ctx.db.placementNOC.findFirst({
-            where: { userId: ctx.session.user.id },
-          });
-          if (existing) throw new Error("NOC already submitted");
-        const {
+      const existing = await ctx.db.placementNOC.findFirst({
+        where: { userId: ctx.session.user.id },
+      });
+      if (existing) throw new Error("NOC already submitted");
+
+      const {
         name,
         rollNo,
         offerLetterDate,
@@ -32,6 +34,7 @@ export const nocRouter = createTRPCRouter({
         companyName,
         salary,
         location,
+        offerLetter,
       } = input;
 
       const noc = await ctx.db.placementNOC.create({
@@ -44,32 +47,36 @@ export const nocRouter = createTRPCRouter({
           salary: parseFloat(salary.toString()),
           location,
           userId: ctx.session.user.id,
-          // Optional: Add `reason` and `details` to Prisma schema if needed
+          offerLetter: offerLetter || "", // ✅ Save it if provided
         },
       });
 
       return noc;
     }),
-    updateStatus: roleProtectedProcedure("superAdmin")
-  .input(
-    z.object({
-      nocId: z.number(),
-      status: z.enum(["Approved", "Rejected"]),
-    })
-  )
-  .mutation(async ({ ctx, input }) => {
-    await ctx.db.placementNOC.update({
-      where: { id: input.nocId },
-      data: { status: input.status },
+
+  // Update the NOC status (admin only)
+  updateStatus: roleProtectedProcedure("superAdmin")
+    .input(
+      z.object({
+        nocId: z.number(),
+        status: z.enum(["Approved", "Rejected"]),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db.placementNOC.update({
+        where: { id: input.nocId },
+        data: { status: input.status },
+      });
+      return true;
+    }),
+
+  getMyNoc: roleProtectedProcedure(["student","PlacementCoreTeam","PlacementTeamMember"]).query(async ({ ctx }) => {
+    return ctx.db.placementNOC.findFirst({
+      where: { userId: ctx.session.user.id },
     });
-    return true;
   }),
-    getMyNoc: roleProtectedProcedure(["student","PlacementCoreTeam","PlacementTeamMember"]).query(async ({ ctx }) => {
-        return ctx.db.placementNOC.findFirst({
-          where: { userId: ctx.session.user.id },
-        });
-      }),
-  // Optional: Fetch all NOC requests (for admin dashboard)
+
+  // Fetch all NOC requests (admin only)
   getAllNocs: roleProtectedProcedure("superAdmin").query(async ({ ctx }) => {
     return ctx.db.placementNOC.findMany({
       orderBy: {

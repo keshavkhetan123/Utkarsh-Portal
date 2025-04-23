@@ -106,6 +106,9 @@ export default function NocAdminPage() {
               {/* {noc.reason && <Typography><strong>Reason:</strong> {noc.reason}</Typography>} */}
               {/* {noc.details && <Typography><strong>Details:</strong> {noc.details}</Typography>} */}
 
+
+              
+
               {noc.status === "Pending" && (
                 <Box className="flex gap-4 pt-2">
                   <Button
