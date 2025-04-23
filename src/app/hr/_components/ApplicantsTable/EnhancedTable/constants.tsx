@@ -31,14 +31,6 @@ export const BASE_COLUMNS: DataColumn[] = [
     ),
   },
   {
-    id: "alreadySelected",
-    numeric: false,
-    disablePadding: false,
-    label: "Already Selected",
-    disableSort: false,
-    format: (value: boolean) => (value ? "Yes" : "No"),
-  },
-  {
     id: "createdAt",
     numeric: false,
     disablePadding: false,
@@ -68,7 +60,7 @@ export const BASE_COLUMNS: DataColumn[] = [
     id: "passOutYear",
     numeric: false,
     disablePadding: false,
-    label: "Admission Year",
+    label: "PassOut Year",
     disableSort: false,
   },
   {

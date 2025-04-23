@@ -22,7 +22,6 @@ export default function ApplicantsTable(props: ApplicantsTableProps) {
   const [sort, setSort] = useState<"asc" | "desc">("asc");
   const [filterColumn, setFilterColumn] = useState("");
   const [filterValue, setFilterValue] = useState("");
-  const [selected, setSelected] = useState<BasicStudentDetails[]>([]);
   const [columns, setColumns] = useState<string[]>([
     "username",
     "name",
@@ -70,7 +69,6 @@ export default function ApplicantsTable(props: ApplicantsTableProps) {
       orderBy={orderBy}
       filterColumn={filterColumn}
       filterValue={filterValue}
-      selected={selected}
       data={data}
       isLoading={isLoading}
       columns={columns}
@@ -85,7 +83,6 @@ export default function ApplicantsTable(props: ApplicantsTableProps) {
       setSort={setSort}
       setFilterColumn={setFilterColumn}
       setFilterValue={setFilterValue}
-      setSelected={setSelected}
       setColumns={setColumns}
     />
   );
