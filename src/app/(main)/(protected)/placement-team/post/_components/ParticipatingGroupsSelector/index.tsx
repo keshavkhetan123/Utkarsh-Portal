@@ -1,35 +1,30 @@
 "use client";
 
 import { useEffect } from "react";
-
 import { CircularProgress, Paper, Typography } from "@mui/material";
-
 import { api } from "~/trpc/react";
-
 import GroupCard from "./GroupCard";
+import { useSession } from "next-auth/react";
 
-export default function PostGroupSelector(
-  props: PostGroupsSelectorProps,
-) {
+export default function PostGroupSelector(props: PostGroupsSelectorProps) {
   const { data: yearWisePrograms, isLoading } =
     api.placementConfig.getYearwisePrograms.useQuery();
 
+  const { data: session } = useSession();
+
   useEffect(() => {
-    if (yearWisePrograms) {
-      const participatingGroups = [];
-      Object.keys(yearWisePrograms).forEach((yearStr) => {
-        const year = parseInt(yearStr)
-        yearWisePrograms[year].forEach((program) => {
-          participatingGroups.push({
-            passOutYear: year,
+    if (yearWisePrograms && session?.user?.year) {
+      const participatingGroups = Object.entries(yearWisePrograms)
+        .filter(([yearStr]) => parseInt(yearStr) === session.user.year)
+        .flatMap(([yearStr, programs]) =>
+          programs.map((program) => ({
+            passOutYear: parseInt(yearStr),
             program,
-          });
-        })
-      }
-      );
+          })),
+        );
       props.onChange(participatingGroups);
     }
-  }, [yearWisePrograms]);
+  }, [yearWisePrograms, session]);
 
   return (
     <Paper className="flex flex-col gap-4 py-2 px-3">
@@ -49,16 +44,19 @@ export default function PostGroupSelector(
               allGroups={Object.fromEntries(
                 Object.keys(yearWisePrograms)
                   .filter((key) => {
+                    const remainingGroups = props.value.filter(
+                      (el, elIdx) =>
+                        elIdx !== index && el.passOutYear === Number(key),
+                    );
                     return (
-                      props.value?.filter((el, elIdx) => {
-                        elIdx !== index && el.passOutYear === Number(key);
-                      }).length !== yearWisePrograms[Number(key)].length
+                      remainingGroups.length !==
+                      yearWisePrograms[Number(key)].length
                     );
                   })
                   .map((key) => [
                     key,
                     yearWisePrograms[Number(key)].filter((batch) => {
-                      return !props.value?.some(
+                      return !props.value.some(
                         (el, elIdx) =>
                           elIdx !== index &&
                           el.program === batch &&
@@ -68,10 +66,10 @@ export default function PostGroupSelector(
                   ]),
               )}
               onDelete={() => {
-                props.onChange(props.value?.filter((_, i) => i !== index));
+                props.onChange(props.value.filter((_, i) => i !== index));
               }}
               onChange={(newGroup) => {
-                const newValue = [...(props.value || [])];
+                const newValue = [...props.value];
                 newValue[index] = newGroup;
                 props.onChange(newValue);
               }}
