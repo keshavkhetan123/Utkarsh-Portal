@@ -24,7 +24,7 @@ import IndividualParticipantsSelector from "../../IndividualParticipantSelector"
 import { type UserMicro } from "../../IndividualParticipantSelector/types";
 import PlacementTypeSelector from "../../../_components/PlacementTypeSelector";
 export default function NewPost({ params }: { params: { id: string } }) {
-  const { data, isLoading } = api.post.getPost.useQuery(params.id);
+  const { data, isLoading } = api.post.getPostAdmin.useQuery(params.id);
 
   const router = useRouter();
   const [title, setTitle] = useState("");

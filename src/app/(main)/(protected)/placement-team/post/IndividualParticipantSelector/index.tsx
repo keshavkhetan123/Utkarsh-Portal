@@ -4,9 +4,13 @@ import SearchUserInput from "~/app/common/components/SearchUserClient";
 
 import { type IndividualParticipantSelectorProps } from "./types";
 
+import { useSession } from "next-auth/react";
+
 export default function IndividualParticipantsSelector(
     props: IndividualParticipantSelectorProps,
 ) {
+    const { data: session } = useSession();
+
     return (
         <>
             {props.hideSelector ? <></> : <>
@@ -27,6 +31,7 @@ export default function IndividualParticipantsSelector(
                         exclude: props.individualParticipants.map((user) => user.id),
                     }}
                     disabled={props.disabled}
+                    year={session?.user?.year}
                 />
             </>}
             {props.individualParticipants.length ? (
