@@ -98,7 +98,7 @@ export const BASE_COLUMNS: DataColumn[] = [
     disablePadding: false,
     label: "CGPA",
     disableSort: false,
-  }
+  },
 ];
 
 export const STATUS_ORDER = [

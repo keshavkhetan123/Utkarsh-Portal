@@ -231,7 +231,7 @@ export const jobApplication = createTRPCRouter({
       return application;
     }),
     
-  getJobApplicants: roleProtectedProcedure(['superAdmin', 'PlacementCoreTeam', 'PlacementTeamMember'])
+  getJobApplicants: publicProcedure
     .input(
       z.object({
         jobId: z.string(),
@@ -321,7 +321,6 @@ export const jobApplication = createTRPCRouter({
                 },
                 selections: {
                   where: {
-                    year: ctx.session.user.year,
                     jobType: jobPlacementType.placementType.id,
                     jobOpeningId: {
                       not: input.jobId,
@@ -365,7 +364,7 @@ export const jobApplication = createTRPCRouter({
         hasMore,
       };
     }),
-  getJobApplicantsCSV: roleProtectedProcedure('superAdmin')
+  getJobApplicantsCSV: publicProcedure
     .input(z.string())
     .mutation(async ({ ctx, input }) => {
       const jobPlacementType = await ctx.db.jobOpening.findUnique({
