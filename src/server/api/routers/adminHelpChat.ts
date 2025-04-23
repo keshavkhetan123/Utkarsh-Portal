@@ -16,6 +16,7 @@ export const adminHelpChatRouter = createTRPCRouter({
           message: input,
           userId: ctx.session.user.id,
           participantId: ctx.session.user.id,
+          year: ctx.session.user.year,
         },
         select: {
           id: true,
@@ -49,6 +50,7 @@ export const adminHelpChatRouter = createTRPCRouter({
           message: input.message,
           userId: ctx.session.user.id,
           participantId: input.participantId,
+          year: ctx.session.user.year,
         },
         select: {
           id: true,
@@ -137,6 +139,7 @@ export const adminHelpChatRouter = createTRPCRouter({
           createdAt: {
             in: actualUserIds.map((u) => u._max.createdAt),
           },
+          year: ctx.session.user.year,
         },
         select: {
           createdAt: true,

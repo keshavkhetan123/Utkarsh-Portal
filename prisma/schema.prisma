@@ -476,6 +476,8 @@ model AdminHelpMessage {
     createdAt     DateTime @default(now())
     updatedAt     DateTime @updatedAt
 
+    year          Int
+
     user        User @relation(fields: [userId], references: [id], onDelete: Cascade)
     participant User @relation("AdminHelpParticipant", fields: [participantId], references: [id], onDelete: Cascade)
 
