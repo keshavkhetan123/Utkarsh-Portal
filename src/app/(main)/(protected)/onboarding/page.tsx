@@ -118,7 +118,7 @@ export default function NewJobOpening() {
           backdropFilter: "blur(10px)",
         }}
       >
-        Created by Team GeekHaven
+        Created by Sugam Sareen and his team
       </Container>
     </div>
   );

@@ -212,7 +212,7 @@ export default function NocRequestPage() {
 
         <Grid item xs={12}>
           <Button variant="outlined" component="label">
-            Upload NOC PDF
+            Upload Offer Letter(Only Offcampus offers)
             <input
               type="file"
               hidden
