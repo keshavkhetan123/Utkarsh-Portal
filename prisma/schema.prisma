@@ -515,5 +515,5 @@ model PlacementNOC {
   userId          String @default("") 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
-  
+  offerLetter     String?
 }
