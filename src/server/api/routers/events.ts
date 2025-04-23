@@ -242,7 +242,7 @@ export const eventsRouter = createTRPCRouter({
         total,
       };
     }),
-  getAdminEventsInTimeRange: roleProtectedProcedure('superAdmin')
+  getAdminEventsInTimeRange: roleProtectedProcedure(['superAdmin','PlacementCoreTeam'])
     .input(
       z.object({
         startDate: z.date(),
@@ -295,7 +295,7 @@ export const eventsRouter = createTRPCRouter({
         total,
       };
     }),
-  getPaginatedAdminEvents: roleProtectedProcedure('superAdmin')
+  getPaginatedAdminEvents: roleProtectedProcedure(['superAdmin','PlacementCoreTeam'])
     .input(
       z.object({
         page: z.number().default(1),
@@ -353,7 +353,7 @@ export const eventsRouter = createTRPCRouter({
     return EVENT_TYPES;
   }),
 
-  getAdminEvent: roleProtectedProcedure('superAdmin')
+  getAdminEvent: roleProtectedProcedure(['superAdmin','PlacementCoreTeam'])
     .input(z.string())
     .query(async ({ ctx, input }) => {
       const event = await ctx.db.event.findUnique({
