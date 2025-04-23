@@ -3,7 +3,7 @@ import { createTRPCRouter, roleProtectedProcedure, publicProcedure } from "../tr
 
 export const nocRouter = createTRPCRouter({
   // Create a NOC request
-  createNoc: roleProtectedProcedure("student")
+  createNoc: roleProtectedProcedure(["student",'PlacementCoreTeam',"PlacementTeamMember"])
     .input(
       z.object({
         name: z.string(),
@@ -64,7 +64,7 @@ export const nocRouter = createTRPCRouter({
     });
     return true;
   }),
-    getMyNoc: roleProtectedProcedure("student").query(async ({ ctx }) => {
+    getMyNoc: roleProtectedProcedure(["student","PlacementCoreTeam","PlacementTeamMember"]).query(async ({ ctx }) => {
         return ctx.db.placementNOC.findFirst({
           where: { userId: ctx.session.user.id },
         });
