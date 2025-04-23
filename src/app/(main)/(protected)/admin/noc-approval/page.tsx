@@ -96,40 +96,50 @@ export default function NocAdminPage() {
             </AccordionSummary>
 
             <AccordionDetails className="flex flex-col gap-2 text-sm text-gray-700">
-              <Typography><strong>Name:</strong> {noc.name}</Typography>
-              <Typography><strong>Roll No:</strong> {noc.rollNo}</Typography>
-              <Typography><strong>Company:</strong> {noc.companyName}</Typography>
-              <Typography><strong>Location:</strong> {noc.location}</Typography>
-              <Typography><strong>Offer Letter Date:</strong> {new Date(noc.offerLetterDate).toDateString()}</Typography>
-              <Typography><strong>Submitted On:</strong> {new Date(noc.todaysDate).toDateString()}</Typography>
-              <Typography><strong>Salary:</strong> ₹{noc.salary}</Typography>
-              {/* {noc.reason && <Typography><strong>Reason:</strong> {noc.reason}</Typography>} */}
-              {/* {noc.details && <Typography><strong>Details:</strong> {noc.details}</Typography>} */}
+  <Typography><strong>Name:</strong> {noc.name}</Typography>
+  <Typography><strong>Roll No:</strong> {noc.rollNo}</Typography>
+  <Typography><strong>Company:</strong> {noc.companyName}</Typography>
+  <Typography><strong>Location:</strong> {noc.location}</Typography>
+  <Typography><strong>Offer Letter Date:</strong> {new Date(noc.offerLetterDate).toDateString()}</Typography>
+  <Typography><strong>Submitted On:</strong> {new Date(noc.todaysDate).toDateString()}</Typography>
+  <Typography><strong>Salary:</strong> ₹{noc.salary}</Typography>
 
+  {noc.offerLetter && (
+    <Typography>
+      <strong>Offer Letter:</strong>{" "}
+      <a
+        href={noc.offerLetter}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-blue-600 underline"
+      >
+        View PDF
+      </a>
+    </Typography>
+  )}
 
-              
+  {noc.status === "Pending" && (
+    <Box className="flex gap-4 pt-2">
+      <Button
+        size="small"
+        color="success"
+        variant="outlined"
+        onClick={() => handleStatusUpdate(noc.id, "Approved")}
+      >
+        Approve
+      </Button>
+      <Button
+        size="small"
+        color="error"
+        variant="outlined"
+        onClick={() => handleStatusUpdate(noc.id, "Rejected")}
+      >
+        Reject
+      </Button>
+    </Box>
+  )}
+</AccordionDetails>
 
-              {noc.status === "Pending" && (
-                <Box className="flex gap-4 pt-2">
-                  <Button
-                    size="small"
-                    color="success"
-                    variant="outlined"
-                    onClick={() => handleStatusUpdate(noc.id, "Approved")}
-                  >
-                    Approve
-                  </Button>
-                  <Button
-                    size="small"
-                    color="error"
-                    variant="outlined"
-                    onClick={() => handleStatusUpdate(noc.id, "Rejected")}
-                  >
-                    Reject
-                  </Button>
-                </Box>
-              )}
-            </AccordionDetails>
           </Accordion>
         ))
       )}
