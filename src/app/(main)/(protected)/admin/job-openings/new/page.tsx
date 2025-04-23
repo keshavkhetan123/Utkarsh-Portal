@@ -120,6 +120,30 @@ export default function GenerateHRLinkPage() {
                     }
                     required
                   />
+                  <TextField
+                    label="Company Website"
+                    name="companyWebsite"
+                    value={companyDetails.website}
+                    onChange={(e) =>
+                      setCompanyDetails({
+                        ...companyDetails,
+                        website: e.target.value
+                      })
+                    }
+                    required
+                  />
+                  <TextField
+                    label="Company Logo URL"
+                    name="companyLogo"
+                    value={companyDetails.logo}
+                    onChange={(e) =>
+                      setCompanyDetails({
+                        ...companyDetails,
+                        logo: e.target.value
+                      })
+                    }
+                    required
+                  />
                 </div>
               ) : (
                 <Autocomplete
