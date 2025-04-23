@@ -26,51 +26,6 @@ export default function EnhancedTable(props: EnhancedTableProps) {
     props.setOrderBy(property);
   };
 
-  const isSelected = (id: string) => !!props.selected.find((s) => s.id === id);
-
-  const handleSelectAllClick = () => {
-    const newSelected: BasicStudentDetails[] = [...props.selected];
-    const allCurrSelected = props.data.data.every((n) => isSelected(n.id));
-    if (!allCurrSelected) {
-      props.data.data.forEach((n) => {
-        if (isSelected(n.id)) return;
-        newSelected.push({
-          id: n.id,
-          name: n.name,
-          username: n.username,
-          status: n.status,
-          alreadySelected: n.alreadySelected,
-        });
-      });
-    } else {
-      props.data.data.forEach((n) => {
-        const index = newSelected.findIndex((s) => s.id === n.id);
-        if (index === -1) return;
-        newSelected.splice(index, 1);
-      });
-    }
-    props.setSelected(newSelected);
-  };
-
-  const handleClick = (id: string) => {
-    const newSelected: BasicStudentDetails[] = [...props.selected];
-    const n = props.data.data.find((n) => n.id === id);
-    const index = newSelected.findIndex((s) => s.id === n.id);
-    if (index === -1) {
-      if (isSelected(n.id)) return;
-      newSelected.push({
-        id: n.id,
-        name: n.name,
-        username: n.username,
-        status: n.status,
-        alreadySelected: n.alreadySelected,
-      });
-    } else {
-      newSelected.splice(index, 1);
-    }
-    props.setSelected(newSelected);
-  };
-
   const handleChangePage = (event: unknown, newPage: number) => {
     props.setPage(newPage);
   };
@@ -91,8 +46,6 @@ export default function EnhancedTable(props: EnhancedTableProps) {
   return (
     <Paper sx={{ width: "100%", mb: 2 }}>
       <EnhancedTableToolbar
-        selected={props.selected}
-        setSelected={props.setSelected}
         columns={props.columns}
         allColumns={props.allColumns}
         setColumns={props.setColumns}
@@ -110,10 +63,8 @@ export default function EnhancedTable(props: EnhancedTableProps) {
           <TableContainer>
             <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle">
               <EnhancedTableHead
-                numSelected={props.selected.length}
                 order={props.sort}
                 orderBy={props.orderBy}
-                onSelectAllClick={handleSelectAllClick}
                 onRequestSort={handleRequestSort}
                 rowCount={props.data?.total}
                 columns={props.columns}
@@ -121,29 +72,16 @@ export default function EnhancedTable(props: EnhancedTableProps) {
               />
               <TableBody>
                 {props.data?.data.map((row, index) => {
-                  const isItemSelected = isSelected(row.id);
                   const labelId = `enhanced-table-checkbox-${index}`;
 
                   return (
                     <TableRow
                       hover
-                      onClick={() => handleClick(row.id)}
                       role="checkbox"
-                      aria-checked={isItemSelected}
                       tabIndex={-1}
                       key={row.id}
-                      selected={isItemSelected}
                       sx={{ cursor: "pointer" }}
                     >
-                      <TableCell padding="checkbox">
-                        <Checkbox
-                          color="primary"
-                          checked={isItemSelected}
-                          inputProps={{
-                            "aria-labelledby": labelId,
-                          }}
-                        />
-                      </TableCell>
                       {props.columns.map((col) => {
                         const headCell = props.allColumns.find(
                           (column) => column.id === col,

@@ -300,40 +300,10 @@ export const postRouter = createTRPCRouter({
   getPostAdmin: roleProtectedProcedure(['superAdmin','PlacementCoreTeam','PlacementTeamMember'])
     .input(z.string())
     .query(async ({ ctx, input }) => {
-      const userDetails = await ctx.db.user.findUnique({
-        where: {
-          id: ctx.session.user.id,
-        },
-        select: {
-          student: {
-            select: {
-              passOutYear: true,
-              program: true,
-            },
-          },
-        },
-      });
       const data = await ctx.db.post.findUniqueOrThrow({
         where: {
           published: true,
-          id: input,
-          OR: [
-            {
-              participatingGroups: {
-                some: {
-                  passOutYear: userDetails.student.passOutYear,
-                  program: userDetails.student.program,
-                },
-              },
-            },
-            {
-              individualParticipants: {
-                some: {
-                  userId: ctx.session.user.id,
-                },
-              },
-            },
-          ],
+          id: input
         },
         select: {
           id: true,

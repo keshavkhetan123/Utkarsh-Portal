@@ -4,6 +4,7 @@ import { Avatar, Button, Container, Paper, Typography } from "@mui/material";
 import Alert from "@mui/material/Alert";
 import React, { useEffect, useState } from "react";
 import { api } from "~/trpc/react";
+import Link from "next/link";
 
 interface TokenProps {
   company: {
@@ -11,6 +12,7 @@ interface TokenProps {
     logo: string;
   };
   token: string;
+  id:string;
 }
 
 export default function Token(props: TokenProps) {
@@ -50,17 +52,21 @@ export default function Token(props: TokenProps) {
   return (
     <Paper className="flex flex-col py-3 px-3">
       <div className="flex items-start justify-between mt-3">
+
         <div className="flex flex-col items-center">
-          <Avatar
-            alt="Company Logo"
-            src={props.company.logo}
-            variant="square"
-            style={{
-              borderRadius: "8px",
-              width: 48,
-              height: 48,
-            }}
-          />
+          <Link href={`/admin/job-openings/${props.id}`} passHref>
+            <Avatar
+              alt="Company Logo"
+              src={props.company.logo}
+              variant="square"
+              style={{
+                borderRadius: "8px",
+                width: 48,
+                height: 48,
+                cursor: "pointer",
+              }}
+            />
+          </Link>
           <Typography variant="body2" className="mt-1 text-center">
             {props.company.name}
           </Typography>

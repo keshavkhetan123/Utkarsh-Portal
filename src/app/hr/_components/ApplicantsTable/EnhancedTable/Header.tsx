@@ -11,9 +11,7 @@ import { visuallyHidden } from "@mui/utils";
 import { type DataColumn } from "./types";
 
 interface EnhancedTableHeaderProps {
-  numSelected: number;
   onRequestSort: (event: React.MouseEvent<unknown>, property: string) => void;
-  onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
   order: "asc" | "desc";
   orderBy: string;
   rowCount: number;
@@ -23,10 +21,8 @@ interface EnhancedTableHeaderProps {
 
 export default function EnhancedTableHead(props: EnhancedTableHeaderProps) {
   const {
-    onSelectAllClick,
     order,
     orderBy,
-    numSelected,
     rowCount,
     onRequestSort,
   } = props;
@@ -38,17 +34,6 @@ export default function EnhancedTableHead(props: EnhancedTableHeaderProps) {
   return (
     <TableHead>
       <TableRow>
-        <TableCell padding="checkbox">
-          <Checkbox
-            color="primary"
-            indeterminate={numSelected > 0 && numSelected < rowCount}
-            checked={rowCount > 0 && numSelected === rowCount}
-            onChange={onSelectAllClick}
-            inputProps={{
-              "aria-label": "select all desserts",
-            }}
-          />
-        </TableCell>
         {props.columns.map((col) => {
           const headCell = props.allColumns.find((column) => column.id === col);
           return (
