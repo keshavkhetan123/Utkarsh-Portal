@@ -7,15 +7,30 @@ import {
   Divider,
   Typography,
 } from "@mui/material";
-
+import { useSession } from "next-auth/react";
+import { useState, useEffect } from "react";
 import { api } from "~/trpc/react";
 
 import FaqRow from "./components/FaqRow";
 import NewfaqModal from "./NewFaq";
 
 function Page() {
-  const { data: allFaqs, isLoading } = api.faq.getFaqs.useQuery();
+  const { data: session } = useSession();
+  const year = session?.user?.year;
 
+  const {
+    data: allFaqs,
+    isLoading,
+    refetch,
+} = api.faq.getFaqs.useQuery(undefined, {
+    enabled: !!year,
+});
+
+useEffect(() => {
+  if (year) {
+    refetch();
+  }
+}, [year, refetch]);
   return (
     <>
       <Container className="flex flex-col gap-4 py-4">
