@@ -7,7 +7,7 @@ import { createTRPCRouter, roleProtectedProcedure, publicProcedure } from "../tr
 // });
 export const nocRouter = createTRPCRouter({
   // Create a NOC request
-  createNoc: roleProtectedProcedure("student")
+  createNoc: roleProtectedProcedure(["student","PlacementCoreTeam","PlacementTeamMember"])
     .input(
       z.object({
         name: z.string(),
@@ -31,6 +31,12 @@ export const nocRouter = createTRPCRouter({
       if (existing) throw new Error("NOC already submitted");
 
       const {
+      const existing = await ctx.db.placementNOC.findFirst({
+        where: { userId: ctx.session.user.id },
+      });
+      if (existing) throw new Error("NOC already submitted");
+
+      const {
         name,
         rollNo,
         offerLetterDate,
@@ -39,6 +45,7 @@ export const nocRouter = createTRPCRouter({
         salary,
         location,
         offerLetter,
+        
       } = input;
 
       const noc = await ctx.db.placementNOC.create({
@@ -60,84 +67,21 @@ export const nocRouter = createTRPCRouter({
 
   // Update the NOC status (admin only)
   updateStatus: roleProtectedProcedure("superAdmin")
-  .input(
-    z.object({
-      nocId: z.number(),
-      status: z.enum(["Approved", "Rejected"]),
-    })
-  )
-  .mutation(async ({ ctx, input }) => {
-    const noc = await ctx.db.placementNOC.update({
-      where: { id: input.nocId },
-      data: { status: input.status },
-      // include: { user: true }, // To get userId
-    });
-
-    if (input.status === "Approved") {
-      // Check if a selection already exists
-      const exists = await ctx.db.selectedStudents.findFirst({
-        where: {
-          student: {
-            userId: noc.userId,
-          },
-          company: {
-            name: noc.companyName,
-          },
-        },
+    .input(
+      z.object({
+        nocId: z.number(),
+        status: z.enum(["Approved", "Rejected"]),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db.placementNOC.update({
+        where: { id: input.nocId },
+        data: { status: input.status },
       });
+      return true;
+    }),
 
-      if (!exists) {
-        // Create or get the company
-        let company = await ctx.db.company.findFirst({
-          where: { name: noc.companyName },
-          select: { id: true },
-        });
-
-        if (!company) {
-          company = await ctx.db.company.create({
-            data: {
-              name: noc.companyName,
-              website: "", // Optional, update if available
-              logo: "",    // Optional, update if available
-            },
-            select: { id: true },
-          });
-        }
-
-        await ctx.db.selectedStudents.create({
-          data: {
-            year: ctx.session.user.year,
-            selectedAt: new Date(noc.todaysDate),
-            role: "N/A",
-            payNumeric: noc.salary,
-            basePay: noc.salary,
-            stipend: 0,
-            isOnCampus: false,
-            company: {
-              connect: { id: company.id },
-            },
-            student: {
-              connect: { userId: noc.userId },
-            },
-            placementType: {
-              connect: {
-                id: 1,
-                // create: { name: "Full Time" },
-              },
-            },
-            author: {
-              connect: { id: ctx.session.user.id },
-            },
-          },
-        });
-      }
-    }
-
-    return true;
-  }),
-
-  // Fetch the logged-in user's NOC
-  getMyNoc: roleProtectedProcedure("student").query(async ({ ctx }) => {
+  getMyNoc: roleProtectedProcedure(["student","PlacementCoreTeam","PlacementTeamMember"]).query(async ({ ctx }) => {
     return ctx.db.placementNOC.findFirst({
       where: { userId: ctx.session.user.id },
     });

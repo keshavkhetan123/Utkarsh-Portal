@@ -16,6 +16,7 @@ export const adminHelpChatRouter = createTRPCRouter({
           message: input,
           userId: ctx.session.user.id,
           participantId: ctx.session.user.id,
+          year: ctx.session.user.year,
         },
         select: {
           id: true,
@@ -33,7 +34,7 @@ export const adminHelpChatRouter = createTRPCRouter({
       });
       return message;
     }),
-  adminPostMessage: roleProtectedProcedure('superAdmin')
+  adminPostMessage: roleProtectedProcedure(['superAdmin','PlacementCoreTeam','PlacementTeamMember'])
     .input(
       z.object({
         message: z.string(),
@@ -49,6 +50,7 @@ export const adminHelpChatRouter = createTRPCRouter({
           message: input.message,
           userId: ctx.session.user.id,
           participantId: input.participantId,
+          year: ctx.session.user.year,
         },
         select: {
           id: true,
@@ -99,7 +101,7 @@ export const adminHelpChatRouter = createTRPCRouter({
       });
       return messages;
     }),
-  getLatestAdminHelpChats: roleProtectedProcedure('superAdmin')
+  getLatestAdminHelpChats: roleProtectedProcedure(['superAdmin','PlacementCoreTeam','PlacementTeamMember'])
     .input(
       z.object({
         page: z.number().min(1).default(1),
@@ -137,6 +139,7 @@ export const adminHelpChatRouter = createTRPCRouter({
           createdAt: {
             in: actualUserIds.map((u) => u._max.createdAt),
           },
+          year: ctx.session.user.year,
         },
         select: {
           createdAt: true,
@@ -160,7 +163,7 @@ export const adminHelpChatRouter = createTRPCRouter({
         hasMore: userIds.length > input.pageSize,
       };
     }),
-  getAdminHelpMessages: roleProtectedProcedure('superAdmin')
+  getAdminHelpMessages: roleProtectedProcedure(['superAdmin','PlacementCoreTeam','PlacementTeamMember'])
     .input(
       z.object({
         participantId: z.string(),

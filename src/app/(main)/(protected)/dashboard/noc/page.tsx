@@ -165,7 +165,10 @@ export default function NocRequestPage() {
             onChange={(e) => handleChange("name", e.target.value)}
             fullWidth
             required
+<<<<<<< HEAD
             InputProps={{ readOnly: true }}
+=======
+>>>>>>> 1ba27f01096cb393826dca44ff806b37932b6d90
           />
         </Grid>
         <Grid item xs={12} sm={6}>
@@ -175,7 +178,10 @@ export default function NocRequestPage() {
             onChange={(e) => handleChange("rollNo", e.target.value)}
             fullWidth
             required
+<<<<<<< HEAD
             InputProps={{ readOnly: true }}
+=======
+>>>>>>> 1ba27f01096cb393826dca44ff806b37932b6d90
           />
         </Grid>
         <Grid item xs={12} sm={6}>
@@ -186,6 +192,7 @@ export default function NocRequestPage() {
             onChange={(e) => handleChange("offerLetterDate", e.target.value)}
             InputLabelProps={{ shrink: true }}
             fullWidth
+            required
           />
         </Grid>
         <Grid item xs={12} sm={6}>

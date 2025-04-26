@@ -68,23 +68,7 @@ function Page() {
             selectedPlacementTypes={jobType}
             setSelectedPlacementTypes={setJobType}
           />
-          <Select
-            size="small"
-            value={year ?? ""}
-            displayEmpty
-            onChange={(e) => setYear(Number(e.target.value))}
-            sx={{ minWidth: 100 }}
-          >
-            <MenuItem disabled value="">
-              Select Year
-            </MenuItem>
-            {[2026, 2027, 2028, 2029, 2030].map((y) => (
-              <MenuItem key={y} value={y}>
-                {y}
-              </MenuItem>
-            ))}
-          </Select>
-
+          
           <Link href="./post/new">
             <IconButton>
               <PostAddIcon />

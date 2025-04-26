@@ -328,7 +328,7 @@ export const authOptions: NextAuthOptions = {
           }
         }
 
-        const latestYear = user.student?.passOutYear || user.year;
+        const latestYear = user.year || user.student?.passOutYear;
 
         console.log("This is the passout year for the student : ",  latestYear);
 

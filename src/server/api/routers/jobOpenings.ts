@@ -802,19 +802,22 @@ export const jobOpeningRouter = createTRPCRouter({
           autoApprove: true,
           autoVisible: true,
           allowSelected: true,
-          hr:{
-            select:{
-              viewPermissions:true
-            }
-          },
+          allowedJobTypes: true,
           JobOpeningParticipantGroups: {
             select: {
               id: true,
               passOutYear: true,
               program: true,
               minCgpa: true,
+              // minCredits: true,
+              backlog:true,
             },
           },
+          hr: {
+            select: {
+              viewPermissions : true,
+            }
+          }
         },
       });
     }),

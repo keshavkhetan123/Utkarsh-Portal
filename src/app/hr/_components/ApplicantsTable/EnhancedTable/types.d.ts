@@ -33,7 +33,6 @@ interface EnhancedTableProps {
   orderBy: string;
   filterColumn: string;
   filterValue: string;
-  selected: BasicStudentDetails[];
   data?: Applications;
   isLoading: boolean;
   columns: string[];
@@ -48,6 +47,5 @@ interface EnhancedTableProps {
   setSort: (newSort: "asc" | "desc") => void;
   setFilterColumn: (newFilterColumn: string) => void;
   setFilterValue: (newFilterValue: string) => void;
-  setSelected: (newSelected: BasicStudentDetails[]) => void;
   setColumns: (newColumns: string[]) => void;
 }
