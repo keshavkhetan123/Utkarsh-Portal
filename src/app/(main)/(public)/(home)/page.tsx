@@ -93,7 +93,7 @@ export default function Home() {
             backdropFilter: "blur(10px)",
           }}
         >
-          Created by Sugam Sareen and his team
+          Created by IIITA Students
         </Container>
       </div>
     </>
