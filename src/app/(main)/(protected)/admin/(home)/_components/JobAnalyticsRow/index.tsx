@@ -8,9 +8,9 @@ import {
   useTheme,
 } from "@mui/material";
 import {
-  blueberryTwilightPalette,
   PieChart,
   useDrawingArea,
+  blueberryTwilightPalette,
 } from "@mui/x-charts";
 
 import { api } from "~/trpc/react";
@@ -21,6 +21,7 @@ interface JobAnalyticsRowProps {
     name: string;
     description: string;
   };
+  filterType: string;
 }
 
 const StyledText = styled("text")(({ theme }) => ({
@@ -39,90 +40,108 @@ function PieCenterLabel({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default function JobAnalyticsRow(props: JobAnalyticsRowProps) {
-  const { data, isLoading } =
-    api.analytics.getJobTypeSelectionAnalytics.useQuery(props.jobType.id);
-
-  const totalObj = data?.find((item) => item.group.program === "Unselected");
+export default function JobAnalyticsRow({ jobType, filterType }: JobAnalyticsRowProps) {
+  const { data, isLoading } = api.analytics.getJobTypeSelectionAnalytics.useQuery({
+    jobTypeId: jobType.id,
+    filterType,
+  });
+console.log("data yaha h");
+console.log(data);
   const theme = useTheme();
+
+  if (isLoading) {
+    return (
+      <Paper elevation={1} className="p-4 pb-5 flex flex-col gap-4">
+        <Typography variant="h6">{jobType.name}</Typography>
+        <div className="flex items-center justify-center py-20">
+          <CircularProgress />
+        </div>
+      </Paper>
+    );
+  }
+
+  const groupedData: Record<string, { selected: number; all: number }> = {};
+
+  (data ?? []).forEach((item) => {
+    console.log("item")
+    console.log(item);
+    let key = "";
+    if (filterType === "program") key = item.group.program ?? "Unknown";
+    if (filterType === "Caste") key = item.group.Caste ?? "Unknown";
+    if (filterType === "Religion") key = item.group.Religion ?? "Unknown";
+    if (filterType === "gender") key = item.group.gender ?? "Unknown";
+
+    if (!groupedData[key]) {
+      groupedData[key] = { selected: 0, all: 0 };
+    }
+    groupedData[key].selected += item.selected;
+    groupedData[key].all += item.all;
+  });
+
+  const pieData = Object.entries(groupedData).map(([label, stats]) => ({
+    id: label,
+    value: stats.selected === 0 ? `(${stats.all-stats.selected}/${stats.all})` : stats.selected, // so that 0s are still slightly visible
+    label: `${label} (${stats.selected}/${stats.all})`,
+  }));
+
+  const totalSelected = pieData.reduce((acc, curr) => acc + curr.value, 0);
+  const totalAll = Object.values(groupedData).reduce((acc, curr) => acc + curr.all, 0);
 
   return (
     <Paper elevation={1} className="p-4 pb-5 flex flex-col gap-4">
       <div>
-        <Typography variant="h6">{props.jobType.name}</Typography>
+        <Typography variant="h6">{jobType.name}</Typography>
         <Typography variant="body1" color="GrayText">
-          {props.jobType.description}
+          {jobType.description}
         </Typography>
       </div>
-      {isLoading ? (
+
+      {pieData.length === 0 ? (
         <div className="flex items-center justify-center py-20">
-          <CircularProgress />
+          <Typography variant="body1" color="textSecondary">
+            No data available
+          </Typography>
         </div>
       ) : (
-        <>
-          <div className="flex flex-row gap-4 flex-wrap justify-between items-center">
-            <PieChart
-              margin={{ top: 0, right: 0, bottom: 0, left: 0 }}
-              width={200}
-              height={200}
-              className="w-full h-96"
-              series={[
-                {
-                  data: data.map((item) => ({
-                    id: item.group.passOutYear + "_" + item.group.program,
-                    value: item.selected,
-                    label: `${item.group.program} ${
-                      item.group.passOutYear
-                        ? `(${item.group.passOutYear})`
-                        : ""
-                    }`,
-                  })),
-                  innerRadius: 60,
-                  valueFormatter: (v, { dataIndex }) => {
-                    const { all } = data[dataIndex];
-                    return `${v.value}/${all}`;
-                  },
-                },
-              ]}
-              slotProps={{
-                pieArc: {
-                  height: 200,
-                },
-                legend: {
-                  hidden: true,
-                },
-              }}
-            >
-              <PieCenterLabel>
-                {totalObj.all - totalObj.selected} / {totalObj.all}
-              </PieCenterLabel>
-            </PieChart>
-            <div className="flex flex-row md:flex-col gap-2 flex-wrap justify-center">
-              {data.map((item, index) => (
-                <div key={item.group.passOutYear + "_" + item.group.program}>
-                  <div className="flex flex-row gap-2 items-center">
-                    <div
-                      className="w-4 h-4 rounded-full"
-                      style={{
-                        backgroundColor: blueberryTwilightPalette(
-                          theme.palette.mode,
-                        )[
-                          index %
-                            blueberryTwilightPalette(theme.palette.mode).length
-                        ],
-                      }}
-                    />
-                    <div>{`${item.group.program} ${
-                      item.group.passOutYear
-                        ? `(${item.group.passOutYear})`
-                        : ""
-                    }`}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
+        <div className="flex flex-col items-center">
+          <PieChart
+            margin={{ top: 0, right: 0, bottom: 0, left: 0 }}
+            width={300}
+            height={300}
+            series={[
+              {
+                data: pieData,
+                innerRadius: 70,
+              },
+            ]}
+            colors={blueberryTwilightPalette(theme.palette.mode)}
+            slotProps={{
+              pieArc: { cornerRadius: 5 },
+              legend: { hidden: true },
+            }}
+          >
+            <PieCenterLabel>
+              {`${totalSelected}/${totalAll}`}
+            </PieCenterLabel>
+          </PieChart>
+
+          {/* Legends */}
+          <div className="flex flex-wrap gap-3 justify-center mt-4">
+            {pieData.map((d, i) => (
+              <div key={d.id} className="flex items-center gap-2">
+                <div
+                  className="w-4 h-4 rounded-full"
+                  style={{
+                    backgroundColor: blueberryTwilightPalette(theme.palette.mode)[
+                      i % blueberryTwilightPalette(theme.palette.mode).length
+                    ],
+                  }}
+                />
+                <Typography variant="body2">{d.label}</Typography>
+              </div>
+            ))}
           </div>
-        </>
+        </div>
       )}
     </Paper>
   );

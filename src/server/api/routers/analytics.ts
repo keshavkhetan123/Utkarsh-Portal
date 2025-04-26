@@ -17,77 +17,60 @@ export const analyticsRouter = createTRPCRouter({
   }),
 
   getJobTypeSelectionAnalytics: roleProtectedProcedure(['superAdmin', 'PlacementCoreTeam', 'PlacementTeamMember'])
-    .input(z.string())
+    .input(z.object({
+      jobTypeId: z.string(),
+      filterType: z.enum(["program", "Caste", "Religion", "gender"]),
+    }))
     .query(async ({ ctx, input }) => {
-      const groups = await ctx.db.participatingGroups.findMany({
+      const { jobTypeId, filterType } = input;
+
+      const allStudents = await ctx.db.students.findMany({
         where: {
-          placementTypeId: input,
-          year: ctx.session.user.year,
+          passOutYear: ctx.session.user.year,
+        },
+        select: {
+          userId : true,
+          [filterType]: true,
         },
       });
 
-      const dbData = await ctx.db.$transaction([
-        ...groups.map((grp) => {
-          return ctx.db.students.count({
-            where: {
-              passOutYear: grp.passOutYear,
-              program: grp.program,
-            },
-            select: {
-              _all: true,
-            },
-          });
-        }),
-        ...groups.map((grp) => {
-          return ctx.db.students.count({
-            where: {
-              passOutYear: grp.passOutYear,
-              program: grp.program,
-              selections: {
-                some: {
-                  year: ctx.session.user.year,
-                  jobType: input,
-                },
-              },
-            },
-            select: {
-              _all: true,
-            },
-          });
-        }),
-      ]);
-      let i = 0;
-      const data: {
-        group: (typeof groups)[number];
-        all: number;
-        selected: number;
-      }[] = [];
-      let totalCnt = 0;
-      let selectedCnt = 0;
-      for (i = 0; i < groups.length; i++) {
-        let allData = dbData[i];
-        let selectedData = dbData[i + groups.length];
-        totalCnt += allData["_all"];
-        selectedCnt += selectedData["_all"];
-        data.push({
-          group: groups[i],
-          all: allData["_all"],
-          selected: selectedData["_all"],
-        });
+      const selectedStudents = await ctx.db.selectedStudents.findMany({
+        where: {
+          year: ctx.session.user.year,
+          jobType: jobTypeId,
+        },
+        select: {
+          userId: true,
+        },
+      });
+
+      const selectedStudentIds = new Set(selectedStudents.map((s) => s.userId));
+
+      const groupedData: Record<string, { selected: number; all: number }> = {};
+
+      console.log(selectedStudentIds);
+      for (const student of allStudents) {
+        const key = (student as any)[filterType] ?? "Unknown";
+
+        if (!groupedData[key]) {
+          groupedData[key] = { selected: 0, all: 0 };
+        }
+        groupedData[key].all += 1;
+
+        console.log("hello");
+        console.log(student);
+        if (selectedStudentIds.has(student.userId)) {
+          groupedData[key].selected += 1;
+        }
       }
-      data.push({
-        group: {
-          id: "total",
-          year: ctx.session.user.year,
-          passOutYear: null,
-          program: "Unselected",
-          placementTypeId: input,
-        },
-        all: totalCnt,
-        selected: totalCnt - selectedCnt,
-      });
 
-      return data;
+      const result = Object.entries(groupedData).map(([key, val]) => ({
+        group: { [filterType]: key },
+        all: val.all,
+        selected: val.selected,
+      }));
+
+      return result;
     }),
 
   getJobTypePaymentAnalytics: roleProtectedProcedure('superAdmin')

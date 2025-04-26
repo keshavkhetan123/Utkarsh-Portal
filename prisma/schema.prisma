@@ -135,7 +135,8 @@ model Students {
     resume       StudentResume[]
     applications Application[]
     selections   SelectedStudents[]
-
+    Religion              String?
+    Caste                 String?
     @@index([userId])
 }
 
