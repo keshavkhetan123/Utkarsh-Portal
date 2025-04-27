@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useState } from "react";
-
 import {
   Button,
   Container,
@@ -13,18 +12,14 @@ import {
   Select,
   Typography,
 } from "@mui/material";
-
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import HowToRegIcon from "@mui/icons-material/HowToReg";
-
 import FullPageLoader from "~/app/common/components/FullPageLoader";
 import { api } from "~/trpc/react";
-
 import JobAnalyticsRow from "./_components/JobAnalyticsRow";
 
 export default function AdminHomePage() {
   const { data: jobTypes = [], isLoading } = api.analytics.getJobTypes.useQuery();
-
   const [filterType, setFilterType] = useState("program"); // default filter
 
   const handleFilterTypeChange = (e: any) => {
@@ -68,13 +63,13 @@ export default function AdminHomePage() {
       <Divider />
 
       {/* Job Analytics Rows */}
-      {jobTypes.map((jobType) => (
+      {/* {jobTypes.map((jobType) => ( */}
         <JobAnalyticsRow
-          key={jobType.id}
-          jobType={jobType}
+          // key={jobType.id}
+          // jobType={jobType}
           filterType={filterType}
         />
-      ))}
+      {/* ))} */}
     </Container>
   );
 }

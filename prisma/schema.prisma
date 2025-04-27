@@ -168,7 +168,7 @@ model ParticipatingGroups {
     passOutYear     Int
     program         String
 
-    placementType PlacementType              @relation(fields: [placementTypeId], references: [id])
+    placementType PlacementType               @relation(fields: [placementTypeId], references: [id])
     events        EventParticipatingGroups[]
 
     @@unique([year, placementTypeId, program])
