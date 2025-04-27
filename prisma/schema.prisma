@@ -516,4 +516,6 @@ model PlacementNOC {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
   offerLetter     String?
+  
+
 }
