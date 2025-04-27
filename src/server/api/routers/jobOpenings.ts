@@ -285,7 +285,6 @@ export const jobOpeningRouter = createTRPCRouter({
     getLatestJobOpenings: protectedProcedure
   .input(
     z.object({
-      onlyApplicable: z.boolean().default(false),
       limit: z.number().default(10),
       page: z.number().default(1),
     }),
@@ -322,11 +321,6 @@ export const jobOpeningRouter = createTRPCRouter({
 
     const query = {
       passOutYear: userDetails.student.passOutYear,
-      program: userDetails.student.program,
-      ...(input.onlyApplicable && {
-        minCgpa: { lte: userDetails.student.cgpa },
-        backlog: userDetails.student.backlog,
-      }),
       jobOpening: {
         year: ctx.session.user.year,
         OR: [
@@ -441,10 +435,8 @@ export const jobOpeningRouter = createTRPCRouter({
       } 
       
       // Continue with the other validations already in place
-      if (!whyNotRegister && jobOpeningRecord.passOutYear !== userDetails.student.passOutYear) {
-        whyNotRegister = "Passout year does not match.";
-      } else if (!whyNotRegister && jobOpeningRecord.program !== userDetails.student.program) {
-        whyNotRegister = "Program does not match.";
+      if (!whyNotRegister && jobOpeningRecord.program !== userDetails.student.program) {
+        whyNotRegister = "Your branch is not eligible for this job opening";
       } else if (!whyNotRegister && job.minCgpa > userDetails.student.cgpa) {
         whyNotRegister = `Required CGPA: ${job.minCgpa}, Your CGPA: ${userDetails.student.cgpa}`;
       }
