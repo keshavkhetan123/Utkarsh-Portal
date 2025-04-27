@@ -39,7 +39,7 @@ useEffect(() => {
             All Faqs
           </Typography>
           <div className="flex gap-2">
-            <NewfaqModal />
+          <NewfaqModal refetch={refetch} />
           </div>
         </div>
         <Divider />
