@@ -341,6 +341,8 @@ export const jobOpeningRouter = createTRPCRouter({
       },
     };
 
+    console.log("query", query);
+
     const [total, jobOpenings] = await ctx.db.$transaction([
       ctx.db.jobOpeningParticipantGroups.count({
         where: query,

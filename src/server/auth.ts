@@ -239,12 +239,12 @@ export const authOptions: NextAuthOptions = {
     
             if (!authenticatedUserGroup) throw new Error("Invalid Credentials");
 
-
             let userData = await getStudentAviralData(
               credentials.username,
               credentials.password,
             );
-            //if (!userData) throw new Error("User Not Found");
+            
+            if (!userData) throw new Error("User Not Found");
 
             user = await db.user.create({
               data: {

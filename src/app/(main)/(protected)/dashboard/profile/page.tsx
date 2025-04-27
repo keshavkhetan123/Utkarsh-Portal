@@ -18,6 +18,8 @@ import {
   Typography,
 } from "@mui/material";
 
+import { signOut } from "next-auth/react";
+
 import FullPageLoader from "~/app/common/components/FullPageLoader";
 import PasswordModal from "~/app/common/components/PasswordModal";
 import { api } from "~/trpc/react";
@@ -29,8 +31,11 @@ export default function UserProfile() {
     [email, setEmail] = useState(""),
     [openUpdateCourseDetails, setOpenUpdateCourseDetails] = useState(false);
 
-  const updateCourseDetailsMutation =
-    api.student.updateAviralData.useMutation();
+    const updateCourseDetailsMutation = api.student.updateAviralData.useMutation({
+      onSuccess: () => {
+        signOut();
+      },
+    });
 
   const handleCourseDetailsSubmit = (password: string) => {
     updateCourseDetailsMutation.mutate(password);
@@ -139,6 +144,25 @@ export default function UserProfile() {
                   {Number(profile.cgpa)}
                 </Typography>
               </Box>
+
+              <Box
+                className="flex flex-row flex-nowrap gap-2 rounded-lg border-solid p-3.5 border-2 md:basis-[30%] sm:basis-[45%] basis-full"
+                sx={{
+                  borderColor: "divider",
+                }}
+              >
+                <Typography variant="body1" className="font-medium">
+                  Pending Backlog? : 
+                </Typography>
+                <Typography
+                  variant="body1"
+                  className="font-bold"
+                  color={profile.backlog ? "error.main" : "success.main"}
+                >
+                  {profile.backlog? "Yes" : "No"}
+                </Typography>
+              </Box>
+
               <TextField
                 disabled
                 label="Current Semester"
