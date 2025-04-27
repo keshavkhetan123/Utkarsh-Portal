@@ -18,7 +18,11 @@ import {
 
 import { api } from "~/trpc/react";
 
-export default function NewfaqModal() {
+type NewfaqModalProps = {
+  refetch: () => void;
+};
+
+export default function NewfaqModal({refetch}:NewfaqModalProps) {
   const router = useRouter();
   const [open, setOpen] = useState<boolean>(false);
 
@@ -28,6 +32,7 @@ export default function NewfaqModal() {
     onSuccess: () => {
       handleClose();
       router.refresh();
+      refetch();
     },
   });
 
