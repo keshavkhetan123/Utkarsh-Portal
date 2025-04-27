@@ -443,7 +443,7 @@ export default function UpdateJobOpening() {
           {jobTypes?.map((jobType) => (
             <FormControlLabel
               key={jobType.id}
-              label={`Students already placed in: ${jobType.name}`}
+              label={`${jobType.name}`}
               control={
                 <Checkbox
                   size="small"

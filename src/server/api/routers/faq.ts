@@ -5,6 +5,9 @@ import { roleProtectedProcedure, createTRPCRouter, publicProcedure } from "../tr
 export const faqRouter = createTRPCRouter({
     getFaqs: publicProcedure.query(async ({ ctx }) => {
         const data = await ctx.db.faq.findMany({
+            where:{
+                year:ctx.session.user.year,
+            },
             select: {
                 id: true,
                 question: true,
@@ -31,6 +34,7 @@ export const faqRouter = createTRPCRouter({
             data: {
                 question: input.question,
                 answer: input.answer,
+                year:ctx.session.user.year,
                 authorId: ctx.session.user.id,
             }
         });

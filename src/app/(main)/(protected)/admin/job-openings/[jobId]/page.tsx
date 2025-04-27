@@ -28,7 +28,7 @@ export default async function Page({
           <DeleteJobOpening jobId={params.jobId} />
           <Link href={"./" + params.jobId + "/view"}>
             <IconButton size="small" color="success">
-              Edit
+              View
             </IconButton>
           </Link>
         </div>
