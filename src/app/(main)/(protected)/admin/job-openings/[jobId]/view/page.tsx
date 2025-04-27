@@ -5,14 +5,13 @@ import { useParams, useRouter } from "next/navigation";
 import axios from "axios";
 import dayjs from "dayjs";
 
-import { Button, Autocomplete, Avatar, Container, Divider, FormControl, FormControlLabel, FormHelperText, InputLabel, MenuItem, Paper, Select, TextField, Typography, Checkbox, CircularProgress } from "@mui/material";
+import { Button, Autocomplete, Avatar, Container, Divider, FormControl, FormControlLabel, FormHelperText, InputLabel, MenuItem, Paper, Select, TextField, Typography, Checkbox, CircularProgress, Box } from "@mui/material";
 import { DateTimePicker } from "@mui/x-date-pickers";
 import { useQuery } from "@tanstack/react-query";
 
 import FullPageLoader from "~/app/common/components/FullPageLoader";
 import TextEditor from "~/app/common/components/TextEditor";
 import { api } from "~/trpc/react";
-
 
 import JobOpeningGroupSelector from "../../_components/ParticipatingGroupsSelector";
 
@@ -24,6 +23,9 @@ export default function ViewJobOpening() {
 
   const { data: originalJobOpening, isLoading } =
     api.jobOpenings.adminGetJobOpening.useQuery(jobId);
+
+  const { data: jobTypes, isLoading: isJobTypesLoading } =
+    api.jobType.getPlacementTypes.useQuery();
 
   const [jobOpening, setJobOpening] = useState(DEFAULT_JOB_OPENING);
 
@@ -138,7 +140,19 @@ export default function ViewJobOpening() {
       <Typography variant="body1" color="text.disabled">
         Detailed Job Description
       </Typography>
-      <TextEditor value={jobOpening.description} height="40vh" />
+      <Box
+        sx={{
+          mt: 1,
+          height: '40vh',
+          overflowY: 'auto',
+          border: '1px solid',
+          borderColor: 'divider',
+          borderRadius: 1,
+          p: 2,
+          backgroundColor: 'background.paper',
+        }}
+        dangerouslySetInnerHTML={{ __html: jobOpening.description || '<i>No description provided.</i>' }}
+      />
 
       {/* Additional Fields */}
       {/* <AdditionalFieldSelector
@@ -164,6 +178,26 @@ export default function ViewJobOpening() {
         control={<Checkbox checked={jobOpening.allowSelected} disabled />}
         label="Allow Already Selected Students"
       />
+
+      {/* Allow already selected students info */}
+      <Typography variant="body2" className="mt-2">
+        Allow already selected students from the following job types:
+      </Typography>
+      <div className="flex flex-col gap-1 ml-2">
+        {jobTypes?.map((jobType) => (
+          <FormControlLabel
+            key={jobType.id}
+            label={jobType.name}
+            control={
+              <Checkbox
+                size="small"
+                checked={jobOpening.allowedJobTypes.includes(jobType.id)}
+                disabled
+              />
+            }
+          />
+        ))}
+      </div>
 
       <Divider className="mt-4" />
 

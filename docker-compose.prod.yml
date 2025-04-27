@@ -4,7 +4,7 @@ services:
   webapp1:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: prod.Dockerfile
     container_name: webapp1
     restart: unless-stopped
 
@@ -33,7 +33,7 @@ services:
   webapp2:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: prod.Dockerfile
     container_name: webapp2
     restart: unless-stopped
     environment:
@@ -63,8 +63,7 @@ services:
     container_name: nginx_reverse_proxy
     restart: unless-stopped
     ports:
-      - "80:80"  # HTTP
-      - "443:443"  # HTTPS
+      - "8080:8080"
     depends_on:
       - webapp1
       - webapp2
