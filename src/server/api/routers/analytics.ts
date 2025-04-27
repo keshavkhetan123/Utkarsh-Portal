@@ -18,7 +18,7 @@ export const analyticsRouter = createTRPCRouter({
 
   getJobTypeSelectionAnalytics: roleProtectedProcedure(['superAdmin', 'PlacementCoreTeam', 'PlacementTeamMember'])
   .input(z.object({
-    filterType: z.enum(["program", "Caste", "Religion", "gender"]),
+    filterType: z.enum(["program", "Caste", "Religion", "gender","PWD"]),
   }))
   .query(async ({ ctx, input }) => {
     const { filterType } = input;

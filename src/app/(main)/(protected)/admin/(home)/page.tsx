@@ -56,17 +56,14 @@ export default function AdminHomePage() {
             <MenuItem value="gender">Gender</MenuItem>
             <MenuItem value="Religion">Religion</MenuItem>
             <MenuItem value="Caste">Caste</MenuItem>
+            <MenuItem value="PWD">PWD</MenuItem>
           </Select>
         </FormControl>
       </div>
 
       <Divider />
 
-      {/* Job Analytics Rows */}
-      {/* {jobTypes.map((jobType) => ( */}
         <JobAnalyticsRow
-          // key={jobType.id}
-          // jobType={jobType}
           filterType={filterType}
         />
       {/* ))} */}
