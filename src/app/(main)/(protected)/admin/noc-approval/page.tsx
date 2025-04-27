@@ -17,13 +17,19 @@ import {
   Button,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { useState } from "react";
+import { useSession } from "next-auth/react";
+import { useState, useEffect } from "react";
 import { api } from "~/trpc/react";
 
 export default function NocAdminPage() {
+  const { data: session } = useSession();
+    const year = session?.user?.year;
+
   const [filterStatus, setFilterStatus] = useState<"All" | "Pending" | "Approved" | "Rejected">("All");
 
-  const { data: allNocs, isLoading, refetch } = api.noc.getAllNocs.useQuery();
+  const { data: allNocs, isLoading, refetch } = api.noc.getAllNocs.useQuery(undefined, {
+    enabled: !!year,
+});
 
   const updateStatus = api.noc.updateStatus.useMutation({
     onSuccess: () => refetch(),
@@ -37,7 +43,11 @@ export default function NocAdminPage() {
   const filteredNocs = allNocs?.filter((noc) =>
     filterStatus === "All" ? true : noc.status === filterStatus
   );
-
+  useEffect(() => {
+    if (year) {
+      refetch();
+    }
+  }, [year, refetch]);
   return (
     <Container className="py-6 flex flex-col gap-4">
       <Typography variant="h4" color="primary">
