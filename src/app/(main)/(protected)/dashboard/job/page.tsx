@@ -53,7 +53,7 @@ export default function JobPage() {
             ))}
           </Box>
 
-          {data.debarred ? (
+          {data?.debarred ? (
             <Typography variant="body1" color="error" className="pt-4 text-center">
               YOU ARE DEBARRED FROM THIS SEASON
             </Typography>

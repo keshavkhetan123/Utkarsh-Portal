@@ -3,7 +3,7 @@ andrewpowell,Patrick Lewis,IT-BI,6,5.27,True,Female,2001-08-30,79.76,87.05,2024,
 jodi26,Michael Ortiz,ECE,2,7.09,True,Male,2002-08-27,88.15,78.96,2025,1384 Emily Knolls Suite 415,Apt. 313,15287,Mumbai,Uttar Pradesh,India,qgonzalez@gmail.com,001-588-505-4414,127829
 gloverjulie,Hailey Garner,IT-BI,5,8.26,True,Male,2002-08-16,92.42,75.87,2022,201 Ford Divide Suite 983,Apt. 829,62200,Bangalore,Delhi,India,ryan40@edwards.info,857.941.1334,831391
 holly09,Jeffrey Herrera,ECE,6,7.3,True,Male,2006-05-17,91.02,97.4,2025,0635 Sandra Track Suite 585,Apt. 964,52178,Lucknow,Delhi,India,matthewsmatthew@martinez.com,1537712316,663727
-pspence,Christina Harris,IT,2,8.65,True,Male,2000-11-13,72.43,63.5,2025,57199 Andrews Pine,Apt. 377,82662,Mumbai,Uttar Pradesh,India,wendyrobertson@hotmail.com,(824)453-0406,994133
+pspence,Christina Harris,IT,2,7.65,False,Male,2000-11-13,72.43,63.5,2026,57199 Andrews Pine,Apt. 377,82662,Mumbai,Uttar Pradesh,India,wendyrobertson@hotmail.com,(824)453-0406,994133
 zacharymarshall,Laura Sanchez,IT,1,8.95,True,Male,2001-07-23,81.96,64.27,2023,136 Burke Radial Suite 446,Suite 414,79901,Chennai,Karnataka,India,sandrahart@yahoo.com,(672)748-7491x51434,600520
 tammy47,Chad Potts,IT,4,9.99,False,Female,2002-10-11,67.88,71.41,2024,00465 Colon View,Suite 714,73942,Bangalore,Maharashtra,India,thomas10@gmail.com,325-913-5828x7745,666358
 codyjones,Tyler White,ECE,6,7.08,True,Male,2004-07-29,66.74,92.53,2025,9728 Kimberly Ferry,Suite 890,39387,Bangalore,Maharashtra,India,jared48@gmail.com,5767127997,197480
@@ -18,4 +18,6 @@ iit2022193,Ananya Mehra,IT-BI,7,8.45,True,Female,2006-07-21,97.60,91.85,2025,298
 iit2022345,Aditya Sharma,ECE,7,8.72,True,Male,2006-05-13,95.40,89.25,2026,143 Green Valley Road, Block B,56078,Kanpur,Uttar Pradesh,India,aditya.sharma95@example.com,981-123-4567,208001
 iit2022289,Simran Kaur,IT,7,8.88,True,Female,2006-09-10,96.20,90.10,2025,57 Blossom Heights, Apt 12B,56045,Noida,Uttar Pradesh,India,simran.kaur96@example.com,982-345-6789,201301
 iit2022987,Neha Verma,IT,6,9.04,False,Female,2005-11-27,93.20,87.60,2027,12 Rosewood Apartments, Sector 17,40076,Lucknow,Uttar Pradesh,India,neha.verma27@example.com,987-654-3210,226001
-iit2022235,Aastha Verma,IT,6,9.04,False,Female,2005-11-27,93.20,87.60,2027,12 Rosewood Apartments, Sector 17,40076,Lucknow,Uttar Pradesh,India,neha.verma27@example.com,987-654-3210,256001
+
+
+

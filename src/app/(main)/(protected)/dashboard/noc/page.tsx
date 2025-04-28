@@ -16,7 +16,6 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { api } from "~/trpc/react";
-
 export default function NocRequestPage() {
   const [formData, setFormData] = useState({
     name: "",
@@ -37,6 +36,9 @@ export default function NocRequestPage() {
     refetch,
   } = api.noc.getMyNoc.useQuery();
 
+
+  const { data: user, isLoading: userLoading } = api.user.getProfile.useQuery();
+
   const createNoc = api.noc.createNoc.useMutation({
     onSuccess: async () => {
       await refetch();
@@ -50,8 +52,18 @@ export default function NocRequestPage() {
 
   useEffect(() => {
     const today = new Date().toISOString().split("T")[0];
-    setFormData((prev) => ({ ...prev, todaysDate: today }));
-  }, []);
+    setFormData((prev) => ({ 
+      ...prev, 
+      todaysDate: today,
+      name: user?.name || "",
+      rollNo: user?.username
+    }));
+  }, [user]);
+
+  console.log("yaha dekho");
+  console.log(formData);
+  console.log(formData.name);
+  console.log(user);
 
   const handleChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -128,6 +140,15 @@ export default function NocRequestPage() {
       </Container>
     );
   }
+  else if(userLoading){
+    if (userLoading) {
+      return (
+        <Container className="flex justify-center items-center h-80">
+          <CircularProgress />
+        </Container>
+      );
+    }
+  }
 
   return (
     <Container fixed className="flex flex-col gap-8 py-4">
@@ -144,6 +165,10 @@ export default function NocRequestPage() {
             onChange={(e) => handleChange("name", e.target.value)}
             fullWidth
             required
+<<<<<<< HEAD
+            InputProps={{ readOnly: true }}
+=======
+>>>>>>> 1ba27f01096cb393826dca44ff806b37932b6d90
           />
         </Grid>
         <Grid item xs={12} sm={6}>
@@ -153,6 +178,10 @@ export default function NocRequestPage() {
             onChange={(e) => handleChange("rollNo", e.target.value)}
             fullWidth
             required
+<<<<<<< HEAD
+            InputProps={{ readOnly: true }}
+=======
+>>>>>>> 1ba27f01096cb393826dca44ff806b37932b6d90
           />
         </Grid>
         <Grid item xs={12} sm={6}>
