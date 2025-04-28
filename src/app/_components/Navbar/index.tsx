@@ -1,8 +1,11 @@
+
+
+
 "use client";
 
 import { useMemo, useRef, useState } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation"; // ✨ Added usePathname
 import { signOut, useSession } from "next-auth/react";
 
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
@@ -18,10 +21,12 @@ import {
   MenuItem,
   Toolbar,
   Typography,
-} from "@mui/material/index";
+} from "@mui/material";
 
 import useThemeContext from "~/app/_utils/theme/ThemeContext";
-import Logo from "~/assets/logo.svg";
+
+import Logo from "~/assets/logo.svg"; // Default logo
+import LandingLogo from "~/assets/logoo.png"; // ✨ New landing logo
 
 import ThemeSwitch from "./ThemeSwitch";
 import YearSelector from "./YearSelector";
@@ -33,14 +38,15 @@ export default function Navbar({
   setIsDrawerOpen?: React.Dispatch<React.SetStateAction<boolean>>;
   noSidebar?: boolean;
 }) {
-  let router = useRouter();
+  const router = useRouter();
+  const pathname = usePathname(); // ✨ Get current path
 
-  let { themeMode, toggleTheme } = useThemeContext();
-  let [menuOpen, setMenuOpen] = useState(false);
-  let [sideMenuOpen, setSideMenuOpen] = useState(false);
-  let sideMenuRef = useRef(null);
-  let menuRef = useRef(null);
-  let { data: session, status } = useSession();
+  const { themeMode, toggleTheme } = useThemeContext();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [sideMenuOpen, setSideMenuOpen] = useState(false);
+  const sideMenuRef = useRef(null);
+  const menuRef = useRef(null);
+  const { data: session, status } = useSession();
 
   const isStudent = useMemo(() => {
     return session?.user.userGroup === "student";
@@ -49,6 +55,9 @@ export default function Navbar({
   function handleLogout() {
     signOut();
   }
+
+  
+  const selectedLogo = pathname === "/" ? LandingLogo.src : Logo.src;
 
   return (
     <AppBar
@@ -73,16 +82,17 @@ export default function Navbar({
               size="large"
               color="primary"
               className="md:hidden mr-4"
-              onClick={() => setIsDrawerOpen((prev) => !prev)}
+              onClick={() => setIsDrawerOpen?.((prev) => !prev)}
             >
               <MenuIcon />
             </IconButton>
           )}
 
           <Box className="flex flex-row gap-2">
+            {/* Mobile Logo */}
             <Image
-              src={Logo.src}
-              alt="Utkarsh Logo"
+              src={selectedLogo}
+              alt="Logo"
               width={32}
               height={32}
               className="cursor-pointer block md:hidden"
@@ -90,9 +100,10 @@ export default function Navbar({
                 router.push("/");
               }}
             />
+            {/* Desktop Logo */}
             <Image
-              src={Logo.src}
-              alt="Utkarsh Logo"
+              src={selectedLogo}
+              alt="Logo"
               width={40}
               height={40}
               className="cursor-pointer hidden md:block"
@@ -100,6 +111,7 @@ export default function Navbar({
                 router.push("/");
               }}
             />
+            {/* Title */}
             <Typography
               variant="h1"
               fontFamily={"'Oswald Variable', sans-serif"}
@@ -110,7 +122,7 @@ export default function Navbar({
                 router.push("/");
               }}
             >
-              Utkarsh
+             {pathname === "/" ? "Utkarsh-Placement Portal, IIIT Allahabad" : "Utkarsh"}
             </Typography>
             <Typography
               variant="h1"
@@ -122,9 +134,11 @@ export default function Navbar({
                 router.push("/");
               }}
             >
-              Utkarsh
+             {pathname === "/" ? "Utkarsh-Placement Portal, IIIT Allahabad" : "Utkarsh"}
             </Typography>
           </Box>
+
+          {/* Desktop Menu */}
           <div className="flex-row justify-end items-center gap-2 hidden md:flex">
             {status !== "loading" &&
               (session ? (
@@ -195,7 +209,6 @@ export default function Navbar({
                     checked={themeMode === "dark"}
                     onClick={toggleTheme}
                   />
-
                   <Button
                     aria-label="Login Button"
                     variant="outlined"
@@ -209,6 +222,8 @@ export default function Navbar({
                 </>
               ))}
           </div>
+
+          {/* Mobile Menu */}
           <IconButton
             size="large"
             color="primary"
@@ -246,28 +261,26 @@ export default function Navbar({
             </MenuItem>
             {status !== "loading" &&
               (session ? (
-                [
-                  isStudent && (
+                <>
+                  {isStudent && (
                     <MenuItem
                       onClick={() => {
                         router.push("/dashboard/profile");
                         setSideMenuOpen(false);
                       }}
-                      key="profile"
                     >
                       My Profile
                     </MenuItem>
-                  ),
+                  )}
                   <MenuItem
                     onClick={() => {
                       handleLogout();
                       setSideMenuOpen(false);
                     }}
-                    key="logout"
                   >
                     Log Out
-                  </MenuItem>,
-                ]
+                  </MenuItem>
+                </>
               ) : (
                 <MenuItem
                   onClick={() => {
@@ -284,3 +297,4 @@ export default function Navbar({
     </AppBar>
   );
 }
+
