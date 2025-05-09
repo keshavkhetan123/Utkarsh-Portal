@@ -17,78 +17,88 @@ export const analyticsRouter = createTRPCRouter({
   }),
 
   getJobTypeSelectionAnalytics: roleProtectedProcedure(['superAdmin', 'PlacementCoreTeam', 'PlacementTeamMember'])
-    .input(z.string())
-    .query(async ({ ctx, input }) => {
-      const groups = await ctx.db.participatingGroups.findMany({
-        where: {
-          placementTypeId: input,
-          year: ctx.session.user.year,
-        },
-      });
+  .input(z.object({
+    filterType: z.enum(["program", "Caste", "Religion", "gender","PWD"]),
+  }))
+  .query(async ({ ctx, input }) => {
+    const { filterType } = input;
 
-      const dbData = await ctx.db.$transaction([
-        ...groups.map((grp) => {
-          return ctx.db.students.count({
-            where: {
-              passOutYear: grp.passOutYear,
-              program: grp.program,
-            },
-            select: {
-              _all: true,
-            },
-          });
-        }),
-        ...groups.map((grp) => {
-          return ctx.db.students.count({
-            where: {
-              passOutYear: grp.passOutYear,
-              program: grp.program,
-              selections: {
-                some: {
-                  year: ctx.session.user.year,
-                  jobType: input,
-                },
-              },
-            },
-            select: {
-              _all: true,
-            },
-          });
-        }),
-      ]);
-      let i = 0;
-      const data: {
-        group: (typeof groups)[number];
-        all: number;
-        selected: number;
-      }[] = [];
-      let totalCnt = 0;
-      let selectedCnt = 0;
-      for (i = 0; i < groups.length; i++) {
-        let allData = dbData[i];
-        let selectedData = dbData[i + groups.length];
-        totalCnt += allData["_all"];
-        selectedCnt += selectedData["_all"];
-        data.push({
-          group: groups[i],
-          all: allData["_all"],
-          selected: selectedData["_all"],
-        });
-      }
-      data.push({
-        group: {
-          id: "total",
-          year: ctx.session.user.year,
-          passOutYear: null,
-          program: "Unselected",
-          placementTypeId: input,
-        },
-        all: totalCnt,
-        selected: totalCnt - selectedCnt,
-      });
+    // Fetch all selected students
+    const selectedStudents = await ctx.db.selectedStudents.findMany({
+      where: {
+        year: ctx.session.user.year,
+      },
+      select: {
+        userId: true,
+        jobType: true,
+      },
+    });
 
-      return data;
-    }),
+    // Fetch all students
+    const allStudents = await ctx.db.students.findMany({
+      where: {
+        passOutYear: ctx.session.user.year,
+      },
+      select: {
+        userId: true,
+        [filterType]: true,
+      },
+    });
+    // Set to track the selected student IDs for efficient look-up
+    const selectedStudentIds = new Set(selectedStudents.map((s) => s.userId));
+
+    // Group data by filterType and jobType
+    const groupedData: Record<string, Record<string, { selected: number; all: number }>> = {};
+
+    // Loop through all students to classify them based on filterType and jobType
+   // Initialize a filterCount map to keep track of all students for each filter group
+const filterCount: Map<string, number> = new Map();
+
+for (const student of allStudents) {
+  const filterKey = (student as any)[filterType] ?? "Unknown"; // e.g., "Hindu" for Religion, "CSE" for program
+
+  // Increment the count for the filterKey (total students for that filterType)
+  filterCount.set(filterKey, (filterCount.get(filterKey) || 0) + 1);
+
+  // Initialize the group in groupedData if it doesn't exist yet
+  if (!groupedData[filterKey]) {
+    groupedData[filterKey] = {};
+  }
+
+  // Loop through selected students and increment the count for the corresponding jobType
+  const studentJobType = selectedStudents.find((s) => s.userId === student.userId)?.jobType ?? "Unplaced";
+  
+  if (!groupedData[filterKey][studentJobType]) {
+    groupedData[filterKey][studentJobType] = { selected: 0, all: 0 };
+  }
+
+  // Increment the "all" count for this filterType and jobType
+  groupedData[filterKey][studentJobType].all += 1;
+
+  // Increment the "selected" count if this student is selected for the jobType
+  if (selectedStudentIds.has(student.userId)) {
+    groupedData[filterKey][studentJobType].selected += 1;
+  }
+}
+
+// Now you can use the filterCount map to get the total count of students for each filter group
+console.log(filterCount); // This will give you the total count of students for each filter group
+
+
+    // Convert the grouped data into an array format
+    const result = Object.entries(groupedData).map(([filterValue, jobTypes]) => ({
+      group: { filterType: filterValue },
+      jobTypes: Object.entries(jobTypes).map(([jobType, stats]) => ({
+        jobType,
+        all: stats.all,
+        totalStudents: allStudents.length,
+        selected: stats.selected,
+      })),
+      filterCount,
+    }));
+console.log("result ",result);
+    return result;
+  }),
 
   getJobTypePaymentAnalytics: roleProtectedProcedure('superAdmin')
     .input(z.string())

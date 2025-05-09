@@ -20,6 +20,7 @@ export const studentRouter = createTRPCRouter({
         program: true,
         email: true,
         phone: true,
+        backlog: true,
         user: {
           select: {
             name: true,
@@ -46,11 +47,22 @@ export const studentRouter = createTRPCRouter({
           passOutYear: userData.passOutYear,
           currentSemester: userData.currentSem,
           cgpa: userData.cgpa,
+          backlog: userData.backlog,
+        },
+      });
+
+      await ctx.db.user.update({
+        where: {
+          id: ctx.session.user.id,
+        },
+        data: {
+          year : userData.passOutYear,
         },
       });
 
       return "Ok";
     }),
+
   updateStudentDetails: protectedProcedure
     .input(
       z.object({

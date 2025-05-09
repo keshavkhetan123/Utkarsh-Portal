@@ -3,7 +3,7 @@
 import React, { useMemo, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 
 import {
   Container,
@@ -65,6 +65,7 @@ export default function NewJobOpening() {
           onboardingComplete: true,
         },
       });
+      signOut();
       router.refresh();
     },
   });
@@ -118,7 +119,7 @@ export default function NewJobOpening() {
           backdropFilter: "blur(10px)",
         }}
       >
-        Created by Sugam Sareen and his team
+        Created by IIITA Students
       </Container>
     </div>
   );

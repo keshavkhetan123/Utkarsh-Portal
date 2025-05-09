@@ -16,6 +16,10 @@ export const userRouter = createTRPCRouter({
     return result;
   }),
 
+  getProfile: roleProtectedProcedure("student").query(({ ctx }) => {
+    const { name, username } = ctx.session.user;
+    return { name, username };
+  }),
   searchUser: roleProtectedProcedure(['superAdmin','PlacementCoreTeam','PlacementTeamMember']).input(
     z.object({
       q: z.string(),

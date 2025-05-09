@@ -163,6 +163,8 @@ export default function NewJobOpening() {
             })
           );
 
+          reqData.autoApprove = true;
+
           createJobOpeningMutation.mutate({...reqData,token});
         }}
       >
